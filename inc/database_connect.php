@@ -573,7 +573,7 @@ function update_japanese_word_count($japid) {
         
     // STEP 1: write the useful info to a file
     $db_to_mecab = tempnam(sys_get_temp_dir(), "{$tbpref}db_to_mecab");
-    $mecab_args = ' -F %m%t\\t -U %m%t\\t -E \\n ';
+    $mecab_args = ' -F %m%t\\t -U %m%t\\t -E ""';
     $mecab = get_mecab_path($mecab_args);
 
     $sql = "SELECT WoID, WoTextLC FROM {$tbpref}words 
@@ -745,7 +745,7 @@ function parse_japanese_text($text, $id)
 
     $file_name = tempnam(sys_get_temp_dir(), $tbpref . "tmpti");
     // We use the format "word  num num" for all nodes
-    $mecab_args = " -F %m\\t%t\\t%h\\n -U %m\\t%t\\t%h\\n -E EOS\\t3\\t7\\n";
+    $mecab_args = " -F %m\\t%t\\t%h\\n -U %m\\t%t\\t%h\\n -E ''";
     $mecab_args .= " -o $file_name ";
     $mecab = get_mecab_path($mecab_args);
     
@@ -773,7 +773,7 @@ function parse_japanese_text($text, $id)
                 $id>0 ?
                 "(SELECT ifnull(max(`SeID`)+1,1) FROM `{$tbpref}sentences`)" 
                 : 1 
-            ) . ", @count:=0,@last_term_type:=0;"
+            ) . ", @count:=0,@last_term_type:=0, @at_sentence_end:=false;"
         );
         
         $sql = 
@@ -783,7 +783,11 @@ function parse_japanese_text($text, $id)
         LINES TERMINATED BY '" . PHP_EOL . "' 
         (@term, @node_type, @third)
         SET 
-        TiSeID = IF(@term_type=2 OR (@term='EOS' AND @third='7'), @sid:=@sid+1,@sid),
+        TiSeID = CASE
+                WHEN (@at_sentence_end = true AND @node_type != 3) THEN @sid:=@sid+1+(@at_sentence_end := false)
+                WHEN (@node_type = 3 AND @term NOT IN ('「', '」', '【', '】', '、', '，', '…', '‥', '『', '』', '〝', '〟', '：')) THEN @sid:=@sid*(@at_sentence_end := true)
+            ELSE @sid
+        END,
         TiCount = (@count:= @count + CHAR_LENGTH(@term)) + 1 - CHAR_LENGTH(@term),
         TiOrder = IF(
             CASE
