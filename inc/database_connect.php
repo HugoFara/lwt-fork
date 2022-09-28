@@ -1202,7 +1202,7 @@ function check_text($sql, $rtlScript, $wl)
     ?>
 <script type="text/javascript">
     MWORDS = <?php echo json_encode($mw) ?>;
-    if (<?php echo json_encode($rtlScript); ?>) {
+    if (<?php echo $rtlScript; ?>) {
         $(function() {
             $("li").attr("dir", "rtl");
         });
