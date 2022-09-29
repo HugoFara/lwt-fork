@@ -773,9 +773,8 @@ function parse_japanese_text($text, $id)
                 $id>0 ?
                 "(SELECT ifnull(max(`SeID`)+1,1) FROM `{$tbpref}sentences`)" 
                 : 1 
-            ) . ", @count:=0,@last_term_type:=0, @at_sentence_end:=false, @inside_quote=false;"
+            ) . ", @count:=0,@last_term_type:=0, @at_sentence_end:=false, @inside_quote:=0;"
         );
-        
         $sql = 
         "LOAD DATA LOCAL INFILE " . convert_string_to_sqlsyntax($file_name) . "
         INTO TABLE {$tbpref}temptextitems2
@@ -784,10 +783,10 @@ function parse_japanese_text($text, $id)
         (@term, @node_type, @third)
         SET 
         TiSeID = CASE
-            WHEN (@inside_quote = false AND @term IN ('「', '【', '『', '〝')) THEN @sid:=@sid+(@inside_quote := true)*(@at_sentence_end := false)
-            WHEN (@inside_quote = true AND @term IN ('】', '」', '』', '〟')) THEN @sid:=@sid+(@inside_quote := false)*(@at_sentence_end := false)
-            WHEN (@inside_quote = false AND @at_sentence_end = true AND (@node_type != 3 OR @term IN ('「', '」', '【', '】', '、', '，', '…', '‥', '『', '』', '〝', '〟', '：', '――'))) THEN @sid:=@sid+1+(@at_sentence_end := false)
-            WHEN (@inside_quote = false AND @node_type = 3 AND @term NOT IN ('「', '」', '【', '】', '、', '，', '…', '‥', '『', '』', '〝', '〟', '：', '――')) THEN @sid:=@sid*(@at_sentence_end := true)
+            WHEN (@inside_quote = 0 AND @term IN ('「', '【', '『', '〝')) THEN @sid:=@sid+(@inside_quote := @inside_quote + 1)*(@at_sentence_end := false)
+            WHEN (@inside_quote > 0 AND @term IN ('】', '」', '』', '〟')) THEN @sid:=@sid+(@inside_quote := @inside_quote - 1)*(@at_sentence_end := false)
+            WHEN (@inside_quote = 0 AND @at_sentence_end = true AND (@node_type != 3 OR @term IN ('「', '」', '【', '】', '、', '，', '…', '‥', '『', '』', '〝', '〟', '：', '――'))) THEN @sid:=@sid+1+(@at_sentence_end := false)
+            WHEN (@inside_quote = 0 AND @node_type = 3 AND @term NOT IN ('「', '」', '【', '】', '、', '，', '…', '‥', '『', '』', '〝', '〟', '：', '――')) THEN @sid:=@sid*(@at_sentence_end := true)
             ELSE @sid
         END,
         TiCount = (@count:= @count + CHAR_LENGTH(@term)) + 1 - CHAR_LENGTH(@term),
