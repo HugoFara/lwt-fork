@@ -33,14 +33,8 @@ function install_demo_db(): string
     global $tbpref;
     global $debug;
     global $dbname;
-    $message = "";
-    $lines = 0;
-    $ok = 0;
-    $errors = 0;
-    $firsterr = "";
-    $drops = 0;
-    $inserts = 0;
-    $creates = 0;
+    $error = "";
+    $failed = false;
     while (! feof($handle)) {
         $sql_line = trim(
             str_replace(
@@ -51,50 +45,30 @@ function install_demo_db(): string
                 )
             )
         );
-        if ($sql_line != "") {
-            if (substr($sql_line, 0, 3) !== '-- ' ) {
-                $res = mysqli_query($GLOBALS['DBCONNECTION'], insert_prefix_in_sql($sql_line));
-                $lines++;
-                if ($res == false) {
-                    $errors++;
-                    if ($firsterr == "") {
-                        $firsterr = $sql_line . ' => ' . mysqli_error($GLOBALS['DBCONNECTION']);
-                    }
-                }
-                else {
-                    $ok++;
-                    if (substr($sql_line, 0, 11) == "INSERT INTO") { 
-                        $inserts++; 
-                    }
-                    elseif (substr($sql_line, 0, 10) == "DROP TABLE") { 
-                        $drops++;
-                    } elseif (substr($sql_line, 0, 12) == "CREATE TABLE") { 
-                        $creates++;
-                    }
-                }
-                // echo $ok . " / " . tohtml(insert_prefix_in_sql($sql_line)) . "<br />";
+
+        if (($sql_line != "") && (substr($sql_line, 0, 3) !== '-- ')) {
+            $sql_line = insert_prefix_in_sql($sql_line);
+            $res = mysqli_query($GLOBALS['DBCONNECTION'], $sql_line);
+            if ($res == false) {
+                $failed = true;
+                $error = mysqli_error($GLOBALS['DBCONNECTION']);
+                break;
             }
         }
     } // while (! feof($handle))
     fclose($handle);
-    if ($errors == 0) {
-        runsql('DROP TABLE IF EXISTS ' . $tbpref . 'textitems', '');
-        check_update_db($debug, $tbpref, $dbname);
-        reparse_all_texts();
-        optimizedb();
-        get_tags(1);
-        get_texttags(1);
-        $message = "Success: Demo database installed - " .
-        $lines . " queries - " . $ok . 
-        " successful (" . $drops . "/" . $creates . " tables dropped/created, " . $inserts . " records added), " . 
-        $errors . " failed.";
-    } else if ($message == "") {
-        $message = "Error: Demo database NOT restored - " .
-        $lines . " queries - " . $ok . 
-        " successful (" . $drops . "/" . $creates . " tables dropped/created, " . $inserts . " records added), " . 
-        $errors . " failed.  First error: " . $firsterr;
+
+    if ($failed) {
+        return "Error: Demo database NOT restored: " . $error;
     }
-    return $message;
+
+    runsql('DROP TABLE IF EXISTS ' . $tbpref . 'textitems', '');
+    check_update_db($debug, $tbpref, $dbname);
+    reparse_all_texts();
+    optimizedb();
+    get_tags(1);
+    get_texttags(1);
+    return "Success: Demo database installed.";
 }
 
 
