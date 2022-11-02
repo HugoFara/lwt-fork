@@ -153,6 +153,12 @@ function do_test_test_sentence($wid, $lang, $wordlc)
         $sql = 'SELECT DISTINCT SeID 
         FROM ' . $tbpref . 'sentences, ' . $tbpref . 'textitems2 
         WHERE Ti2WoID = ' . $wid . $sentexcl . ' AND SeID = Ti2SeID AND SeLgID = ' . $lang . ' 
+        AND SeID NOT IN ( 
+          SELECT Ti2SeID 
+          FROM ' . $tbpref . 'textitems2 
+          WHERE Ti2WoID = 0 AND Ti2WordCount != 0 
+          GROUP BY Ti2SeID 
+        ) 
         ORDER BY rand() LIMIT 1';
         $res = do_mysqli_query($sql);
         $record = mysqli_fetch_assoc($res);
