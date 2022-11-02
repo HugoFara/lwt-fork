@@ -20,12 +20,12 @@ require_once 'database_connect.php';
  */
 function install_demo_db(): string 
 {
-    $file = getcwd() . '/db/install_demo_db.sql.gz';
+    $file = getcwd() . '/db/install_demo_db.sql';
     if (! file_exists($file) ) {
         return "Error: File ' . $file . ' does not exist";
     }
 
-    $handle = gzopen($file, "r");
+    $handle = fopen($file, "r");
     if ($handle === false) {
         return "Error: File ' . $file . ' could not be opened";
     }
@@ -41,13 +41,13 @@ function install_demo_db(): string
     $inserts = 0;
     $creates = 0;
     $start = 1;
-    while (! gzeof($handle)) {
+    while (! feof($handle)) {
         $sql_line = trim(
             str_replace(
                 "\r", "",
                 str_replace(
                     "\n", "",
-                    gzgets($handle, 99999)
+                    fgets($handle, 99999)
                 )
             )
         );
@@ -82,7 +82,7 @@ function install_demo_db(): string
             }
         }
     } // while (! feof($handle))
-    gzclose($handle);
+    fclose($handle);
     if ($errors == 0) {
         runsql('DROP TABLE IF EXISTS ' . $tbpref . 'textitems', '');
         check_update_db($debug, $tbpref, $dbname);
