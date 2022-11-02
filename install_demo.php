@@ -12,7 +12,7 @@ $message = '';
 // RESTORE DEMO
 
 if (isset($_REQUEST['install'])) {
-    $file = getcwd() . '/install_demo_db.sql.gz';
+    $file = getcwd() . '/db/install_demo_db.sql.gz';
     if (file_exists($file) ) {
         $handle = gzopen($file, "r");
         if ($handle === false) {
