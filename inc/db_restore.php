@@ -41,7 +41,6 @@ function install_demo_db(): string
     $drops = 0;
     $inserts = 0;
     $creates = 0;
-    $start = 1;
     while (! feof($handle)) {
         $sql_line = trim(
             str_replace(
@@ -53,15 +52,6 @@ function install_demo_db(): string
             )
         );
         if ($sql_line != "") {
-            if($start) {
-                if (strpos($sql_line, "-- lwt-backup-") === false and strpos($sql_line, "-- lwt-exp_version-backup-") === false) {
-                    $message = "Error: Invalid " . $title . " Restore file (possibly not created by LWT backup)";
-                    $errors = 1;
-                    break;
-                }
-                $start = 0;
-                continue;
-            }
             if (substr($sql_line, 0, 3) !== '-- ' ) {
                 $res = mysqli_query($GLOBALS['DBCONNECTION'], insert_prefix_in_sql($sql_line));
                 $lines++;

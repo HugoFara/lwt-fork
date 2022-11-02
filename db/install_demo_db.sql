@@ -1,6 +1,3 @@
--- lwt-backup--- /ensures that this can be imported via Restore/ 
--- 
--- --------------------------------------------------------------
 -- "Learning with Texts" (LWT) is free and unencumbered software 
 -- released into the PUBLIC DOMAIN.
 -- 
