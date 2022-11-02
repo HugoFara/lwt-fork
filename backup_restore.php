@@ -18,6 +18,7 @@
  */
 
 require_once 'inc/session_utility.php';
+require 'inc/db_restore.php';
 
 $message = '';
 
@@ -39,7 +40,7 @@ if (isset($_REQUEST['restore'])) {
             $message = "Error: Restore file could not be opened";
         } // $handle not OK
         else { // $handle OK
-            $message = restore_file($handle, "Database");
+            $message = restore_gzip($handle, "Database");
         } // $handle OK
     } // restore file specified
     else {

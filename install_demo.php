@@ -6,6 +6,7 @@ Install LWT Demo Database
  ***************************************************************/
 
 require_once 'inc/session_utility.php';
+require 'inc/db_restore.php';
 
 $message = '';
 
@@ -19,7 +20,7 @@ if (isset($_REQUEST['install'])) {
             $message = "Error: File ' . $file . ' could not be opened";
         } // $handle not OK
         else { // $handle OK
-            $message = restore_file($handle, "Demo Database");
+            $message = restore_gzip($handle, "Demo Database");
         } // $handle OK
     } // restore file specified
     else {
