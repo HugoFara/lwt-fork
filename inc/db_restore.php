@@ -37,6 +37,7 @@ function install_demo_db(): string
     $lines = 0;
     $ok = 0;
     $errors = 0;
+    $firsterr = "";
     $drops = 0;
     $inserts = 0;
     $creates = 0;
@@ -62,10 +63,13 @@ function install_demo_db(): string
                 continue;
             }
             if (substr($sql_line, 0, 3) !== '-- ' ) {
-                do_mysqli_query(insert_prefix_in_sql($sql_line)); // merge conflict
                 $res = mysqli_query($GLOBALS['DBCONNECTION'], insert_prefix_in_sql($sql_line));
                 $lines++;
-                if ($res == false) { $errors++; 
+                if ($res == false) {
+                    $errors++;
+                    if ($firsterr == "") {
+                        $firsterr = $sql_line . ' => ' . mysqli_error($GLOBALS['DBCONNECTION']);
+                    }
                 }
                 else {
                     $ok++;
@@ -98,7 +102,7 @@ function install_demo_db(): string
         $message = "Error: Demo database NOT restored - " .
         $lines . " queries - " . $ok . 
         " successful (" . $drops . "/" . $creates . " tables dropped/created, " . $inserts . " records added), " . 
-        $errors . " failed.";
+        $errors . " failed.  First error: " . $firsterr;
     }
     return $message;
 }
