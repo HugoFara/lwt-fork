@@ -12,6 +12,23 @@ require_once 'database_connect.php';
 
 
 /**
+ * Finalize db tables and optimize.
+ */
+function finalize_restore() {
+    global $tbpref;
+    global $debug;
+    global $dbname;
+
+    runsql('DROP TABLE IF EXISTS ' . $tbpref . 'textitems', '');
+    check_update_db($debug, $tbpref, $dbname);
+    reparse_all_texts();
+    optimizedb();
+    get_tags(1);
+    get_texttags(1);
+}
+
+
+/**
  * Install the demo db.
  * 
  * @global string $tbpref Table name prefix
@@ -31,8 +48,6 @@ function install_demo_db(): string
     }
 
     global $tbpref;
-    global $debug;
-    global $dbname;
     $error = "";
     $failed = false;
     while (! feof($handle)) {
@@ -62,12 +77,7 @@ function install_demo_db(): string
         return "Error: Demo database NOT restored: " . $error;
     }
 
-    runsql('DROP TABLE IF EXISTS ' . $tbpref . 'textitems', '');
-    check_update_db($debug, $tbpref, $dbname);
-    reparse_all_texts();
-    optimizedb();
-    get_tags(1);
-    get_texttags(1);
+    finalize_restore();
     return "Success: Demo database installed.";
 }
 
@@ -82,8 +92,6 @@ function install_demo_db(): string
 function restore_gzip($handle, $title): string 
 {
     global $tbpref;
-    global $debug;
-    global $dbname;
     $message = "";
     $lines = 0;
     $ok = 0;
@@ -134,12 +142,7 @@ function restore_gzip($handle, $title): string
     } // while (! feof($handle))
     gzclose($handle);
     if ($errors == 0) {
-        runsql('DROP TABLE IF EXISTS ' . $tbpref . 'textitems', '');
-        check_update_db($debug, $tbpref, $dbname);
-        reparse_all_texts();
-        optimizedb();
-        get_tags(1);
-        get_texttags(1);
+        finalize_restore();
         $message = "Success: " . $title . " restored - " .
         $lines . " queries - " . $ok . 
         " successful (" . $drops . "/" . $creates . " tables dropped/created, " . $inserts . " records added), " . 
