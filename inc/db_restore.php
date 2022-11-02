@@ -66,6 +66,7 @@ function execute_sql_file($file): array
             if ($res == false) {
                 $failed = true;
                 $error = mysqli_error($GLOBALS['DBCONNECTION']);
+                $error = $sql_line . " => " . $error;
                 break;
             }
         }
@@ -89,7 +90,7 @@ function execute_sql_file($file): array
  */
 function install_demo_db(): string 
 {
-    $files = [ 'baseline_schema.sql', 'demo_data.sql' ];
+    $files = [ 'baseline_schema.sql', 'reference_data.sql', 'demo_data.sql' ];
     foreach ($files as $file) {
         $fullfile = getcwd() . '/db/' . $file;
         [ $result, $error ] = execute_sql_file($fullfile);

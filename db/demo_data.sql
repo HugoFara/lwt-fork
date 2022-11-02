@@ -66,58 +66,7 @@ INSERT INTO languages VALUES('7','Thai','http://dict.longdo.com/search/###',NULL
 INSERT INTO languages VALUES('8','Hebrew','*http://dictionary.reverso.net/hebrew-english/###',NULL,'*http://translate.google.com/?ie=UTF-8&sl=iw&tl=en&text=###','$y\\t$t\\n','150','','.!?:;','','\\x{0590}-\\x{05FF}','0','0','1');
 
 
-INSERT INTO settings VALUES('dbversion','v002000000');
-INSERT INTO settings VALUES('showallwords','0');
-INSERT INTO settings VALUES('currentlanguage','1');
-INSERT INTO settings VALUES('lastscorecalc','2020-10-03');
-INSERT INTO settings VALUES('set-text-h-frameheight-no-audio','140');
-INSERT INTO settings VALUES('set-text-h-frameheight-with-audio','200');
-INSERT INTO settings VALUES('set-text-l-framewidth-percent','50');
-INSERT INTO settings VALUES('set-text-r-frameheight-percent','50');
-INSERT INTO settings VALUES('set-test-h-frameheight','140');
-INSERT INTO settings VALUES('set-test-l-framewidth-percent','50');
-INSERT INTO settings VALUES('set-test-r-frameheight-percent','50');
-INSERT INTO settings VALUES('set-test-main-frame-waiting-time','0');
-INSERT INTO settings VALUES('set-test-edit-frame-waiting-time','500');
-INSERT INTO settings VALUES('set-test-sentence-count','1');
-INSERT INTO settings VALUES('set-term-sentence-count','1');
-INSERT INTO settings VALUES('set-archivedtexts-per-page','100');
-INSERT INTO settings VALUES('set-texts-per-page','10');
-INSERT INTO settings VALUES('set-terms-per-page','100');
-INSERT INTO settings VALUES('set-tags-per-page','100');
-INSERT INTO settings VALUES('set-show-text-word-counts','1');
-INSERT INTO settings VALUES('set-term-translation-delimiters','/;|');
-INSERT INTO settings VALUES('set-mobile-display-mode','0');
-INSERT INTO settings VALUES('set-similar-terms-count','0');
-INSERT INTO settings VALUES('currenttext','1');
-
-
-INSERT INTO tags VALUES('1','masc','');
-INSERT INTO tags VALUES('2','fem','');
-INSERT INTO tags VALUES('8','3p-sg','');
-INSERT INTO tags VALUES('5','1p-sg','');
-INSERT INTO tags VALUES('6','2p-sg','');
-INSERT INTO tags VALUES('7','verb','');
-INSERT INTO tags VALUES('9','1p-pl','');
-INSERT INTO tags VALUES('10','2p-pl','');
-INSERT INTO tags VALUES('11','3p-pl','');
-INSERT INTO tags VALUES('12','adj','');
-INSERT INTO tags VALUES('13','adv','');
-INSERT INTO tags VALUES('14','interj','');
-INSERT INTO tags VALUES('15','conj','');
-INSERT INTO tags VALUES('16','num','');
-INSERT INTO tags VALUES('17','infinitive','');
-INSERT INTO tags VALUES('18','noun','');
-INSERT INTO tags VALUES('19','pronoun','');
-INSERT INTO tags VALUES('20','informal','');
-INSERT INTO tags VALUES('21','colloc','');
-INSERT INTO tags VALUES('22','pres','');
-INSERT INTO tags VALUES('23','impf','');
-INSERT INTO tags VALUES('24','subj','');
-INSERT INTO tags VALUES('25','pastpart','');
-INSERT INTO tags VALUES('26','prespart','');
-INSERT INTO tags VALUES('27','name','');
-INSERT INTO tags VALUES('28','greeting','');
+-- tags are created in reference_data.sql
 
 
 INSERT INTO tags2 VALUES('1','demo','');
@@ -427,4 +376,10 @@ INSERT INTO wordtags VALUES('151','19');
 INSERT INTO wordtags VALUES('171','13');
 INSERT INTO wordtags VALUES('175','12');
 INSERT INTO wordtags VALUES('175','16');
+
+
+-- Settings are created in reference_data.sql
+UPDATE settings set StValue = '1' WHERE StKey = 'currentlanguage';
+UPDATE settings set StValue = '1' WHERE StKey = 'currenttext';
+UPDATE settings set StValue = '2020-10-03' WHERE StKey = 'lastscorecalc';
 
