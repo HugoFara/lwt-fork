@@ -29,22 +29,21 @@ function finalize_restore() {
 
 
 /**
- * Install the demo db.
+ * Execute a given filename.
  * 
  * @global string $tbpref Table name prefix
  * 
- * @return string message.
+ * @return [ boolean pass_or_fail, string message ]
  */
-function install_demo_db(): string 
+function execute_sql_file($file): array
 {
-    $file = getcwd() . '/db/install_demo_db.sql';
     if (! file_exists($file) ) {
-        return "Error: File ' . $file . ' does not exist";
+        return [ false, "Error: File ' . $file . ' does not exist" ];
     }
 
     $handle = fopen($file, "r");
     if ($handle === false) {
-        return "Error: File ' . $file . ' could not be opened";
+        return [ false, "Error: File ' . $file . ' could not be opened" ];
     }
 
     global $tbpref;
@@ -74,7 +73,29 @@ function install_demo_db(): string
     fclose($handle);
 
     if ($failed) {
-        return "Error: Demo database NOT restored: " . $error;
+        return [ false, $error ];
+    }
+
+    return [ true, "" ];
+}
+
+
+/**
+ * Install the demo db.
+ * 
+ * @global string $tbpref Table name prefix
+ * 
+ * @return string message.
+ */
+function install_demo_db(): string 
+{
+    $files = [ 'baseline_schema.sql', 'demo_data.sql' ];
+    foreach ($files as $file) {
+        $fullfile = getcwd() . '/db/' . $file;
+        [ $result, $error ] = execute_sql_file($fullfile);
+        if (! $result) {
+            return "Demo database NOT restored.  Error in " . $file . ": " . $error;
+        }
     }
 
     finalize_restore();
