@@ -149,7 +149,6 @@ function restore_gzip($handle, $title): string
                 continue;
             }
             if (substr($sql_line, 0, 3) !== '-- ' ) {
-                do_mysqli_query(insert_prefix_in_sql($sql_line)); // merge conflict
                 $res = mysqli_query($GLOBALS['DBCONNECTION'], insert_prefix_in_sql($sql_line));
                 $lines++;
                 if ($res == false) { $errors++; 
