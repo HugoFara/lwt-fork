@@ -10,22 +10,8 @@ require 'inc/db_restore.php';
 
 $message = '';
 
-// RESTORE DEMO
-
 if (isset($_REQUEST['install'])) {
-    $file = getcwd() . '/db/install_demo_db.sql.gz';
-    if (file_exists($file) ) {
-        $handle = gzopen($file, "r");
-        if ($handle === false) {
-            $message = "Error: File ' . $file . ' could not be opened";
-        } // $handle not OK
-        else { // $handle OK
-            $message = restore_gzip($handle, "Demo Database");
-        } // $handle OK
-    } // restore file specified
-    else {
-        $message = "Error: File ' . $file . ' does not exist";
-    }
+    $message = install_demo_db();
 } 
 
 pagestart('Install LWT Demo Database', true);
