@@ -218,12 +218,12 @@ If needed, increase in "<?php echo tohtml(php_ini_loaded_file()); ?>" and restar
 </td>
 </tr>
 <tr>
-<th class="th1 center">Install<br />LWT<br />Demo</th>
+<th class="th1 center">Install<br />LWT<br />Database</th>
 <td class="td1">
 <p class="smallgray2">
-The database <i><?php echo tohtml($dbname); ?></i> <?php echo $prefinfo; ?> will be <b>replaced</b> by the LWT demo database.</p>
+The database <i><?php echo tohtml($dbname); ?></i> <?php echo $prefinfo; ?> will be <b>replaced</b> by a new LWT database.</p>
 <p class="right">&nbsp;<br /> 
-<input type="button" value="Install LWT Demo Database" onclick="location.href='install_demo.php';" />
+<input type="button" value="Install LWT Database" onclick="location.href='install_demo.php';" />
 </td>
 </tr>
 <tr>

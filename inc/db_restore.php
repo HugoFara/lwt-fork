@@ -82,7 +82,42 @@ function execute_sql_file($file): array
 
 
 /**
- * Install the demo db.
+ * Install a db using a set of files.
+ * 
+ * @global string $tbpref Table name prefix
+ * 
+ * @return string message.
+ */
+function install_db_fileset($files, $name): string 
+{
+    foreach ($files as $file) {
+        $fullfile = getcwd() . '/db/' . $file;
+        [ $result, $error ] = execute_sql_file($fullfile);
+        if (! $result) {
+            return $name . " NOT installed.  Error in " . $file . ": " . $error;
+        }
+    }
+
+    finalize_restore();
+    return "Success: " . $name . " installed.";
+}
+
+
+/**
+ * Install a new db, with no demo data.
+ * 
+ * @global string $tbpref Table name prefix
+ * 
+ * @return string message.
+ */
+function install_new_db(): string 
+{
+    return install_db_fileset([ 'baseline_schema.sql', 'reference_data.sql' ], "New database");
+}
+
+
+/**
+ * Install the db, including demo data.
  * 
  * @global string $tbpref Table name prefix
  * 
@@ -90,18 +125,10 @@ function execute_sql_file($file): array
  */
 function install_demo_db(): string 
 {
-    $files = [ 'baseline_schema.sql', 'reference_data.sql', 'demo_data.sql' ];
-    foreach ($files as $file) {
-        $fullfile = getcwd() . '/db/' . $file;
-        [ $result, $error ] = execute_sql_file($fullfile);
-        if (! $result) {
-            return "Demo database NOT restored.  Error in " . $file . ": " . $error;
-        }
-    }
-
-    finalize_restore();
-    return "Success: Demo database installed.";
+    return install_db_fileset([ 'baseline_schema.sql', 'reference_data.sql', 'demo_data.sql' ], "New database and demo data");
 }
+
+
 
 
 /**

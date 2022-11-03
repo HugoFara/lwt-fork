@@ -10,11 +10,14 @@ require 'inc/db_restore.php';
 
 $message = '';
 
-if (isset($_REQUEST['install'])) {
+if (isset($_REQUEST['install_new'])) {
+    $message = install_new_db();
+} 
+if (isset($_REQUEST['install_demo'])) {
     $message = install_demo_db();
 } 
 
-pagestart('Install LWT Demo Database', true);
+pagestart('Install LWT Database', true);
 
 echo error_message_with_hide($message, 1);
 
@@ -31,10 +34,10 @@ else {
 <form enctype="multipart/form-data" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post" onsubmit="return confirm('Are you sure?');">
 <table class="tab3" cellspacing="0" cellpadding="5">
 <tr>
-<th class="th1 center">Install Demo</th>
+<th class="th1 center">Install Database</th>
 <td class="td1">
 <p class="smallgray2">
-The database <i><?php echo tohtml($dbname); ?></i> <?php echo $prefinfo; ?> will be <b>replaced</b> by the LWT demo database.
+The database <i><?php echo tohtml($dbname); ?></i> <?php echo $prefinfo; ?> will be <b>replaced</b> with a new database.
 
 <?php 
 if ($langcnt > 0 ) { 
@@ -45,8 +48,9 @@ if ($langcnt > 0 ) {
 ?>
 
 </p>
-<p class="right">&nbsp;<br /><span class="red2">YOU MAY LOSE DATA - BE CAREFUL: &nbsp; &nbsp; &nbsp;</span> 
-<input type="submit" name="install" value="Install LWT demo database" /></p>
+<p><br /><span class="red2" style="align:left;">YOU MAY LOSE DATA - BE CAREFUL!</span></p>
+<p><input type="submit" name="install_new" value="Install new empty LWT database" /></p>
+<p><input type="submit" name="install_demo" value="Install LWT database with demo data" /></p>
 </td>
 </tr>
 <tr>
