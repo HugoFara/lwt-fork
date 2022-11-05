@@ -1,7 +1,9 @@
-set -e
+# set -e
+# set -x
 
 FILES=`find . -name '*.*' -print0 | xargs -0 grep -l tbpref 2>/dev/null`;
 # FILES=`echo ./inc/database_connect.php`
+echo $FILES
 
 for f in $FILES; do
     echo "$f"
