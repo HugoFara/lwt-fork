@@ -1,7 +1,5 @@
-set +x
-
 FILES=`find . -name '*.*' -print0 | xargs -0 grep -l tbpref 2>/dev/null`;
-FILES=`echo ./edit_words.php`
+# FILES=`echo ./edit_words.php`
 
 for f in $FILES; do
     echo "$f"
