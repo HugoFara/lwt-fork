@@ -3431,7 +3431,7 @@ function getSentence($seid, $wordlc, $mode): array
     if (isset($nextseid)) $seidlist .= ',' . $nextseid;
     }
     }
-    $sql2 = 'SELECT TiText, TiTextLC, TiWordCount, TiIsNotWord FROM ' . $tbpref . 'textitems WHERE TiSeID in (' . $seidlist . ') and TiTxID=' . $txtid . ' order by TiOrder asc, TiWordCount desc';
+    $sql2 = 'SELECT TiText, TiTextLC, TiWordCount, TiIsNotWord FROM textitems WHERE TiSeID in (' . $seidlist . ') and TiTxID=' . $txtid . ' order by TiOrder asc, TiWordCount desc';
     $res2 = do_mysqli_query($sql2);
     $sejs=''; 
     $se='';
@@ -4109,7 +4109,7 @@ function restore_file($handle, $title): string
     } // while (! feof($handle))
     gzclose($handle);
     if ($errors == 0) {
-        runsql("DROP TABLE IF EXISTS {$tbpref}textitems", '');
+        runsql("DROP TABLE IF EXISTS textitems", '');
         check_update_db($debug, $tbpref, $dbname);
         reparse_all_texts();
         optimizedb();
@@ -4392,7 +4392,7 @@ function refreshText($word,$tid): string
         return ''; 
     }
     $sql = 
-    'SELECT distinct TiSeID FROM ' . $tbpref . 'textitems 
+    'SELECT distinct TiSeID FROM textitems 
     WHERE TiIsNotWord = 0 AND TiTextLC = ' . convert_string_to_sqlsyntax($wordlc) . ' 
     AND TiTxID = ' . $tid . ' 
     ORDER BY TiSeID';
@@ -4413,7 +4413,7 @@ function refreshText($word,$tid): string
     }
     $sql = 
     'SELECT TiWordCount AS Code, TiOrder, TiIsNotWord, WoID 
-    FROM (' . $tbpref . 'textitems 
+    FROM (textitems 
         LEFT JOIN words ON (TiTextLC = WoTextLC) AND (TiLgID = WoLgID)
     ) ' . $inlist . ' 
     ORDER BY TiOrder asc, TiWordCount desc';

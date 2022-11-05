@@ -1675,7 +1675,7 @@ function check_update_db($debug, $tbpref, $dbname): void
             ''
         );
         // Add data from the old database system
-        if (in_array($tbpref . 'textitems', $tables)) {
+        if (in_array('textitems', $tables)) {
             runsql(
                 'INSERT INTO textitems2 (
                     Ti2WoID, Ti2LgID, Ti2TxID, Ti2SeID, Ti2Order, Ti2WordCount, Ti2Text
@@ -1683,12 +1683,12 @@ function check_update_db($debug, $tbpref, $dbname): void
                 SELECT IFNULL(WoID,0), TiLgID, TiTxID, TiSeID, TiOrder, 
                 CASE WHEN TiIsNotWord = 1 THEN 0 ELSE TiWordCount END as WordCount, 
                 CASE WHEN STRCMP( TiText COLLATE utf8_bin ,TiTextLC)!=0 OR TiWordCount = 1 THEN TiText ELSE "" END as Text 
-                FROM ' . $tbpref . 'textitems 
+                FROM textitems 
                 LEFT JOIN words ON TiTextLC=WoTextLC AND TiLgID=WoLgID 
                 WHERE TiWordCount<2 OR WoID IS NOT NULL',
                 ''
             );
-            runsql('TRUNCATE ' . $tbpref . 'textitems', '');
+            runsql('TRUNCATE textitems', '');
         }
         $count++;
     }
