@@ -13,17 +13,17 @@
 FILES=`echo ./edit_texts.php`
 
 for f in $FILES; do
-    echo "$f"
+    # echo "$f"
 
-    echo "initial grep"
-    grep "\$tbpref" $f
-    echo "----------------"
+    # echo "initial grep"
+    # grep "\$tbpref" $f
+    # echo "----------------"
     LINES=$(grep "\$tbpref" $f | sed -Ee 's/^[[:space:]]*//g' | sed -Ee 's/[[:space:]]*$//g' | sort | uniq)
 
     HASBADLINE=0
     BADLINE=""
     while IFS= read -r line; do
-        echo "=> $line"
+        # echo "=> $line"
         OK=0
         if [[ "$line" =~ "@global string $tbpref" ]]; then
             OK=1
@@ -35,18 +35,15 @@ for f in $FILES; do
             OK=1
         fi
 
-        if [[ $OK -eq 1 ]]; then
-            echo "ok, this line matches one of the patterns"
-        else
-            echo "Bad line: ${line}"
+        if [[ $OK -eq 0 ]]; then
             BADLINE="$line"
             HASBADLINE=1
         fi
     done <<< "$LINES"
 
     if [[ $HASBADLINE -eq 0 ]]; then
-        echo "File only contains lines matching patterns, can clean it."
+        echo "Cleaning ${f}"
     else
-        echo "Can't clean file, has bad line ${BADLINE}"
+        echo "Skipping ${f}, has line ${BADLINE}"
     fi
 done
