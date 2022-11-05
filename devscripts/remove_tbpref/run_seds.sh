@@ -8,11 +8,12 @@ echo $FILES
 for f in $FILES; do
     echo "$f"
 
-    for tbl in archivedtexts archtexttags feedlinks languages newsfeeds sentences settings tags tags2 temptextitems tempwords textitems2 texts texttags tts words wordtags; do
-        echo "  $tbl"
+    for tbl in archivedtexts archtexttags feedlinks languages merge_words newsfeeds numbers sentences settings tags tags2 temptextitems tempwords textitems2 texts texttags tts words wordtags; do
+        # echo "  $tbl"
         sed -i "" "s/' \. \$tbpref \. '$tbl/$tbl/g" $f
         sed -i "" "s/\" \. \$tbpref \. \"$tbl/$tbl/g" $f
         sed -i "" "s/{\$tbpref}$tbl/$tbl/g" $f
         sed -i "" "s/in_array(\$tbpref \. '$tbl', \$tables)/in_array('$tbl', \$tables)/g" $f
+        sed -i "" "s/FROM ' \. \$tbpref \. \$table/FROM ' . \$table/g" $f
     done
 done
