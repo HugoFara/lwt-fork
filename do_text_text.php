@@ -30,7 +30,7 @@ function get_text_data($textid)
     global $tbpref;
     $sql = 
     'SELECT TxLgID, TxTitle, TxAnnotatedText, TxPosition 
-    FROM ' . $tbpref . 'texts
+    FROM texts
     WHERE TxID = ' . $textid;
     $res = do_mysqli_query($sql);
     $record = mysqli_fetch_assoc($res);
@@ -72,7 +72,7 @@ function get_language_settings($langid)
     $sql = 
     'SELECT LgName, LgDict1URI, LgDict2URI, LgGoogleTranslateURI, 
     LgTextSize, LgRemoveSpaces, LgRightToLeft
-    FROM ' . $tbpref . 'languages
+    FROM languages
     WHERE LgID = ' . $langid;
     $res = do_mysqli_query($sql);
     $record = mysqli_fetch_assoc($res);
@@ -422,7 +422,7 @@ function main_word_loop($textid, $showAll): void
         ELSE CHAR_LENGTH(`WoTextLC`) 
      END AS TiTextLength, 
      WoID, WoText, WoStatus, WoTranslation, WoRomanization
-     FROM {$tbpref}textitems2 LEFT JOIN {$tbpref}words ON Ti2WoID = WoID
+     FROM textitems2 LEFT JOIN words ON Ti2WoID = WoID
      WHERE Ti2TxID = $textid
      ORDER BY Ti2Order asc, Ti2WordCount desc";
     

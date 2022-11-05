@@ -55,7 +55,7 @@ if (isset($_REQUEST["action"])) {  // Action
     
         $lang = $_REQUEST["lang"];
         $langname = getLanguage($lang);
-        $sql = 'select TxID, TxTitle from ' . $tbpref . 'texts where TxLgID = ' . $lang . 
+        $sql = 'select TxID, TxTitle from texts where TxLgID = ' . $lang . 
         ' order by TxTitle';
         $res = do_mysqli_query($sql);
 
@@ -85,9 +85,9 @@ if (isset($_REQUEST["action"])) {  // Action
     
         $lang = $_REQUEST["lang"];
         $text = $_REQUEST["text"];
-        $texttitle = get_first_value('select TxTitle as value from ' . $tbpref . 'texts where TxID = ' . $text);
-        $textaudio = get_first_value('select TxAudioURI as value from ' . $tbpref . 'texts where TxID = ' . $text);
-        $sql = 'select SeID, SeText from ' . $tbpref . 'sentences where SeTxID = ' . $text . ' order by SeOrder';
+        $texttitle = get_first_value('select TxTitle as value from texts where TxID = ' . $text);
+        $textaudio = get_first_value('select TxAudioURI as value from texts where TxID = ' . $text);
+        $sql = 'select SeID, SeText from sentences where SeTxID = ' . $text . ' order by SeOrder';
         $res = do_mysqli_query($sql);
 
         ?>
@@ -142,11 +142,11 @@ if (isset($_REQUEST["action"])) {  // Action
         $text = $_REQUEST["text"];
         $sent = $_REQUEST["sent"];
         $senttext = get_first_value(
-            'SELECT SeText AS value FROM ' . $tbpref . 'sentences WHERE SeID = ' . $sent
+            'SELECT SeText AS value FROM sentences WHERE SeID = ' . $sent
         );
         $nextsent = get_first_value(
             'SELECT SeID AS value 
-            FROM ' . $tbpref . 'sentences 
+            FROM sentences 
             WHERE SeTxID = ' . $text . ' AND trim(SeText) != \'¶\' AND SeID > ' . $sent . ' 
             ORDER BY SeID 
             LIMIT 1'
@@ -160,7 +160,7 @@ if (isset($_REQUEST["action"])) {  // Action
             WoID, WoTranslation, WoRomanization, WoStatus 
             FROM (' . 
                 $tbpref . 'textitems2 
-                LEFT JOIN ' . $tbpref . 'words 
+                LEFT JOIN words 
                 ON (Ti2WoID = WoID) AND (Ti2LgID = WoLgID)
             ) 
             WHERE Ti2SeID = ' . $sent . ' 
@@ -305,7 +305,7 @@ span.status5 {
 <ul id="home" title="Mobile LWT" selected="true">
     <li class="group">Languages</li>
     <?php
-    $sql = 'select LgID, LgName from ' . $tbpref . 'languages where LgName<>"" order by LgName';
+    $sql = 'select LgID, LgName from languages where LgName<>"" order by LgName';
     $res = do_mysqli_query($sql);
     while ($record = mysqli_fetch_assoc($res)) {
         echo '<li><a href="mobile.php?action=2&amp;lang=' . $record["LgID"] . '">' .

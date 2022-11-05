@@ -35,17 +35,17 @@ if (isset($_REQUEST['term'])) {
         ')';
         $cnt++;
     }
-    $sqltext = "INSERT INTO {$tbpref}words (
+    $sqltext = "INSERT INTO words (
         WoLgID, WoTextLC, WoText, WoStatus, WoTranslation, WoSentence, 
         WoRomanization, WoStatusChanged," .  
         make_score_random_insert_update('iv') . "
     ) VALUES " . rtrim(implode(',', $sqlarr), ',');
     runsql($sqltext, '');
     $tooltip_mode = getSettingWithDefault('set-tooltip-mode');
-    $max = get_first_value("SELECT max(WoID) AS value FROM {$tbpref}words");
+    $max = get_first_value("SELECT max(WoID) AS value FROM words");
     $res = do_mysqli_query(
         "SELECT WoID, WoTextLC, WoStatus, WoTranslation 
-        FROM {$tbpref}words 
+        FROM words 
         where WoID > $max"
     );
     pagestart($cnt . ' New Word' . ($cnt != 1 ? 's' : '') . ' Saved', false);
@@ -79,8 +79,8 @@ if (isset($_REQUEST['term'])) {
     mysqli_free_result($res);
     flush();
     do_mysqli_query(
-        "UPDATE {$tbpref}textitems2 
-        JOIN {$tbpref}words 
+        "UPDATE textitems2 
+        JOIN words 
         ON lower(Ti2Text)=WoTextLC AND Ti2WordCount=1 AND Ti2LgID=WoLgID AND WoID>$max 
         SET Ti2WoID = WoID"
     );
@@ -105,7 +105,7 @@ if(isset($pos)) {
     $offset = '';
     $limit = (int)getSettingWithDefault('set-ggl-translation-per-page') + 1;
     $sql = 'select LgName, LgDict1URI, LgDict2URI, LgGoogleTranslateURI 
-    from ' . $tbpref . 'languages, ' . $tbpref . 'texts 
+    from languages, texts 
     where LgID = TxLgID and TxID = ' . $tid;
     $res = do_mysqli_query($sql);
     $record = mysqli_fetch_assoc($res);
@@ -372,7 +372,7 @@ function googleTranslateElementInit() {
     <?php
     $res = do_mysqli_query(
         'select Ti2Text as word,Ti2LgID,min(Ti2Order) as pos 
-        from ' . $tbpref . 'textitems2 
+        from textitems2 
         where Ti2WoID = 0 and Ti2TxID = ' . $tid . ' AND Ti2WordCount =1 
         group by LOWER(Ti2Text) 
         order by pos 

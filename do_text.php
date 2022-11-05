@@ -117,7 +117,7 @@ function do_text_page($textid)
     
     $audio = get_first_value(
         'SELECT TxAudioURI AS value 
-        FROM ' . $tbpref . 'texts 
+        FROM texts 
         WHERE TxID = ' . $textid
     );
     

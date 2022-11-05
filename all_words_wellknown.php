@@ -30,8 +30,8 @@ function all_words_wellknown_get_words($txid)
     global $tbpref;
     $sql = "SELECT DISTINCT Ti2Text, LOWER(Ti2Text) AS Ti2TextLC
     FROM ( 
-        {$tbpref}textitems2 
-        LEFT JOIN {$tbpref}words 
+        textitems2 
+        LEFT JOIN words 
         ON LOWER(Ti2Text) = WoTextLC AND Ti2LgID = WoLgID
     ) 
     WHERE WoID IS NULL AND Ti2WordCount = 1 AND Ti2TxID = $txid 
@@ -63,7 +63,7 @@ function all_words_wellknown_process_word($status, $term, $termlc, $langid)
         $rows = 0;
     } else {
         $message = runsql(
-            "INSERT INTO {$tbpref}words (
+            "INSERT INTO words (
                 WoLgID, WoText, WoTextLC, WoStatus, WoStatusChanged," 
                 . make_score_random_insert_update('iv') . 
             ") 
@@ -117,7 +117,7 @@ function all_words_wellknown_main_loop($txid, $status)
     global $tbpref;
     $langid = get_first_value(
         "SELECT TxLgID AS value 
-        FROM {$tbpref}texts 
+        FROM texts 
         WHERE TxID = $txid"
     );
     $javascript = "let title='';";
@@ -134,8 +134,8 @@ function all_words_wellknown_main_loop($txid, $status)
 
     // Associate existing textitems.
     runsql(
-        "UPDATE {$tbpref}words 
-        JOIN {$tbpref}textitems2 
+        "UPDATE words 
+        JOIN textitems2 
         ON Ti2WoID = 0 AND LOWER(Ti2Text) = WoTextLC AND Ti2LgID = WoLgID 
         SET Ti2WoID = WoID", 
         ''

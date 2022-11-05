@@ -38,9 +38,9 @@ function get_test_table_sql()
             exit();
         }
     } else if (isset($_REQUEST['lang'])) {
-        $testsql = ' ' . $tbpref . 'words where WoLgID = ' . $_REQUEST['lang'] . ' ';
+        $testsql = ' words where WoLgID = ' . $_REQUEST['lang'] . ' ';
     } else if (isset($_REQUEST['text'])) {
-        $testsql = ' ' . $tbpref . 'words, ' . $tbpref . 'textitems2 
+        $testsql = ' words, textitems2 
         WHERE Ti2LgID = WoLgID AND Ti2WoID = WoID AND Ti2TxID = ' . $_REQUEST['text'] . ' ';
     } else { 
         my_die("do_test_table.php called with wrong parameters"); 
@@ -63,7 +63,7 @@ function do_test_table_language_settings($testsql)
     }
 
     $sql = 'SELECT LgTextSize, LgRegexpWordCharacters, LgRightToLeft 
-    FROM ' . $tbpref . 'languages WHERE LgID = ' . $lang;
+    FROM languages WHERE LgID = ' . $lang;
     $res = do_mysqli_query($sql);
     $record = mysqli_fetch_assoc($res);
     mysqli_free_result($res);

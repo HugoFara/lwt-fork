@@ -44,9 +44,9 @@ function get_test_sql()
             exit();
         }
     } else if (isset($_REQUEST['lang'])) {
-        $testsql = " {$tbpref}words WHERE WoLgID = " . $_REQUEST['lang'] . " ";
+        $testsql = " words WHERE WoLgID = " . $_REQUEST['lang'] . " ";
     } else if (isset($_REQUEST['text'])) {
-        $testsql = " {$tbpref}words, {$tbpref}textitems2 
+        $testsql = " words, textitems2 
         WHERE Ti2LgID = WoLgID AND Ti2WoID = WoID AND Ti2TxID = " . 
         $_REQUEST['text'] . " ";
     } else {
@@ -156,24 +156,24 @@ function do_test_test_sentence($wid, $lang, $wordlc)
     $sent = null;
     // Select senetences where at least 70 % of words are known
     $sql = "SELECT DISTINCT SeID, UnknownRate
-    FROM {$tbpref}sentences
+    FROM sentences
     JOIN (
         SELECT total.Ti2SeID, UnknownWords / TotalWords AS UnknownRate
         FROM (
             SELECT Ti2SeID, COUNT(*) AS UnknownWords
-            FROM {$tbpref}textitems2
+            FROM textitems2
             WHERE Ti2WordCount = 1 AND Ti2WoID = 0
             GROUP BY Ti2SeID
         ) AS unknowns JOIN (
             SELECT Ti2SeID, COUNT(*) AS TotalWords
-            FROM {$tbpref}textitems2
+            FROM textitems2
             WHERE Ti2WordCount = 1
             GROUP BY Ti2SeID
         ) AS total
         ON unknowns.Ti2SeId = total.Ti2SeId
     ) AS ti_with_rate 
     ON SeID = ti_with_rate.Ti2SeID
-    JOIN {$tbpref}textitems2 AS ti_words
+    JOIN textitems2 AS ti_words
     ON SeID = ti_words.Ti2SeID
     WHERE Ti2WoID = $wid AND SeLgID = $lang AND UnknownRate < .3
     ORDER BY RAND() 
@@ -311,7 +311,7 @@ function prepare_test_area($testsql, $totaltests, $count, $testtype): int
     
     $sql = 'SELECT LgName, LgDict1URI, LgDict2URI, LgGoogleTranslateURI, LgTextSize, 
     LgRemoveSpaces, LgRegexpWordCharacters, LgRightToLeft 
-    FROM ' . $tbpref . 'languages WHERE LgID = ' . $lang;
+    FROM languages WHERE LgID = ' . $lang;
     $res = do_mysqli_query($sql);
     $record = mysqli_fetch_assoc($res);
     $wb1 = isset($record['LgDict1URI']) ? $record['LgDict1URI'] : "";
@@ -437,7 +437,7 @@ function do_test_test_javascript_interaction(
     $trans = repl_tab_nl($wo_record['WoTranslation']) . 
     getWordTagList($wid, ' ', 1, 0);
     $lang = get_first_value(
-        'SELECT LgName AS value FROM ' . $tbpref . 'languages
+        'SELECT LgName AS value FROM languages
         WHERE LgID = ' . $wo_record['WoLgID'] . '
         LIMIT 1'        
     );

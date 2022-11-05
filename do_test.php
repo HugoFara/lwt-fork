@@ -39,7 +39,7 @@ function get_l2_language_name()
     if (getreq('lang') != '') {
         $langid = (int) getreq('lang');
         $lang = (string) get_first_value(
-            'SELECT LgName AS value FROM ' . $tbpref . 'languages 
+            'SELECT LgName AS value FROM languages 
             WHERE LgID = ' . $langid . '
             LIMIT 1'
         ); 
@@ -47,8 +47,8 @@ function get_l2_language_name()
         $textid = (int) getreq('text');
         $lang = (string) get_first_value(
             'SELECT LgName AS value 
-            FROM ' . $tbpref . 'texts
-            JOIN ' . $tbpref . 'languages
+            FROM texts
+            JOIN languages
             ON TxLgID = LgID
             WHERE TxID = ' . $textid . '
             LIMIT 1'
@@ -61,7 +61,7 @@ function get_l2_language_name()
         if ($cntlang == 1) {
             $lang = (string) get_first_value(
                 'SELECT LgName AS value 
-                FROM ' . $tbpref . 'languages, ' . $testsql . ' AND LgID = WoLgID 
+                FROM languages, ' . $testsql . ' AND LgID = WoLgID 
                 LIMIT 1'
             ); 
         }

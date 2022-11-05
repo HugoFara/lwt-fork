@@ -19,11 +19,11 @@ $showAll = getSettingZeroOrOne('showallwords', 1);
 
 $tid = $_REQUEST['tid'];
 $wid = $_REQUEST['wid'];
-$word = get_first_value("select WoText as value from " . $tbpref . "words where WoID = " . $wid);
+$word = get_first_value("select WoText as value from words where WoID = " . $wid);
 pagestart("Term: " . $word, false);
-$m1 = runsql('delete from ' . $tbpref . 'words where WoID = ' . $wid, '');
+$m1 = runsql('delete from words where WoID = ' . $wid, '');
 adjust_autoincr('words', 'WoID');
-runsql('delete from ' . $tbpref . 'textitems2 where Ti2WordCount>1 AND Ti2WoID = ' . $wid, '');
+runsql('delete from textitems2 where Ti2WordCount>1 AND Ti2WoID = ' . $wid, '');
 
 echo "<p>OK, term deleted (" . $m1 . ").</p>";
 

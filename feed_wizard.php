@@ -22,7 +22,7 @@ function feed_wizard_edit_options()
         
     $result = do_mysqli_query(
         "SELECT LgName, LgID 
-        FROM " . $tbpref . "languages 
+        FROM languages 
         WHERE LgName<>'' 
         ORDER BY LgName"
     );
@@ -510,7 +510,7 @@ function feed_wizard_select_text()
         $_SESSION['wizard']['edit_feed']=$_REQUEST['edit_feed'];
         $result = do_mysqli_query(
             "SELECT * 
-            FROM " . $tbpref . "newsfeeds 
+            FROM newsfeeds 
             WHERE NfID=".$_REQUEST['edit_feed']
         );
         $row = mysqli_fetch_assoc($result);

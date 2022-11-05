@@ -35,7 +35,7 @@ function insert_new_word($textlc, $translation)
     echo '<h4><span class="bigger">' . $titletext . '</span></h4>';
 
     $message = runsql(
-        'INSERT INTO ' . $tbpref . 'words 
+        'INSERT INTO words 
         (
             WoLgID, WoTextLC, WoText, WoStatus, WoTranslation, 
             WoSentence, WoWordCount, WoRomanization, WoStatusChanged,' 
@@ -53,7 +53,7 @@ function insert_new_word($textlc, $translation)
     );
     $wid = get_last_key();
     do_mysqli_query(
-        'UPDATE ' . $tbpref . 'textitems2 SET Ti2WoID = ' . $wid . ' 
+        'UPDATE textitems2 SET Ti2WoID = ' . $wid . ' 
         WHERE Ti2LgID = ' . $_REQUEST["WoLgID"] . ' AND LOWER(Ti2Text) =' . 
         convert_string_to_sqlsyntax_notrim_nonull($textlc)
     );
@@ -83,7 +83,7 @@ function edit_term($translation)
     }
 
     $message = runsql(
-        'update ' . $tbpref . 'words set WoText = ' . 
+        'update words set WoText = ' . 
         convert_string_to_sqlsyntax($_REQUEST["WoText"]) . ', WoTranslation = ' . 
         convert_string_to_sqlsyntax($translation) . ', WoSentence = ' . 
         convert_string_to_sqlsyntax(repl_tab_nl($_REQUEST["WoSentence"])) . ', WoRomanization = ' .
@@ -248,7 +248,7 @@ else {  // if (! isset($_REQUEST['op']))
     
     if ($wid == '') {    
         $sql = 
-        'SELECT Ti2Text, Ti2LgID FROM ' . $tbpref . 'textitems2 
+        'SELECT Ti2Text, Ti2LgID FROM textitems2 
         WHERE Ti2TxID = ' . $_REQUEST['tid'] . ' AND Ti2WordCount = 1 AND Ti2Order = ' . $_REQUEST['ord'];
         $res = do_mysqli_query($sql);
         $record = mysqli_fetch_assoc($res);
@@ -264,13 +264,13 @@ else {  // if (! isset($_REQUEST['op']))
         
         $wid = get_first_value(
             "SELECT WoID AS value 
-            FROM " . $tbpref . "words 
+            FROM words 
             WHERE WoLgID = " . $lang . " AND WoTextLC = " . convert_string_to_sqlsyntax($termlc)
         ); 
         
     } else {
 
-        $sql = 'SELECT WoText, WoLgID FROM ' . $tbpref . 'words WHERE WoID = ' . $wid;
+        $sql = 'SELECT WoText, WoLgID FROM words WHERE WoID = ' . $wid;
         $res = do_mysqli_query($sql);
         $record = mysqli_fetch_assoc($res);
         if ($record ) {
@@ -303,7 +303,7 @@ else {  // if (! isset($_REQUEST['op']))
     if ($new) {
          
         $seid = get_first_value(
-            "SELECT Ti2SeID AS value FROM " . $tbpref . "textitems2 
+            "SELECT Ti2SeID AS value FROM textitems2 
             WHERE Ti2TxID = " . $_REQUEST['tid'] . " AND Ti2WordCount = 1 AND Ti2Order = " . $_REQUEST['ord']
         );
         $sent = getSentence($seid, $termlc, (int) getSettingWithDefault('set-term-sentence-count'));
@@ -364,7 +364,7 @@ else {  // if (! isset($_REQUEST['op']))
     
     else {
         
-        $sql = 'select WoTranslation, WoSentence, WoRomanization, WoStatus from ' . $tbpref . 'words where WoID = ' . $wid;
+        $sql = 'select WoTranslation, WoSentence, WoRomanization, WoStatus from words where WoID = ' . $wid;
         $res = do_mysqli_query($sql);
         if ($record = mysqli_fetch_assoc($res)) {
             
@@ -376,7 +376,7 @@ else {  // if (! isset($_REQUEST['op']))
             }
             $sentence = repl_tab_nl($record['WoSentence']);
             if ($sentence == '' && isset($_REQUEST['tid']) && isset($_REQUEST['ord'])) {
-                $seid = get_first_value("select Ti2SeID as value from " . $tbpref . "textitems2 where Ti2TxID = " . $_REQUEST['tid'] . " and Ti2WordCount = 1 and Ti2Order = " . $_REQUEST['ord']);
+                $seid = get_first_value("select Ti2SeID as value from textitems2 where Ti2TxID = " . $_REQUEST['tid'] . " and Ti2WordCount = 1 and Ti2Order = " . $_REQUEST['ord']);
                 $sent = getSentence($seid, $termlc, (int) getSettingWithDefault('set-term-sentence-count'));
                 $sentence = repl_tab_nl($sent[1]);
             }

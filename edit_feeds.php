@@ -20,19 +20,19 @@ if(isset($_SESSION['wizard'])) {
 
 if (isset($_REQUEST['markaction'])) {
     if ($_REQUEST['markaction']=='del') {
-        $message= runsql('delete from ' . $tbpref . 'feedlinks where FlNfID in(' . $currentfeed . ')', "Article item(s) deleted");
-        $message.= runsql('delete from ' . $tbpref . 'newsfeeds where NfID in(' . $currentfeed . ')', " / Newsfeed(s) deleted");
+        $message= runsql('delete from feedlinks where FlNfID in(' . $currentfeed . ')', "Article item(s) deleted");
+        $message.= runsql('delete from newsfeeds where NfID in(' . $currentfeed . ')', " / Newsfeed(s) deleted");
         echo error_message_with_hide($message, 0);unset($message);
     }
 
     if ($_REQUEST['markaction']=='del_art') {
-        $message= runsql('delete from ' . $tbpref . 'feedlinks where FlNfID in(' . $currentfeed . ')', "Article item(s) deleted");
+        $message= runsql('delete from feedlinks where FlNfID in(' . $currentfeed . ')', "Article item(s) deleted");
         echo error_message_with_hide($message, 0);unset($message);
-        do_mysqli_query('UPDATE ' . $tbpref . 'newsfeeds SET NfUpdate="'.time().'" where NfID in(' . $currentfeed . ')');
+        do_mysqli_query('UPDATE newsfeeds SET NfUpdate="'.time().'" where NfID in(' . $currentfeed . ')');
     }
 
     if ($_REQUEST['markaction']=='res_art') {
-        $message= runsql('UPDATE ' . $tbpref . 'feedlinks SET FlLink=TRIM(FlLink) where FlNfID in (' . $currentfeed . ')', "Article(s) reset");
+        $message= runsql('UPDATE feedlinks SET FlLink=TRIM(FlLink) where FlNfID in (' . $currentfeed . ')', "Article(s) reset");
         echo error_message_with_hide($message, 0);unset($message);
     }
 }
@@ -50,17 +50,17 @@ $(".hide_message").delay(2500).slideUp(1000);
 
 if(isset($_REQUEST['update_feed'])) {
     $currentfeed = $_REQUEST['NfID'];
-    runsql('UPDATE ' . $tbpref . 'newsfeeds SET NfLgID=' . convert_string_to_sqlsyntax($_REQUEST['NfLgID']) .',NfName=' . convert_string_to_sqlsyntax($_REQUEST['NfName']) .',NfSourceURI=' . convert_string_to_sqlsyntax($_REQUEST['NfSourceURI']) .',NfArticleSectionTags=' . convert_string_to_sqlsyntax($_REQUEST['NfArticleSectionTags']) .',NfFilterTags=' . convert_string_to_sqlsyntax_nonull($_REQUEST['NfFilterTags']) .',NfOptions=' . convert_string_to_sqlsyntax_nonull(rtrim($_REQUEST['NfOptions'], ',')) .' where NfID='.$_REQUEST['NfID'], "");
+    runsql('UPDATE newsfeeds SET NfLgID=' . convert_string_to_sqlsyntax($_REQUEST['NfLgID']) .',NfName=' . convert_string_to_sqlsyntax($_REQUEST['NfName']) .',NfSourceURI=' . convert_string_to_sqlsyntax($_REQUEST['NfSourceURI']) .',NfArticleSectionTags=' . convert_string_to_sqlsyntax($_REQUEST['NfArticleSectionTags']) .',NfFilterTags=' . convert_string_to_sqlsyntax_nonull($_REQUEST['NfFilterTags']) .',NfOptions=' . convert_string_to_sqlsyntax_nonull(rtrim($_REQUEST['NfOptions'], ',')) .' where NfID='.$_REQUEST['NfID'], "");
 }
 
 if(isset($_REQUEST['save_feed'])) {
-    runsql('insert into ' . $tbpref . 'newsfeeds (NfLgID,NfName,NfSourceURI,NfArticleSectionTags,NfFilterTags,NfOptions) VALUES (' . convert_string_to_sqlsyntax($_REQUEST['NfLgID']) .',' . convert_string_to_sqlsyntax($_REQUEST['NfName']) .',' . convert_string_to_sqlsyntax($_REQUEST['NfSourceURI']) .',' . convert_string_to_sqlsyntax($_REQUEST['NfArticleSectionTags']) .',' . convert_string_to_sqlsyntax_nonull($_REQUEST['NfFilterTags']) .',' . convert_string_to_sqlsyntax_nonull(rtrim($_REQUEST['NfOptions'], ',')) .')', "");
+    runsql('insert into newsfeeds (NfLgID,NfName,NfSourceURI,NfArticleSectionTags,NfFilterTags,NfOptions) VALUES (' . convert_string_to_sqlsyntax($_REQUEST['NfLgID']) .',' . convert_string_to_sqlsyntax($_REQUEST['NfName']) .',' . convert_string_to_sqlsyntax($_REQUEST['NfSourceURI']) .',' . convert_string_to_sqlsyntax($_REQUEST['NfArticleSectionTags']) .',' . convert_string_to_sqlsyntax_nonull($_REQUEST['NfFilterTags']) .',' . convert_string_to_sqlsyntax_nonull(rtrim($_REQUEST['NfOptions'], ',')) .')', "");
 }
 if(isset($_REQUEST['load_feed']) || isset($_REQUEST['check_autoupdate']) || (isset($_REQUEST['markaction']) && $_REQUEST['markaction']=='update')) {
     load_feeds($currentfeed);
 }    
 elseif(isset($_REQUEST['new_feed'])) {
-    $result = do_mysqli_query("SELECT LgName,LgID FROM " . $tbpref . "languages where LgName<>'' ORDER BY LgName");
+    $result = do_mysqli_query("SELECT LgName,LgID FROM languages where LgName<>'' ORDER BY LgName");
     ?>
 <h4>New Feed <a target="_blank" href="docs/info.html#new_feed"><img src="icn/question-frame.png" title="Help" alt="Help" /></a> </h4>
 <a href="do_feeds.php?page=1"> My Feeds</a> &nbsp; | &nbsp;
@@ -125,9 +125,9 @@ $('[type="submit"]').on('click', function(){
 }
 
 elseif(isset($_REQUEST['edit_feed'])) {
-    $result = do_mysqli_query("SELECT * FROM " . $tbpref . "newsfeeds WHERE NfID=$currentfeed");
+    $result = do_mysqli_query("SELECT * FROM newsfeeds WHERE NfID=$currentfeed");
     $row = mysqli_fetch_assoc($result);
-    $result = do_mysqli_query("SELECT LgName,LgID FROM " . $tbpref . "languages where LgName<>'' ORDER BY LgName");
+    $result = do_mysqli_query("SELECT LgName,LgID FROM languages where LgName<>'' ORDER BY LgName");
     ?>
 <h4>Edit Feed <a target="_blank" href="docs/info.html#new_feed"><img src="icn/question-frame.png" title="Help" alt="Help" /></a> </h4>
 <a href="do_feeds.php?page=1"> My Feeds</a> &nbsp; | &nbsp;
@@ -254,10 +254,10 @@ $('[type="submit"]').on('click', function(){
 
 elseif(isset($_REQUEST['multi_load_feed'])) {
     if(!empty($currentlang)) {
-        $result = do_mysqli_query("SELECT NfName,NfID,NfUpdate FROM " . $tbpref . "newsfeeds WHERE NfLgID=$currentlang ORDER BY NfUpdate DESC");
+        $result = do_mysqli_query("SELECT NfName,NfID,NfUpdate FROM newsfeeds WHERE NfLgID=$currentlang ORDER BY NfUpdate DESC");
     }
     else{
-        $result = do_mysqli_query("SELECT NfName,NfID,NfUpdate FROM " . $tbpref . "newsfeeds ORDER BY NfUpdate DESC");
+        $result = do_mysqli_query("SELECT NfName,NfID,NfUpdate FROM newsfeeds ORDER BY NfUpdate DESC");
     }
     ?>
 <form name="form1" action="do_feeds.php" onsubmit="document.form1.querybutton.click(); return false;">
@@ -348,7 +348,7 @@ Feed Name (Wildc.=*):
 <option value="del">Delete</option>
 </select></td></tr>
     <?php
-        $sql = 'select count(*) as value from ' . $tbpref . 'newsfeeds where '; if($currentlang>0) { $sql .= 'NfLgID ='.$currentlang . $wh_query; 
+        $sql = 'select count(*) as value from newsfeeds where '; if($currentlang>0) { $sql .= 'NfLgID ='.$currentlang . $wh_query; 
         }else { $sql .= '1=1' . $wh_query; 
         }
         $recno = (int) get_first_value($sql);
@@ -373,10 +373,10 @@ Feed Name (Wildc.=*):
             echo '</th><th class="th1">';
             makePager($currentpage, $pages, 'edit_feeds.php', 'form1');
             if(!empty($currentlang)) {
-                $result = do_mysqli_query("SELECT * FROM " . $tbpref . "newsfeeds WHERE NfLgID=$currentlang $wh_query ORDER BY " . $sorts[$currentsort-1]);
+                $result = do_mysqli_query("SELECT * FROM newsfeeds WHERE NfLgID=$currentlang $wh_query ORDER BY " . $sorts[$currentsort-1]);
             }
             else{
-                $result = do_mysqli_query("SELECT * FROM " . $tbpref . "newsfeeds WHERE (1=1) $wh_query ORDER BY " . $sorts[$currentsort-1]);
+                $result = do_mysqli_query("SELECT * FROM newsfeeds WHERE (1=1) $wh_query ORDER BY " . $sorts[$currentsort-1]);
             }
             ?>
         </th>

@@ -26,7 +26,7 @@ function get_term($wid)
     global $tbpref;
     $term = get_first_value(
         "SELECT WoText AS value 
-        FROM " . $tbpref . "words 
+        FROM words 
         WHERE WoID = " . $wid
     );
     return $term;
@@ -45,13 +45,13 @@ function delete_word_from_database($wid)
 {
     global $tbpref;
     $m1 = runsql(
-        'DELETE FROM ' . $tbpref . 'words 
+        'DELETE FROM words 
         WHERE WoID = ' . $wid, 
         ''
     );
     adjust_autoincr('words', 'WoID');
     runsql(
-        "UPDATE  " . $tbpref . "textitems2 
+        "UPDATE  textitems2 
         SET Ti2WoID  = 0 
         WHERE Ti2WordCount=1 AND Ti2WoID  = " . $wid, 
         ''

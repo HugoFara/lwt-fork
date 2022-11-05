@@ -18,7 +18,7 @@ if (isset($_REQUEST['op'])) {
         );
     }
     else {    
-        runsql("delete from " . $tbpref . "settings where StKey like 'set-%'", '');
+        runsql("delete from settings where StKey like 'set-%'", '');
     }
 }
 pagestart('Settings/Preferences', true);

@@ -30,7 +30,7 @@ function do_diplay_impr_text_header_data($textid)
 
     $sql = 
     'SELECT TxLgID, TxTitle, TxAudioURI, TxSourceURI 
-    FROM ' . $tbpref . 'texts
+    FROM texts
     WHERE TxID = ' . $textid;
     $res = do_mysqli_query($sql);
     $record = mysqli_fetch_assoc($res);

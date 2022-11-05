@@ -38,7 +38,7 @@ function get_tags($refresh = 0)
             return $_SESSION['TAGS'];
     }
     $tags = array();
-    $sql = 'SELECT TgText FROM ' . $tbpref . 'tags ORDER BY TgText';
+    $sql = 'SELECT TgText FROM tags ORDER BY TgText';
     $res = do_mysqli_query($sql);
     while ($record = mysqli_fetch_assoc($res)) {
         $tags[] = $record["TgText"];
@@ -70,7 +70,7 @@ function get_texttags($refresh = 0)
             return $_SESSION['TEXTTAGS']; 
     }
     $tags = array();
-    $sql = 'SELECT T2Text FROM ' . $tbpref . 'tags2 ORDER BY T2Text';
+    $sql = 'SELECT T2Text FROM tags2 ORDER BY T2Text';
     $res = do_mysqli_query($sql);
     while ($record = mysqli_fetch_assoc($res)) {
         $tags[] = $record["T2Text"];
@@ -88,7 +88,7 @@ function getTextTitle($textid): string
     global $tbpref;
     $text = get_first_value(
         "SELECT TxTitle AS value 
-        FROM " . $tbpref . "texts 
+        FROM texts 
         WHERE TxID=" . $textid
     );
     if (!isset($text)) { 
@@ -109,13 +109,13 @@ function get_tag_selectoptions($v,$l): string
     $r .= ">[Filter off]</option>";
     if ($l == '') {
         $sql = "select TgID, TgText 
-        from " . $tbpref . "words, " . $tbpref . "tags, " . $tbpref . "wordtags 
+        from words, tags, wordtags 
         where TgID = WtTgID and WtWoID = WoID 
         group by TgID 
         order by UPPER(TgText)"; 
     } else {
         $sql = "select TgID, TgText 
-        from " . $tbpref . "words, " . $tbpref . "tags, " . $tbpref . "wordtags 
+        from words, tags, wordtags 
         where TgID = WtTgID and WtWoID = WoID and WoLgID = " . $l . " 
         group by TgID 
         order by UPPER(TgText)"; 
@@ -148,13 +148,13 @@ function get_texttag_selectoptions($v,$l): string
     $r .= ">[Filter off]</option>";
     if ($l == '') {
         $sql = "select T2ID, T2Text 
-        from " . $tbpref . "texts, " . $tbpref . "tags2, " . $tbpref . "texttags 
+        from texts, tags2, texttags 
         where T2ID = TtT2ID and TtTxID = TxID 
         group by T2ID 
         order by UPPER(T2Text)"; 
     } else {
         $sql = "select T2ID, T2Text 
-        from " . $tbpref . "texts, " . $tbpref . "tags2, " . $tbpref . "texttags 
+        from texts, tags2, texttags 
         where T2ID = TtT2ID and TtTxID = TxID and TxLgID = " . $l . " 
         group by T2ID 
         order by UPPER(T2Text)"; 
@@ -188,9 +188,9 @@ function get_txtag_selectoptions($l,$v): string
     $r .= ">[Filter off]</option>";
     $sql = 'SELECT IFNULL(T2Text, 1) AS TagName, TtT2ID AS TagID, GROUP_CONCAT(TxID 
     ORDER BY TxID) AS TextID 
-    FROM ' . $tbpref . 'texts 
-    LEFT JOIN ' . $tbpref . 'texttags ON TxID = TtTxID
-    LEFT JOIN ' . $tbpref . 'tags2 ON TtT2ID = T2ID';
+    FROM texts 
+    LEFT JOIN texttags ON TxID = TtTxID
+    LEFT JOIN tags2 ON TtT2ID = T2ID';
     if ($l) {
         $sql .= ' WHERE TxLgID=' . $l; 
     }
@@ -223,14 +223,14 @@ function get_archivedtexttag_selectoptions($v,$l): string
     $r .= ">[Filter off]</option>";
     if ($l == '') {
         $sql = "select T2ID, T2Text 
-        from " . $tbpref . "archivedtexts, " . 
-        $tbpref . "tags2, " . $tbpref . "archtexttags 
+        from archivedtexts, " . 
+        $tbpref . "tags2, archtexttags 
         where T2ID = AgT2ID and AgAtID = AtID 
         group by T2ID 
         order by UPPER(T2Text)"; 
     } else {
         $sql = "select T2ID, T2Text 
-        from " . $tbpref . "archivedtexts, " . $tbpref . "tags2, " . 
+        from archivedtexts, tags2, " . 
         $tbpref . "archtexttags 
         where T2ID = AgT2ID and AgAtID = AtID and AtLgID = " . $l . " 
         group by T2ID 
@@ -261,7 +261,7 @@ function get_archivedtexttag_selectoptions($v,$l): string
 function saveWordTags($wid) 
 {
     global $tbpref;
-    runsql("DELETE from " . $tbpref . "wordtags WHERE WtWoID =" . $wid, '');
+    runsql("DELETE from wordtags WHERE WtWoID =" . $wid, '');
     if (!isset($_REQUEST['TermTags'])  
         || !is_array($_REQUEST['TermTags'])  
         || !isset($_REQUEST['TermTags']['TagList'])  
@@ -276,15 +276,15 @@ function saveWordTags($wid)
         $tag = $_REQUEST['TermTags']['TagList'][$i];
         if(!in_array($tag, $_SESSION['TAGS'])) {
             runsql(
-                "INSERT INTO {$tbpref}tags (TgText) 
+                "INSERT INTO tags (TgText) 
                 VALUES(" . convert_string_to_sqlsyntax($tag) . ")", 
                 ""
             );
         }
         runsql(
-            "INSERT INTO {$tbpref}wordtags (WtWoID, WtTgID) 
+            "INSERT INTO wordtags (WtWoID, WtTgID) 
             SELECT $wid, TgID 
-            FROM {$tbpref}tags 
+            FROM tags 
             WHERE TgText = " . convert_string_to_sqlsyntax($tag), 
             ""
         );
@@ -304,7 +304,7 @@ function saveTextTags($tid): void
 {
     global $tbpref;
     runsql(
-        "DELETE FROM " . $tbpref . "texttags WHERE TtTxID =" . $tid, 
+        "DELETE FROM texttags WHERE TtTxID =" . $tid, 
         ''
     );
     if (!isset($_REQUEST['TextTags']) 
@@ -321,15 +321,15 @@ function saveTextTags($tid): void
         $tag = $_REQUEST['TextTags']['TagList'][$i];
         if (!in_array($tag, $_SESSION['TEXTTAGS'])) {
             runsql(
-                "INSERT INTO {$tbpref}tags2 (T2Text) 
+                "INSERT INTO tags2 (T2Text) 
                 VALUES(" . convert_string_to_sqlsyntax($tag) . ")", 
                 ""
             );
         }
         runsql(
-            "INSERT INTO {$tbpref}texttags (TtTxID, TtT2ID) 
+            "INSERT INTO texttags (TtTxID, TtT2ID) 
             SELECT $tid, T2ID 
-            FROM {$tbpref}tags2 
+            FROM tags2 
             WHERE T2Text = " . convert_string_to_sqlsyntax($tag), 
             ""
         );
@@ -349,7 +349,7 @@ function saveTextTags($tid): void
 function saveArchivedTextTags($tid): void 
 {
     global $tbpref;
-    runsql("DELETE from " . $tbpref . "archtexttags WHERE AgAtID =" . $tid, '');
+    runsql("DELETE from archtexttags WHERE AgAtID =" . $tid, '');
     if (!isset($_REQUEST['TextTags']) 
         || !is_array($_REQUEST['TextTags']) 
         || !isset($_REQUEST['TextTags']['TagList']) 
@@ -363,15 +363,15 @@ function saveArchivedTextTags($tid): void
         $tag = $_REQUEST['TextTags']['TagList'][$i];
         if (!in_array($tag, $_SESSION['TEXTTAGS'])) {
             runsql(
-                'INSERT INTO {$tbpref}tags2 (T2Text) 
+                'INSERT INTO tags2 (T2Text) 
                 VALUES(' . convert_string_to_sqlsyntax($tag) . ')', 
                 ""
             );
         }
         runsql(
-            "INSERT INTO {$tbpref}archtexttags (AgAtID, AgT2ID) 
+            "INSERT INTO archtexttags (AgAtID, AgT2ID) 
             SELECT $tid, T2ID 
-            FROM {$tbpref}tags2 
+            FROM tags2 
             WHERE T2Text = " . convert_string_to_sqlsyntax($tag), 
             ""
         );
@@ -388,7 +388,7 @@ function getWordTags($wid): string
     $r = '<ul id="termtags">';
     if ($wid > 0) {
         $sql = 'select TgText 
-        from ' . $tbpref . 'wordtags, ' . $tbpref . 'tags 
+        from wordtags, tags 
         where TgID = WtTgID and WtWoID = ' . $wid . ' 
         order by TgText';
         $res = do_mysqli_query($sql);
@@ -416,7 +416,7 @@ function getTextTags($tid): string
     $r = '<ul id="texttags">';
     if ($tid > 0) {
         $sql = 'SELECT T2Text 
-        FROM ' . $tbpref . 'texttags, ' . $tbpref . 'tags2 
+        FROM texttags, tags2 
         WHERE T2ID = TtT2ID AND TtTxID = ' . $tid . ' 
         ORDER BY T2Text';
         $res = do_mysqli_query($sql);
@@ -445,7 +445,7 @@ function getArchivedTextTags($tid): string
     $r = '<ul id="texttags">';
     if ($tid > 0) {
         $sql = 'SELECT T2Text 
-        FROM ' . $tbpref . 'archtexttags, ' . $tbpref . 'tags2 
+        FROM archtexttags, tags2 
         WHERE T2ID = AgT2ID AND AgAtID = ' . $tid . ' 
         ORDER BY T2Text';
         $res = do_mysqli_query($sql);
@@ -465,31 +465,31 @@ function addtaglist($item, $list): string
     global $tbpref;
     $tagid = get_first_value(
         'select TgID as value 
-        from ' . $tbpref . 'tags 
+        from tags 
         where TgText = ' . convert_string_to_sqlsyntax($item)
     );
     if (!isset($tagid)) {
         runsql(
-            'insert into ' . $tbpref . 'tags (TgText) 
+            'insert into tags (TgText) 
             values(' . convert_string_to_sqlsyntax($item) . ')', 
             ""
         );
         $tagid = get_first_value(
             'select TgID as value 
-            from ' . $tbpref . 'tags 
+            from tags 
             where TgText = ' . convert_string_to_sqlsyntax($item)
         );
     }
     $sql = 'select WoID 
-    from ' . $tbpref . 'words 
-    LEFT JOIN ' . $tbpref . 'wordtags 
+    from words 
+    LEFT JOIN wordtags 
     ON WoID = WtWoID AND WtTgID = ' . $tagid . ' 
     WHERE WtTgID IS NULL AND WoID in ' . $list;
     $res = do_mysqli_query($sql);
     $cnt = 0;
     while ($record = mysqli_fetch_assoc($res)) {
         $cnt += (int) runsql(
-            'insert ignore into ' . $tbpref . 'wordtags (WtWoID, WtTgID) 
+            'insert ignore into wordtags (WtWoID, WtTgID) 
             values(' . $record['WoID'] . ', ' . $tagid . ')', 
             ""
         );
@@ -505,30 +505,30 @@ function addarchtexttaglist($item, $list): string
 {
     global $tbpref;
     $tagid = get_first_value(
-        'select T2ID as value from ' . $tbpref . 'tags2 
+        'select T2ID as value from tags2 
         where T2Text = ' . convert_string_to_sqlsyntax($item)
     );
     if (!isset($tagid)) {
         runsql(
-            'insert into ' . $tbpref . 'tags2 (T2Text) 
+            'insert into tags2 (T2Text) 
             values(' . convert_string_to_sqlsyntax($item) . ')', 
             ""
         );
         $tagid = get_first_value(
             'select T2ID as value 
-            from ' . $tbpref . 'tags2 
+            from tags2 
             where T2Text = ' . convert_string_to_sqlsyntax($item)
         );
     }
-    $sql = 'select AtID from ' . $tbpref . 'archivedtexts 
-    LEFT JOIN ' . $tbpref . 'archtexttags 
+    $sql = 'select AtID from archivedtexts 
+    LEFT JOIN archtexttags 
     ON AtID = AgAtID AND AgT2ID = ' . $tagid . ' 
     WHERE AgT2ID IS NULL AND AtID in ' . $list;
     $res = do_mysqli_query($sql);
     $cnt = 0;
     while ($record = mysqli_fetch_assoc($res)) {
         $cnt += (int) runsql(
-            'insert ignore into ' . $tbpref . 'archtexttags (AgAtID, AgT2ID) 
+            'insert ignore into archtexttags (AgAtID, AgT2ID) 
             values(' . $record['AtID'] . ', ' . $tagid . ')', 
             ""
         );
@@ -545,30 +545,30 @@ function addtexttaglist($item, $list): string
     global $tbpref;
     $tagid = get_first_value(
         'select T2ID as value 
-        from ' . $tbpref . 'tags2 
+        from tags2 
         where T2Text = ' . convert_string_to_sqlsyntax($item)
     );
     if (!isset($tagid)) {
         runsql(
-            'insert into ' . $tbpref . 'tags2 (T2Text) 
+            'insert into tags2 (T2Text) 
             values(' . convert_string_to_sqlsyntax($item) . ')', 
             ""
         );
         $tagid = get_first_value(
             'select T2ID as value 
-            from ' . $tbpref . 'tags2 
+            from tags2 
             where T2Text = ' . convert_string_to_sqlsyntax($item)
         );
     }
-    $sql = 'select TxID from ' . $tbpref . 'texts
-     LEFT JOIN ' . $tbpref . 'texttags 
+    $sql = 'select TxID from texts
+     LEFT JOIN texttags 
      ON TxID = TtTxID AND TtT2ID = ' . $tagid . ' 
      WHERE TtT2ID IS NULL AND TxID in ' . $list;
     $res = do_mysqli_query($sql);
     $cnt = 0;
     while ($record = mysqli_fetch_assoc($res)) {
         $cnt += (int) runsql(
-            'insert ignore into ' . $tbpref . 'texttags (TtTxID, TtT2ID) 
+            'insert ignore into texttags (TtTxID, TtT2ID) 
             values(' . $record['TxID'] . ', ' . $tagid . ')', 
             ""
         );
@@ -585,19 +585,19 @@ function removetaglist($item, $list): string
     global $tbpref;
     $tagid = get_first_value(
         'SELECT TgID AS value
-        FROM ' . $tbpref . 'tags
+        FROM tags
         WHERE TgText = ' . convert_string_to_sqlsyntax($item)
     );
     if (! isset($tagid)) { 
         return "Tag " . $item . " not found"; 
     }
-    $sql = 'select WoID from ' . $tbpref . 'words where WoID in ' . $list;
+    $sql = 'select WoID from words where WoID in ' . $list;
     $res = do_mysqli_query($sql);
     $cnt = 0;
     while ($record = mysqli_fetch_assoc($res)) {
         $cnt++;
         runsql(
-            'DELETE FROM ' . $tbpref . 'wordtags
+            'DELETE FROM wordtags
             WHERE WtWoID = ' . $record['WoID'] . ' AND WtTgID = ' . $tagid, 
             ""
         );
@@ -613,19 +613,19 @@ function removearchtexttaglist($item, $list): string
     global $tbpref;
     $tagid = get_first_value(
         'select T2ID as value 
-        from ' . $tbpref . 'tags2 
+        from tags2 
         where T2Text = ' . convert_string_to_sqlsyntax($item)
     );
     if (!isset($tagid)) { 
         return "Tag " . $item . " not found"; 
     }
-    $sql = 'select AtID from ' . $tbpref . 'archivedtexts where AtID in ' . $list;
+    $sql = 'select AtID from archivedtexts where AtID in ' . $list;
     $res = do_mysqli_query($sql);
     $cnt = 0;
     while ($record = mysqli_fetch_assoc($res)) {
         $cnt++;
         runsql(
-            'delete from ' . $tbpref . 'archtexttags 
+            'delete from archtexttags 
             where AgAtID = ' . $record['AtID'] . ' and AgT2ID = ' . $tagid, 
             ""
         );
@@ -640,19 +640,19 @@ function removetexttaglist($item, $list): string
 {
     global $tbpref;
     $tagid = get_first_value(
-        'select T2ID as value from ' . $tbpref . 'tags2 
+        'select T2ID as value from tags2 
         where T2Text = ' . convert_string_to_sqlsyntax($item)
     );
     if (!isset($tagid)) { 
         return "Tag " . $item . " not found"; 
     }
-    $sql = 'select TxID from ' . $tbpref . 'texts where TxID in ' . $list;
+    $sql = 'select TxID from texts where TxID in ' . $list;
     $res = do_mysqli_query($sql);
     $cnt = 0;
     while ($record = mysqli_fetch_assoc($res)) {
         $cnt++;
         runsql(
-            'delete from ' . $tbpref . 'texttags 
+            'delete from texttags 
             where TtTxID = ' . $record['TxID'] . ' and TtT2ID = ' . $tagid, 
             ""
         );
@@ -671,7 +671,7 @@ function load_feeds($currentfeed): void
     echo '<script type="text/javascript">';
     if (isset($_REQUEST['check_autoupdate'])) {
         $result = do_mysqli_query(
-            "SELECT * FROM " . $tbpref . "newsfeeds 
+            "SELECT * FROM newsfeeds 
             where `NfOptions` like '%autoupdate=%'"
         );
         while($row = mysqli_fetch_assoc($result)){
@@ -697,7 +697,7 @@ function load_feeds($currentfeed): void
         }
         mysqli_free_result($result);
     } else {
-        $sql="SELECT * FROM " . $tbpref . "newsfeeds WHERE NfID in ($currentfeed)";
+        $sql="SELECT * FROM newsfeeds WHERE NfID in ($currentfeed)";
         $result = do_mysqli_query($sql);
         while($row = mysqli_fetch_assoc($result)){
             $ajax[$cnt]=  "$.ajax({type: 'POST',beforeSend: function(){ $('#feed_" . $row['NfID'] . "').replaceWith( '<div id=\"feed_" . $row['NfID'] . "\" class=\"msgblue\"><p>". addslashes($row['NfName']).": loading</p></div>' );},url:'inc/ajax_load_feed.php', data: { NfID: '".$row['NfID']."', NfSourceURI: '". $row['NfSourceURI']."', NfName: '". addslashes($row['NfName'])."', NfOptions: '". $row['NfOptions']."', cnt: '". $cnt."' },success:function (data) {feedcnt+=1;$('#feedcount').text(feedcnt);$('#feed_" . $row['NfID'] . "').replaceWith( data );}})";
@@ -750,7 +750,7 @@ function write_rss_to_db($texts): string
                     foreach($text['TagList'] as $tag){
                         if(! in_array($tag, $_SESSION['TEXTTAGS'])) {
                             do_mysqli_query(
-                                'insert into ' . $tbpref . 'tags2 (T2Text) 
+                                'insert into tags2 (T2Text) 
                                 values (' . convert_string_to_sqlsyntax($tag) . ')'
                             );
                         }
@@ -760,7 +760,7 @@ function write_rss_to_db($texts): string
                 echo '<div class="msgblue"><p class="hide_message">+++ "' . 
                 $text['TxTitle']. '" added! +++</p></div>';
                 do_mysqli_query(
-                    'INSERT INTO ' . $tbpref . 'texts (
+                    'INSERT INTO texts (
                         TxLgID,TxTitle,TxText,TxAudioURI,TxSourceURI
                     ) VALUES (
                         '.$text['TxLgID'].',' . 
@@ -772,26 +772,26 @@ function write_rss_to_db($texts): string
                 $id = (int)get_last_key();
                 splitCheckText(
                     get_first_value(
-                        'select TxText as value from ' . $tbpref . 'texts 
+                        'select TxText as value from texts 
                         where TxID = ' . $id
                     ), 
                     get_first_value(
-                        'select TxLgID as value from ' . $tbpref . 'texts 
+                        'select TxLgID as value from texts 
                         where TxID = ' . $id
                     ), 
                     $id 
                 );
                 do_mysqli_query(
-                    'insert into ' . $tbpref . 'texttags (TtTxID, TtT2ID) 
-                    select ' . $id . ', T2ID from ' . $tbpref . 'tags2 
+                    'insert into texttags (TtTxID, TtT2ID) 
+                    select ' . $id . ', T2ID from tags2 
                     where T2Text in (' . $Nf_tag .')'
                 );        
             }
         }
         get_texttags(1);
         $result=do_mysqli_query(
-            "SELECT TtTxID FROM " . $tbpref . "texttags 
-            join " . $tbpref . "tags2 on TtT2ID=T2ID 
+            "SELECT TtTxID FROM texttags 
+            join tags2 on TtT2ID=T2ID 
             WHERE T2Text in (". $Nf_tag .")"
         );
         $text_count=0;
@@ -804,34 +804,34 @@ function write_rss_to_db($texts): string
             $text_item=array_slice($text_item, 0, $text_count-$nf_max_texts);
             foreach ($text_item as $text_ID){
                 $message3 += (int) runsql(
-                    'delete from ' . $tbpref . 'textitems2 
+                    'delete from textitems2 
                     where Ti2TxID = ' . $text_ID, 
                     ""
                 );
                 $message2 += (int) runsql(
-                    'delete from ' . $tbpref . 'sentences 
+                    'delete from sentences 
                     where SeTxID = ' . $text_ID, 
                     ""
                 );
                 $message4 += (int) runsql(
-                    'insert into ' . $tbpref . 'archivedtexts (
+                    'insert into archivedtexts (
                         AtLgID, AtTitle, AtText, AtAnnotatedText, 
                         AtAudioURI, AtSourceURI
                     ) select TxLgID, TxTitle, TxText, TxAnnotatedText, 
                     TxAudioURI, TxSourceURI 
-                    from ' . $tbpref . 'texts 
+                    from texts 
                     where TxID = ' . $text_ID, 
                     ""
                 );
                 $id = get_last_key();
                 runsql(
-                    'insert into ' . $tbpref . 'archtexttags (AgAtID, AgT2ID) 
-                    select ' . $id . ', TtT2ID from ' . $tbpref . 'texttags 
+                    'insert into archtexttags (AgAtID, AgT2ID) 
+                    select ' . $id . ', TtT2ID from texttags 
                     where TtTxID = ' . $text_ID, 
                     ""
                 );    
                 $message1 += (int) runsql(
-                    'delete from ' . $tbpref . 'texts 
+                    'delete from texts 
                     where TxID = ' . $text_ID, 
                     ""
                 );
@@ -839,10 +839,10 @@ function write_rss_to_db($texts): string
                 adjust_autoincr('texts', 'TxID');
                 adjust_autoincr('sentences', 'SeID');
                 runsql(
-                    "DELETE " . $tbpref . "texttags 
+                    "DELETE texttags 
                     FROM (" 
                         . $tbpref . "texttags 
-                        LEFT JOIN " . $tbpref . "texts on TtTxID = TxID
+                        LEFT JOIN texts on TtTxID = TxID
                     ) 
                     WHERE TxID IS NULL", 
                     ''
@@ -1209,7 +1209,7 @@ function get_text_from_rsslink($feed_data, $NfArticleSection, $NfFilterTags, $Nf
             $link = trim($feed_data[$key]['link']);
             if(substr($link, 0, 1)=='#') {
                 runsql(
-                    'UPDATE ' . $tbpref . 'feedlinks 
+                    'UPDATE feedlinks 
                     SET FlLink=' . convert_string_to_sqlsyntax($link) . ' 
                     where FlID = ' .substr($link, 1), 
                     ""
@@ -1518,11 +1518,11 @@ function getPreviousAndNextTextLinks($textid, $url, $onlyann, $add): string
         $sql = 
         'SELECT TxID 
         FROM (
-            (' . $tbpref . 'texts 
-                LEFT JOIN ' . $tbpref . 'texttags ON TxID = TtTxID
+            (texts 
+                LEFT JOIN texttags ON TxID = TtTxID
             ) 
-            LEFT JOIN ' . $tbpref . 'tags2 ON T2ID = TtT2ID
-        ), ' . $tbpref . 'languages 
+            LEFT JOIN tags2 ON T2ID = TtT2ID
+        ), languages 
         WHERE LgID = TxLgID AND LENGTH(TxAnnotatedText) > 0 ' 
         . $wh_lang . $wh_query . ' 
         GROUP BY TxID ' . $wh_tag . ' 
@@ -1532,11 +1532,11 @@ function getPreviousAndNextTextLinks($textid, $url, $onlyann, $add): string
         $sql = 
         'SELECT TxID 
         FROM (
-            (' . $tbpref . 'texts 
-                LEFT JOIN ' . $tbpref . 'texttags ON TxID = TtTxID
+            (texts 
+                LEFT JOIN texttags ON TxID = TtTxID
             ) 
-            LEFT JOIN ' . $tbpref . 'tags2 ON T2ID = TtT2ID
-        ), ' . $tbpref . 'languages 
+            LEFT JOIN tags2 ON T2ID = TtT2ID
+        ), languages 
         WHERE LgID = TxLgID ' . $wh_lang . $wh_query . ' 
         GROUP BY TxID ' . $wh_tag . ' 
         ORDER BY ' . $sorts[$currentsort-1]; 
@@ -2022,10 +2022,10 @@ function getWordTagList($wid, $before=' ', $brack=1, $tohtml=1): string
         "SELECT IFNULL(" . ($brack ? "CONCAT('['," : "") . 
         "GROUP_CONCAT(DISTINCT TgText ORDER BY TgText separator ', ')" . 
         ($brack ? ",']')" : "") . ",'') as value 
-        FROM ((" . $tbpref . "words 
-        LEFT JOIN " . $tbpref . "wordtags 
+        FROM ((words 
+        LEFT JOIN wordtags 
         ON WoID = WtWoID) 
-        LEFT JOIN " . $tbpref . "tags 
+        LEFT JOIN tags 
         ON TgID = WtTgID) 
         WHERE WoID = " . $wid
     );
@@ -2118,7 +2118,7 @@ function make_status_controls_test_table($score, $status, $wordid): string
 function get_languages_selectoptions($v,$dt): string 
 {
     global $tbpref;
-    $sql = "select LgID, LgName from " . $tbpref . "languages 
+    $sql = "select LgID, LgName from languages 
     where LgName<>'' order by LgName";
     $res = do_mysqli_query($sql);
     if (! isset($v) || trim($v) == '' ) {
@@ -2533,7 +2533,7 @@ function get_texts_selectoptions($lang, $v): string
     $r = "<option value=\"\"" . get_selected($v, '');
     $r .= ">[Filter off]</option>";
     $sql = "select TxID, TxTitle, LgName 
-    from " . $tbpref . "languages, " . $tbpref . "texts 
+    from languages, texts 
     where LgID = TxLgID " . $l . " 
     order by LgName, TxTitle";
     $res = do_mysqli_query($sql);
@@ -2726,7 +2726,7 @@ function createDictLinksInEditWin($lang,$word,$sentctljs,$openfirst): string
 {
     global $tbpref;
     $sql = 'SELECT LgDict1URI, LgDict2URI, LgGoogleTranslateURI 
-    FROM ' . $tbpref . 'languages 
+    FROM languages 
     WHERE LgID = ' . $lang;
     $res = do_mysqli_query($sql);
     $record = mysqli_fetch_assoc($res);
@@ -2810,7 +2810,7 @@ function createDictLinksInEditWin2($lang,$sentctljs,$wordctljs): string
 {
     global $tbpref;
     $sql = 'SELECT LgDict1URI, LgDict2URI, LgGoogleTranslateURI 
-    FROM ' . $tbpref . 'languages 
+    FROM languages 
     WHERE LgID = ' . $lang;
     $res = do_mysqli_query($sql);
     $record = mysqli_fetch_assoc($res);
@@ -2845,7 +2845,7 @@ function makeDictLinks($lang,$wordctljs): string
 {
     global $tbpref;
     $sql = 'SELECT LgDict1URI, LgDict2URI, LgGoogleTranslateURI 
-    FROM ' . $tbpref . 'languages WHERE LgID = ' . $lang;
+    FROM languages WHERE LgID = ' . $lang;
     $res = do_mysqli_query($sql);
     $record = mysqli_fetch_assoc($res);
     $wb1 = isset($record['LgDict1URI']) ? $record['LgDict1URI'] : "";
@@ -2879,7 +2879,7 @@ function createDictLinksInEditWin3($lang,$sentctljs,$wordctljs): string
 {
     global $tbpref;
     $sql = 'SELECT LgDict1URI, LgDict2URI, LgGoogleTranslateURI 
-    FROM ' . $tbpref . 'languages WHERE LgID = ' . $lang;
+    FROM languages WHERE LgID = ' . $lang;
     $res = do_mysqli_query($sql);
     $record = mysqli_fetch_assoc($res);
     
@@ -3217,7 +3217,7 @@ function textwordcount($textID): void
     $res = do_mysqli_query(
         "SELECT Ti2TxID AS text, COUNT(DISTINCT LOWER(Ti2Text)) AS value, 
         COUNT(LOWER(Ti2Text)) AS total
-		FROM {$tbpref}textitems2
+		FROM textitems2
 		WHERE Ti2WordCount = 1 AND Ti2TxID IN($textID)
 		GROUP BY Ti2TxID"
     );
@@ -3229,7 +3229,7 @@ function textwordcount($textID): void
     $res = do_mysqli_query(
         'SELECT Ti2TxID as text, count(distinct Ti2WoID) as value, 
         count(Ti2WoID) as total
-		from ' . $tbpref . 'textitems2
+		from textitems2
 		where Ti2WordCount > 1 and Ti2TxID in(' . $textID . ')
 		group by Ti2TxID'
     );
@@ -3241,7 +3241,7 @@ function textwordcount($textID): void
     $res = do_mysqli_query(
         'SELECT Ti2TxID as text, count(distinct Ti2WoID) as value, 
         count(Ti2WoID) as total, WoStatus as status
-		from ' . $tbpref . 'textitems2, ' . $tbpref . 'words
+		from textitems2, words
 		where Ti2WoID!=0 and Ti2TxID in(' . $textID . ') and Ti2WoID=WoID
 		group by Ti2TxID, WoStatus'
     );
@@ -3265,7 +3265,7 @@ function texttodocount($text): string
     return '<span title="To Do" class="status0">&nbsp;' . 
     (get_first_value(
         'SELECT count(DISTINCT LOWER(Ti2Text)) as value 
-        FROM ' . $tbpref . 'textitems2 
+        FROM textitems2 
         WHERE Ti2WordCount=1 and Ti2WoID=0 and Ti2TxID=' . $text
     )
     ) . '&nbsp;</span>';
@@ -3288,7 +3288,7 @@ function texttodocount2($textid): string
     }
     $c = get_first_value(
         "SELECT COUNT(DISTINCT LOWER(Ti2Text)) AS value 
-        FROM {$tbpref}textitems2 
+        FROM textitems2 
         WHERE Ti2WordCount=1 AND Ti2WoID=0 AND Ti2TxID=$textid"
     );
     if ($c <= 0) {
@@ -3298,7 +3298,7 @@ function texttodocount2($textid): string
     
     $dict = get_first_value(
         "SELECT LgGoogleTranslateURI AS value 
-        FROM {$tbpref}languages, {$tbpref}texts 
+        FROM languages, texts 
         WHERE LgID = TxLgID and TxID = $textid"
     );
     if ($dict) {
@@ -3345,7 +3345,7 @@ function getSentence($seid, $wordlc, $mode): array
             '​', group_concat(Ti2Text ORDER BY Ti2Order asc SEPARATOR '​'),'​'
         ) AS SeText, 
         Ti2TxID AS SeTxID, LgRegexpWordCharacters, LgRemoveSpaces,  LgSplitEachChar 
-        FROM {$tbpref}textitems2, {$tbpref}languages 
+        FROM textitems2, languages 
         WHERE Ti2LgID = LgID AND Ti2WordCount < 2 AND Ti2SeID = $seid" 
     );
     $record = mysqli_fetch_assoc($res);
@@ -3376,7 +3376,7 @@ function getSentence($seid, $wordlc, $mode): array
                 'select concat(
                     \'​\',group_concat(Ti2Text order by Ti2Order asc SEPARATOR \'​\'),\'​\'
                 ) as value 
-                from ' . $tbpref . 'sentences, ' . $tbpref . 'textitems2 
+                from sentences, textitems2 
                 where Ti2SeID = SeID and SeID < ' . $seid . ' and SeTxID = ' . $txtid . " 
                 and trim(SeText) not in ('¶','') 
                 group by SeID 
@@ -3384,7 +3384,7 @@ function getSentence($seid, $wordlc, $mode): array
             );
         } else {
             $prevseSent = get_first_value(
-                'select SeText as value from ' . $tbpref . 'sentences 
+                'select SeText as value from sentences 
                 where SeID < ' . $seid . ' and SeTxID = ' . $txtid . "
                  and trim(SeText) not in ('¶','') order by SeID desc"
             );
@@ -3400,7 +3400,7 @@ function getSentence($seid, $wordlc, $mode): array
                         \'​\',group_concat(Ti2Text order by Ti2Order asc SEPARATOR \'​\'),
                         \'​\'
                     ) as  value 
-                    from ' . $tbpref . 'sentences, ' . $tbpref . 'textitems2 
+                    from sentences, textitems2 
                     where Ti2SeID = SeID and SeID > ' . $seid . ' 
                     and SeTxID = ' . $txtid . " 
                     and trim(SeText) not in ('¶','') 
@@ -3410,7 +3410,7 @@ function getSentence($seid, $wordlc, $mode): array
             } else {
                 $nextSent = get_first_value(
                     'SELECT SeText as value 
-                    from ' . $tbpref . 'sentences 
+                    from sentences 
                     where SeID > ' . $seid . ' and SeTxID = ' . $txtid . " 
                     and trim(SeText) not in ('¶','') order by SeID asc"
                 );
@@ -3427,7 +3427,7 @@ function getSentence($seid, $wordlc, $mode): array
         $sejs = str_replace('​', '', $sejs);
     }
     /* Not merged from official. Works better?
-    $nextseid = get_first_value('select SeID as value from ' . $tbpref . 'sentences where SeID > ' . $seid . ' and SeTxID = ' . $txtid . " and trim(SeText) not in ('¶','') order by SeID asc");
+    $nextseid = get_first_value('select SeID as value from sentences where SeID > ' . $seid . ' and SeTxID = ' . $txtid . " and trim(SeText) not in ('¶','') order by SeID asc");
     if (isset($nextseid)) $seidlist .= ',' . $nextseid;
     }
     }
@@ -3503,7 +3503,7 @@ function get20Sentences($lang, $wordlc, $wid, $jsctlname, $mode): string
     to copy sentence into above term)</p>';
     if (empty($wid)) {
         $sql = "SELECT DISTINCT SeID, SeText 
-        FROM {$tbpref}sentences, {$tbpref}textitems2 
+        FROM sentences, textitems2 
         WHERE LOWER(Ti2Text) = " . convert_string_to_sqlsyntax($wordlc) . " 
         AND Ti2WoID = 0 AND SeID = Ti2SeID AND SeLgID = $lang 
         ORDER BY CHAR_LENGTH(SeText), SeText 
@@ -3511,7 +3511,7 @@ function get20Sentences($lang, $wordlc, $wid, $jsctlname, $mode): string
     } else if ($wid==-1) {
         $res = do_mysqli_query(
             'SELECT LgRegexpWordCharacters, LgRemoveSpaces 
-            FROM ' . $tbpref . 'languages 
+            FROM languages 
             WHERE LgID = ' . $lang
         );
         $record = mysqli_fetch_assoc($res);
@@ -3551,7 +3551,7 @@ function get20Sentences($lang, $wordlc, $wid, $jsctlname, $mode): string
                 group_concat(Ti2Text ORDER BY Ti2Order asc SEPARATOR "\\t"),
                 "\\t"
             ) val
-             FROM ' . $tbpref . 'sentences, ' . $tbpref . 'textitems2
+             FROM sentences, textitems2
              WHERE lower(SeText)
              LIKE ' . convert_string_to_sqlsyntax("%$wordlc%") . '
              AND SeID = Ti2SeID AND SeLgID = ' . $lang . ' AND Ti2WordCount<2
@@ -3571,7 +3571,7 @@ function get20Sentences($lang, $wordlc, $wid, $jsctlname, $mode): string
             }
             $sql 
             = "SELECT DISTINCT SeID, SeText
-             FROM {$tbpref}sentences
+             FROM sentences
              WHERE SeText RLIKE $pattern AND SeLgID = $lang
              ORDER BY CHAR_LENGTH(SeText), SeText 
              LIMIT 0,20";
@@ -3579,7 +3579,7 @@ function get20Sentences($lang, $wordlc, $wid, $jsctlname, $mode): string
     } else {
         $sql 
         = "SELECT DISTINCT SeID, SeText
-         FROM {$tbpref}sentences, {$tbpref}textitems2
+         FROM sentences, textitems2
          WHERE Ti2WoID = $wid AND SeID = Ti2SeID AND SeLgID = $lang
          ORDER BY CHAR_LENGTH(SeText), SeText
          LIMIT 0,20";
@@ -3614,7 +3614,7 @@ function get_languages(): array
 {
     global $tbpref;
     $langs = array();
-    $sql = "SELECT LgID, LgName FROM " . $tbpref . "languages WHERE LgName<>''";
+    $sql = "SELECT LgID, LgName FROM languages WHERE LgName<>''";
     $res = do_mysqli_query($sql);
     while ($record = mysqli_fetch_assoc($res)) {
         $langs[$record['LgName']] = $record['LgID'];
@@ -3639,7 +3639,7 @@ function getLanguage($lid)
     }
     $r = get_first_value(
         "SELECT LgName AS value 
-        FROM " . $tbpref . "languages 
+        FROM languages 
         WHERE LgID='" . $lid . "'"
     );
     if (isset($r)) { 
@@ -3664,7 +3664,7 @@ function getScriptDirectionTag($lid): string
     }
     $r = get_first_value(
         "select LgRightToLeft as value 
-        from " . $tbpref . "languages 
+        from languages 
         where LgID='" . $lid . "'"
     );
     if (isset($r) ) {
@@ -3697,7 +3697,7 @@ function insert_expression_from_mecab($text, $lid, $wid, $len)
     $mecab_args = " -F %m\\t%t\\t%h\\n -U %m\\t%t\\t%h\\n -E EOS\\t3\\t7\\n ";
 
     $mecab = get_mecab_path($mecab_args);
-    $sql = "SELECT SeID, SeTxID, SeFirstPos, SeText FROM {$tbpref}sentences 
+    $sql = "SELECT SeID, SeTxID, SeFirstPos, SeText FROM sentences 
     WHERE SeText LIKE " . convert_string_to_sqlsyntax_notrim_nonull("%$text%");
     $res = do_mysqli_query($sql);
 
@@ -3801,7 +3801,7 @@ function insert_standard_expression($textlc, $lid, $wid, $len, $mode)
     global $tbpref;
     $appendtext = array();
     $sqlarr = array();
-    $res = do_mysqli_query("SELECT * FROM {$tbpref}languages WHERE LgID=$lid");
+    $res = do_mysqli_query("SELECT * FROM languages WHERE LgID=$lid");
     $record = mysqli_fetch_assoc($res);
     $removeSpaces = $record["LgRemoveSpaces"];
     $splitEachChar = $record['LgSplitEachChar'];
@@ -3812,13 +3812,13 @@ function insert_standard_expression($textlc, $lid, $wid, $len, $mode)
         $sql = "SELECT 
         group_concat(Ti2Text ORDER BY Ti2Order SEPARATOR ' ') AS SeText, SeID, 
         SeTxID, SeFirstPos 
-        FROM {$tbpref}textitems2, {$tbpref}sentences 
+        FROM textitems2, sentences 
         WHERE SeID=Ti2SeID AND SeLgID = $lid AND Ti2LgID = $lid 
         AND SeText LIKE " . convert_string_to_sqlsyntax_notrim_nonull("%$textlc%") . " 
         AND Ti2WordCount < 2 
         GROUP BY SeID";
     } else {
-        $sql = "SELECT * FROM {$tbpref}sentences 
+        $sql = "SELECT * FROM sentences 
         WHERE SeLgID = $lid AND SeText LIKE " . 
         convert_string_to_sqlsyntax_notrim_nonull("%$textlc%");
     }
@@ -3926,7 +3926,7 @@ function new_expression_interactable2($hex, $appendtext, $wid, $len): void
     global $tbpref;
     $showAll = (bool)getSettingZeroOrOne('showallwords', 1) ? "m" : "";
     
-    $sql = "SELECT * FROM {$tbpref}words WHERE WoID=$wid";
+    $sql = "SELECT * FROM words WHERE WoID=$wid";
     $res = do_mysqli_query($sql);
 
     $record = mysqli_fetch_assoc($res);
@@ -3988,7 +3988,7 @@ function new_expression_interactable2($hex, $appendtext, $wid, $len): void
 function insertExpressions($textlc, $lid, $wid, $len, $mode) 
 {
     global $tbpref;
-    $sql = "SELECT * FROM {$tbpref}languages WHERE LgID=$lid";
+    $sql = "SELECT * FROM languages WHERE LgID=$lid";
     $res = do_mysqli_query($sql);
     $record = mysqli_fetch_assoc($res);
     $mecab = 'MECAB' == strtoupper(trim($record['LgRegexpWordCharacters']));
@@ -4013,7 +4013,7 @@ function insertExpressions($textlc, $lid, $wid, $len, $mode)
         $sqltext = '';
         if ($mode != 2) {
             $sqltext .= 
-            "INSERT INTO {$tbpref}textitems2
+            "INSERT INTO textitems2
              (Ti2WoID,Ti2LgID,Ti2TxID,Ti2SeID,Ti2Order,Ti2WordCount,Ti2Text)
              VALUES ";
         }
@@ -4167,14 +4167,14 @@ function recreate_save_ann($textid, $oldann): ?string
         $ann .= $item . "\n";
     }
     runsql(
-        'update ' . $tbpref . 'texts set ' .
+        'update texts set ' .
         'TxAnnotatedText = ' . convert_string_to_sqlsyntax($ann) . ' 
         where TxID = ' . $textid, 
         ""
     );
     return get_first_value(
         "select TxAnnotatedText as value 
-        from " . $tbpref . "texts 
+        from texts 
         where TxID = " . $textid
     );
 }
@@ -4193,8 +4193,8 @@ function create_ann($textid): string
     CASE WHEN Ti2WordCount > 0 THEN 0 ELSE 1 END AS TiIsNotWord, 
     WoID, WoTranslation 
     FROM (
-        ' . $tbpref . 'textitems2 
-        LEFT JOIN ' . $tbpref . 'words ON (Ti2WoID = WoID) AND (Ti2LgID = WoLgID)
+        textitems2 
+        LEFT JOIN words ON (Ti2WoID = WoID) AND (Ti2LgID = WoLgID)
     ) 
     WHERE Ti2TxID = ' . $textid . ' 
     ORDER BY Ti2Order asc, Ti2WordCount desc';
@@ -4266,13 +4266,13 @@ function create_save_ann($textid): ?string
     global $tbpref;
     $ann = create_ann($textid);
     runsql(
-        'update ' . $tbpref . 'texts set ' .
+        'update texts set ' .
         'TxAnnotatedText = ' . convert_string_to_sqlsyntax($ann) . ' 
         where TxID = ' . $textid, ""
     );
     return get_first_value(
         "select TxAnnotatedText as value 
-        from " . $tbpref . "texts 
+        from texts 
         where TxID = " . $textid
     );
 }
@@ -4310,7 +4310,7 @@ function get_first_translation($trans): string
 function get_annotation_link($textid): string 
 {
     global $tbpref;
-    if (get_first_value('select length(TxAnnotatedText) as value from ' . $tbpref . 'texts where TxID=' . $textid) > 0) { 
+    if (get_first_value('select length(TxAnnotatedText) as value from texts where TxID=' . $textid) > 0) { 
         return ' &nbsp;<a href="print_impr_text.php?text=' . $textid . 
         '" target="_top"><img src="icn/tick.png" title="Annotated Text" alt="Annotated Text" /></a>'; 
     }
@@ -4414,7 +4414,7 @@ function refreshText($word,$tid): string
     $sql = 
     'SELECT TiWordCount AS Code, TiOrder, TiIsNotWord, WoID 
     FROM (' . $tbpref . 'textitems 
-        LEFT JOIN ' . $tbpref . 'words ON (TiTextLC = WoTextLC) AND (TiLgID = WoLgID)
+        LEFT JOIN words ON (TiTextLC = WoTextLC) AND (TiLgID = WoLgID)
     ) ' . $inlist . ' 
     ORDER BY TiOrder asc, TiWordCount desc';
 

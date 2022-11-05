@@ -35,8 +35,8 @@ function getData($textid): ?array
     global $tbpref;
     $sql = 
     'SELECT LgName, TxLgID, TxText, TxTitle, TxAudioURI, TxSourceURI, TxAudioPosition 
-    FROM ' . $tbpref . 'texts 
-    JOIN ' . $tbpref . 'languages ON TxLgID = LgID 
+    FROM texts 
+    JOIN languages ON TxLgID = LgID 
     WHERE TxID = ' . $textid;
     $res = do_mysqli_query($sql);
     $record = mysqli_fetch_assoc($res);

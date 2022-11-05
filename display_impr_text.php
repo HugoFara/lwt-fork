@@ -91,7 +91,7 @@ function do_display_impr_text_page($textid)
 {
     global $tbpref;
     $audio = get_first_value(
-        'SELECT TxAudioURI AS value FROM ' . $tbpref . 'texts 
+        'SELECT TxAudioURI AS value FROM texts 
         WHERE TxID = ' . $_REQUEST['text']
     );
     pagestart_nobody('Display');

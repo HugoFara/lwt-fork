@@ -123,8 +123,8 @@ function show_imported_terms($last_update, $limit, $rtl)
         ), \'\'
     ) AS taglist 
     FROM (
-        (' . $tbpref . 'words LEFT JOIN ' . $tbpref . 'wordtags ON WoID = WtWoID) 
-        LEFT JOIN ' . $tbpref . 'tags ON TgID = WtTgID
+        (words LEFT JOIN wordtags ON WoID = WtWoID) 
+        LEFT JOIN tags ON TgID = WtTgID
     ) 
     WHERE WoStatusChanged > ' . convert_string_to_sqlsyntax($last_update) . ' 
     GROUP BY WoID ' . $limit;

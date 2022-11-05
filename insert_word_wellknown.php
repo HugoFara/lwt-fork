@@ -27,7 +27,7 @@ function get_word($textid, $textpos)
     global $tbpref;
     $word = get_first_value(
         "SELECT Ti2Text AS value 
-        FROM " . $tbpref . "textitems2 
+        FROM textitems2 
         WHERE Ti2WordCount = 1 AND Ti2TxID = " . $textid . " AND Ti2Order = " . $textpos
     );
     return $word;
@@ -51,11 +51,11 @@ function insert_word_wellknown_to_database($textid, $word)
     
     $langid = get_first_value(
         "SELECT TxLgID AS value 
-        FROM " . $tbpref . "texts 
+        FROM texts 
         WHERE TxID = " . $textid
     );
     runsql(
-        'INSERT INTO ' . $tbpref . 'words (
+        'INSERT INTO words (
             WoLgID, WoText, WoTextLC, WoStatus, WoWordCount, WoStatusChanged,' .  make_score_random_insert_update('iv') . '
         ) values( ' . 
             $langid . ', ' . 
@@ -67,7 +67,7 @@ function insert_word_wellknown_to_database($textid, $word)
     );
     $wid = get_last_key();
     do_mysqli_query(
-        "UPDATE  " . $tbpref . "textitems2
+        "UPDATE  textitems2
         SET Ti2WoID  = " . $wid . " 
         WHERE Ti2LgID = " . $langid . " AND lower(Ti2Text) = " . convert_string_to_sqlsyntax($wordlc)
     );

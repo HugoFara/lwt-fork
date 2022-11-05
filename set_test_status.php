@@ -115,18 +115,18 @@ function do_set_test_status_content($wid, $status, $oldstatus, $stchange)
 {
     global $tbpref;
     $word = get_first_value(
-        "SELECT WoText AS value FROM " . $tbpref . "words 
+        "SELECT WoText AS value FROM words 
         WHERE WoID = " . $wid
     );
 
     $oldscore = (int)get_first_value(
-        'SELECT greatest(0,round(WoTodayScore,0)) AS value FROM ' . $tbpref . 'words 
+        'SELECT greatest(0,round(WoTodayScore,0)) AS value FROM words 
         WHERE WoID = ' . $wid
     );
 
 
     runsql(
-        'UPDATE ' . $tbpref . 'words SET WoStatus = ' . 
+        'UPDATE words SET WoStatus = ' . 
         $status . ', WoStatusChanged = NOW(),' . make_score_random_insert_update('u') . ' 
         WHERE WoID = ' . $wid, 
         'Status changed'
@@ -134,7 +134,7 @@ function do_set_test_status_content($wid, $status, $oldstatus, $stchange)
         
     $newscore = (int)get_first_value(
         'SELECT greatest(0,round(WoTodayScore,0)) AS value 
-        FROM ' . $tbpref . 'words where WoID = ' . $wid
+        FROM words where WoID = ' . $wid
     );
     pagestart("Term: " . $word, false);
     do_set_test_status_html($status, $oldstatus, $newscore, $oldscore);
@@ -160,7 +160,7 @@ function start_set_text_status()
 
     $wid = (int)getreq('wid');
     $oldstatus = (int)get_first_value(
-        "SELECT WoStatus AS value FROM " . $tbpref . "words 
+        "SELECT WoStatus AS value FROM words 
         WHERE WoID = " . $wid
     );
 

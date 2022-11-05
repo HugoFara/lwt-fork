@@ -53,7 +53,7 @@ if (isset($_REQUEST['op'])) {
             }
         
             runsql(
-                'update ' . $tbpref . 'words set WoText = ' . 
+                'update words set WoText = ' . 
                 convert_string_to_sqlsyntax($_REQUEST["WoText"]) . ', WoTranslation = ' . 
                 convert_string_to_sqlsyntax($translation) . ', WoSentence = ' . 
                 convert_string_to_sqlsyntax(repl_tab_nl($_REQUEST["WoSentence"])) . ', WoRomanization = ' .
@@ -84,11 +84,11 @@ if (isset($_REQUEST['op'])) {
 
     <?php
 
-    $lang = get_first_value('select WoLgID as value from ' . $tbpref . 'words where WoID = ' . $wid);
+    $lang = get_first_value('select WoLgID as value from words where WoID = ' . $wid);
     if (!isset($lang)) { 
         my_die('Cannot retrieve language in edit_tword.php'); 
     }
-    $regexword = get_first_value('select LgRegexpWordCharacters as value from ' . $tbpref . 'languages where LgID = ' . $lang);
+    $regexword = get_first_value('select LgRegexpWordCharacters as value from languages where LgID = ' . $lang);
     if (!isset($regexword)) {
         my_die('Cannot retrieve language data in edit_tword.php'); 
     }
@@ -139,7 +139,7 @@ else {  // if (! isset($_REQUEST['op']))
     if ($wid == '') { my_die("Term ID missing in edit_tword.php"); 
     }
     
-    $sql = 'select WoText, WoLgID, WoTranslation, WoSentence, WoRomanization, WoStatus from ' . $tbpref . 'words where WoID = ' . $wid;
+    $sql = 'select WoText, WoLgID, WoTranslation, WoSentence, WoRomanization, WoStatus from words where WoID = ' . $wid;
     $res = do_mysqli_query($sql);
     $record = mysqli_fetch_assoc($res);
     if ($record ) {

@@ -24,10 +24,10 @@ if($_REQUEST['status']==1) {
 $word = convert_string_to_sqlsyntax($_REQUEST['text']);
 $wordlc = convert_string_to_sqlsyntax(mb_strtolower($_REQUEST['text'], 'UTF-8'));
 
-$langid = get_first_value("select TxLgID as value from " . $tbpref . "texts where TxID = " . $_REQUEST['tid']);
+$langid = get_first_value("select TxLgID as value from texts where TxID = " . $_REQUEST['tid']);
 
             runsql(
-                'insert into ' . $tbpref . 'words (WoLgID, WoTextLC, WoText, ' .
+                'insert into words (WoLgID, WoTextLC, WoText, ' .
                 'WoStatus, WoTranslation, WoSentence, WoRomanization, WoStatusChanged,' .  make_score_random_insert_update('iv') . ') values( ' . 
                 $langid . ', ' .
                 $wordlc . ', ' .
@@ -37,7 +37,7 @@ $langid = get_first_value("select TxLgID as value from " . $tbpref . "texts wher
                 make_score_random_insert_update('id') . ')', "Term saved"
             );
             $wid = get_last_key();
-            do_mysqli_query('UPDATE ' . $tbpref . 'textitems2 SET Ti2WoID = ' . $wid . ' WHERE Ti2LgID = ' . $langid . ' AND LOWER(Ti2Text) =' . $wordlc);
+            do_mysqli_query('UPDATE textitems2 SET Ti2WoID = ' . $wid . ' WHERE Ti2LgID = ' . $langid . ' AND LOWER(Ti2Text) =' . $wordlc);
             $hex = strToClassName(prepare_textdata(mb_strtolower($_REQUEST['text'], 'UTF-8')));
 
 

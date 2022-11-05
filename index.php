@@ -115,19 +115,19 @@ function do_current_text_info($textid)
     global $tbpref;
     $txttit = get_first_value(
         'SELECT TxTitle AS value 
-        FROM ' . $tbpref . 'texts 
+        FROM texts 
         WHERE TxID=' . $textid
     );
     if (!isset($txttit)) {
         return;
     } 
     $txtlng = get_first_value(
-        'SELECT TxLgID AS value FROM ' . $tbpref . 'texts WHERE TxID=' . $textid
+        'SELECT TxLgID AS value FROM texts WHERE TxID=' . $textid
     );
     $lngname = getLanguage($txtlng);
     $annotated = (int)get_first_value(
         "SELECT LENGTH(TxAnnotatedText) AS value 
-        FROM " . $tbpref . "texts 
+        FROM texts 
         WHERE TxID = " . $textid
     ) > 0;
     ?>
@@ -259,7 +259,7 @@ if (is_numeric(getSetting('currenttext'))) {
     $currenttext = (int) getSetting('currenttext');
 }
 
-$langcnt = (int) get_first_value('SELECT COUNT(*) AS value FROM ' . $tbpref . 'languages');
+$langcnt = (int) get_first_value('SELECT COUNT(*) AS value FROM languages');
 
 list($p, $mb, $serversoft, $apache, $php, $mysql) = get_server_data();
 

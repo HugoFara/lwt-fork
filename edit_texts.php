@@ -162,25 +162,25 @@ function edit_texts_mark_action($markaction, $marked, $actiondata)
 
     if ($markaction == 'del') {
         $message3 = runsql(
-            'delete from ' . $tbpref . 'textitems2 where Ti2TxID in ' . $list, 
+            'delete from textitems2 where Ti2TxID in ' . $list, 
             "Text items deleted"
         );
         $message2 = runsql(
-            'delete from ' . $tbpref . 'sentences where SeTxID in ' . $list, 
+            'delete from sentences where SeTxID in ' . $list, 
             "Sentences deleted"
         );
         $message1 = runsql(
-            'delete from ' . $tbpref . 'texts where TxID in ' . $list, 
+            'delete from texts where TxID in ' . $list, 
             "Texts deleted"
         );
         $message = $message1 . " / " . $message2 . " / " . $message3;
         adjust_autoincr('texts', 'TxID');
         adjust_autoincr('sentences', 'SeID');
         runsql(
-            "DELETE " . $tbpref . "texttags 
+            "DELETE texttags 
             FROM (
-                " . $tbpref . "texttags 
-                LEFT JOIN " . $tbpref . "texts 
+                texttags 
+                LEFT JOIN texts 
                 ON TtTxID = TxID
             ) 
             WHERE TxID IS NULL", 
@@ -188,43 +188,43 @@ function edit_texts_mark_action($markaction, $marked, $actiondata)
         );
     } elseif ($markaction == 'arch') {
         runsql(
-            'delete from ' . $tbpref . 'textitems2 where Ti2TxID in ' . $list, 
+            'delete from textitems2 where Ti2TxID in ' . $list, 
             ""
         );
         runsql(
-            'delete from ' . $tbpref . 'sentences where SeTxID in ' . $list, 
+            'delete from sentences where SeTxID in ' . $list, 
             ""
         );
         $count = 0;
-        $sql = "select TxID from " . $tbpref . "texts where TxID in " . $list;
+        $sql = "select TxID from texts where TxID in " . $list;
         $res = do_mysqli_query($sql);
         while ($record = mysqli_fetch_assoc($res)) {
             $id = $record['TxID'];
             $count += (int)runsql(
-                'insert into ' . $tbpref . 'archivedtexts (
+                'insert into archivedtexts (
                     AtLgID, AtTitle, AtText, AtAnnotatedText, AtAudioURI, AtSourceURI
                 ) 
                 select TxLgID, TxTitle, TxText, TxAnnotatedText, TxAudioURI, TxSourceURI 
-                from ' . $tbpref . 'texts where TxID = ' . $id, 
+                from texts where TxID = ' . $id, 
                 ""
             );
             $aid = get_last_key();
             runsql(
-                'insert into ' . $tbpref . 'archtexttags (AgAtID, AgT2ID) 
+                'insert into archtexttags (AgAtID, AgT2ID) 
                 select ' . $aid . ', TtT2ID 
-                from ' . $tbpref . 'texttags 
+                from texttags 
                 where TtTxID = ' . $id, 
                 ""
             );
         }
         mysqli_free_result($res);
         $message = 'Text(s) archived: ' . $count;
-        runsql('delete from ' . $tbpref . 'texts where TxID in ' . $list, "");
+        runsql('delete from texts where TxID in ' . $list, "");
         runsql(
-            "DELETE " . $tbpref . "texttags 
+            "DELETE texttags 
             FROM (
-                " . $tbpref . "texttags 
-                LEFT JOIN " . $tbpref . "texts 
+                texttags 
+                LEFT JOIN texts 
                 on TtTxID = TxID
             ) 
             WHERE TxID IS NULL", 
@@ -241,7 +241,7 @@ function edit_texts_mark_action($markaction, $marked, $actiondata)
     } elseif ($markaction == 'setsent') {
         $count = 0;
         $sql = "select WoID, WoTextLC, min(Ti2SeID) as SeID 
-        from " . $tbpref . "words, " . $tbpref . "textitems2 
+        from words, textitems2 
         where Ti2LgID = WoLgID and Ti2WoID = WoID and Ti2TxID in " . $list . " and 
         ifnull(WoSentence,'') not like concat('%{',WoText,'}%') 
         group by WoID order by WoID, min(Ti2SeID)";
@@ -254,7 +254,7 @@ function edit_texts_mark_action($markaction, $marked, $actiondata)
                 (int) getSettingWithDefault('set-term-sentence-count')
             );
             $count += (int) runsql(
-                'UPDATE ' . $tbpref . 'words 
+                'UPDATE words 
                 SET WoSentence = ' . convert_string_to_sqlsyntax(repl_tab_nl($sent[1])) . ' 
                 WHERE WoID = ' . $record['WoID'], 
                 ''
@@ -265,7 +265,7 @@ function edit_texts_mark_action($markaction, $marked, $actiondata)
     } elseif ($markaction == 'setactsent') {
         $count = 0;
         $sql = "SELECT WoID, WoTextLC, MIN(Ti2SeID) AS SeID 
-        FROM " . $tbpref . "words, " . $tbpref . "textitems2 
+        FROM words, textitems2 
         WHERE Ti2LgID = WoLgID AND WoStatus != 98 AND WoStatus != 99 AND 
         Ti2WoID = WoID AND Ti2TxID IN " . $list . " AND 
         IFNULL(WoSentence,'') NOT LIKE CONCAT('%{',WoText,'}%') 
@@ -280,7 +280,7 @@ function edit_texts_mark_action($markaction, $marked, $actiondata)
                 (int) getSettingWithDefault('set-term-sentence-count')
             );
             $count += (int) runsql(
-                'update ' . $tbpref . 'words 
+                'update words 
                 set WoSentence = ' . convert_string_to_sqlsyntax(repl_tab_nl($sent[1])) . ' 
                 where WoID = ' . $record['WoID'], 
                 ''
@@ -290,22 +290,22 @@ function edit_texts_mark_action($markaction, $marked, $actiondata)
         $message = 'Term Sentences set from Text(s): ' . $count;
     } elseif ($markaction == 'rebuild') {
         $count = 0;
-        $sql = "select TxID, TxLgID from " . $tbpref . "texts where TxID in " . $list;
+        $sql = "select TxID, TxLgID from texts where TxID in " . $list;
         $res = do_mysqli_query($sql);
         while ($record = mysqli_fetch_assoc($res)) {
             $id = (int)$record['TxID'];
             runsql(
-                'delete from ' . $tbpref . 'sentences where SeTxID = ' . $id, 
+                'delete from sentences where SeTxID = ' . $id, 
                 "Sentences deleted"
             );
             runsql(
-                'delete from ' . $tbpref . 'textitems2 where Ti2TxID = ' . $id, 
+                'delete from textitems2 where Ti2TxID = ' . $id, 
                 "Text items deleted"
             );
             adjust_autoincr('sentences', 'SeID');
             splitCheckText(
                 get_first_value(
-                    'select TxText as value from ' . $tbpref . 'texts where TxID = ' . $id
+                    'select TxText as value from texts where TxID = ' . $id
                 ),
                 $record['TxLgID'], $id 
             );
@@ -314,7 +314,7 @@ function edit_texts_mark_action($markaction, $marked, $actiondata)
         mysqli_free_result($res);
         $message = 'Text(s) reparsed: ' . $count;
     } elseif ($markaction == 'test' ) {
-        $_SESSION['testsql'] = ' ' . $tbpref . 'words, ' . $tbpref . 'textitems2 
+        $_SESSION['testsql'] = ' words, textitems2 
         WHERE Ti2LgID = WoLgID AND Ti2WoID = WoID AND Ti2TxID IN ' . $list . ' ';
         header("Location: do_test.php?selection=1");
         exit();
@@ -336,25 +336,25 @@ function edit_texts_delete($txid)
 {
     global $tbpref;
     $message3 = runsql(
-        'DELETE FROM ' . $tbpref . 'textitems2 where Ti2TxID = ' . $txid,
+        'DELETE FROM textitems2 where Ti2TxID = ' . $txid,
         "Text items deleted"
     );
     $message2 = runsql(
-        'DELETE FROM ' . $tbpref . 'sentences where SeTxID = ' . $txid,
+        'DELETE FROM sentences where SeTxID = ' . $txid,
         "Sentences deleted"
     );
     $message1 = runsql(
-        'DELETE FROM ' . $tbpref . 'texts where TxID = ' . $txid,
+        'DELETE FROM texts where TxID = ' . $txid,
         "Texts deleted"
     );
     $message = $message1 . " / " . $message2 . " / " . $message3;
     adjust_autoincr('texts', 'TxID');
     adjust_autoincr('sentences', 'SeID');
     runsql(
-        "DELETE {$tbpref}texttags 
+        "DELETE texttags 
         FROM (
-            {$tbpref}texttags 
-            LEFT JOIN {$tbpref}texts 
+            texttags 
+            LEFT JOIN texts 
             ON TtTxID = TxID
         ) 
         WHERE TxID IS NULL", 
@@ -378,41 +378,41 @@ function edit_texts_archive($txid)
 {
     global $tbpref;
     $message3 = runsql(
-        "DELETE FROM {$tbpref}textitems2 WHERE Ti2TxID = $txid",
+        "DELETE FROM textitems2 WHERE Ti2TxID = $txid",
         "Text items deleted"
     );
     $message2 = runsql(
-        "DELETE FROM {$tbpref}sentences WHERE SeTxID = $txid",
+        "DELETE FROM sentences WHERE SeTxID = $txid",
         "Sentences deleted"
     );
     $message4 = runsql(
-        "INSERT INTO {$tbpref}archivedtexts (
+        "INSERT INTO archivedtexts (
             AtLgID, AtTitle, AtText, AtAnnotatedText, AtAudioURI, AtSourceURI
         ) SELECT TxLgID, TxTitle, TxText, TxAnnotatedText, TxAudioURI, TxSourceURI 
-        FROM {$tbpref}texts 
+        FROM texts 
         WHERE TxID = $txid", 
         "Archived Texts saved"
     );
     $id = get_last_key();
     runsql(
-        "INSERT INTO {$tbpref}archtexttags (AgAtID, AgT2ID) 
+        "INSERT INTO archtexttags (AgAtID, AgT2ID) 
         SELECT $id, TtT2ID 
-        FROM {$tbpref}texttags 
+        FROM texttags 
         WHERE TtTxID = $txid", 
         ""
     );
     $message1 = runsql(
-        "DELETE FROM {$tbpref}texts WHERE TxID = $txid", 
+        "DELETE FROM texts WHERE TxID = $txid", 
         "Texts deleted"
     );
     $message = $message4 . " / " . $message1 . " / " . $message2 . " / " . $message3;
     adjust_autoincr('texts', 'TxID');
     adjust_autoincr('sentences', 'SeID');
     runsql(
-        "DELETE {$tbpref}texttags 
+        "DELETE texttags 
         FROM (
-            {$tbpref}texttags 
-            LEFT JOIN {$tbpref}texts 
+            texttags 
+            LEFT JOIN texts 
             ON TtTxID = TxID
         ) 
         WHERE TxID IS NULL", 
@@ -469,7 +469,7 @@ function edit_texts_do_operation($op, $message1, $no_pagestart)
 
     elseif (substr($op, 0, 4) == 'Save') {
         runsql(
-            'insert into ' . $tbpref . 'texts (
+            'insert into texts (
                 TxLgID, TxTitle, TxText, TxAnnotatedText, 
                 TxAudioURI, TxSourceURI
             ) values( ' . 
@@ -490,14 +490,14 @@ function edit_texts_do_operation($op, $message1, $no_pagestart)
         /*
         $oldtext = get_first_value(
             'SELECT TxText AS value 
-            FROM ' . $tbpref . 'texts 
+            FROM texts 
             WHERE TxID = ' . $_REQUEST["TxID"]
         );
         (convert_string_to_sqlsyntax(remove_soft_hyphens($_REQUEST["TxText"])) 
         != convert_string_to_sqlsyntax($oldtext));
         */
         runsql(
-            'update ' . $tbpref . 'texts set ' .
+            'update texts set ' .
             'TxLgID = ' . $_REQUEST["TxLgID"] . ', ' .
             'TxTitle = ' . convert_string_to_sqlsyntax($_REQUEST["TxTitle"]) . ', ' .
             'TxText = ' . convert_string_to_sqlsyntax(remove_soft_hyphens($_REQUEST["TxText"])) . ', ' .
@@ -510,18 +510,18 @@ function edit_texts_do_operation($op, $message1, $no_pagestart)
     }
 
     $message1 = runsql(
-        'delete from ' . $tbpref . 'sentences where SeTxID = ' . $id,
+        'delete from sentences where SeTxID = ' . $id,
         "Sentences deleted"
     );
     $message2 = runsql(
-        'delete from ' . $tbpref . 'textitems2 where Ti2TxID = ' . $id,
+        'delete from textitems2 where Ti2TxID = ' . $id,
         "Textitems deleted"
     );
     adjust_autoincr('sentences', 'SeID');
 
     splitCheckText(
         get_first_value(
-            'SELECT TxText AS value FROM ' . $tbpref . 'texts 
+            'SELECT TxText AS value FROM texts 
             WHERE TxID = ' . $id
         ),
         $_REQUEST["TxLgID"], $id 
@@ -530,12 +530,12 @@ function edit_texts_do_operation($op, $message1, $no_pagestart)
     $message = $message1 . " / " . $message2 . 
     " / Sentences added: " . get_first_value(
         "SELECT COUNT(*) AS value 
-        FROM {$tbpref}sentences 
+        FROM sentences 
         WHERE SeTxID = $id"
     ) . 
     " / Text items added: " . get_first_value(
         "SELECT COUNT(*) AS value 
-        FROM {$tbpref}textitems2 
+        FROM textitems2 
         WHERE Ti2TxID = $id"
     );
 
@@ -650,7 +650,7 @@ function edit_texts_change($txid)
 {
     global $tbpref;
     $sql = "SELECT TxLgID, TxTitle, TxText, TxAudioURI, TxSourceURI, LENGTH(TxAnnotatedText) AS annotlen 
-    FROM {$tbpref}texts 
+    FROM texts 
     WHERE TxID = {$txid}";
     $res = do_mysqli_query($sql);
     if ($record = mysqli_fetch_assoc($res)) {
@@ -1179,8 +1179,8 @@ function edit_texts_display($message)
     FROM (
         SELECT TxID 
         FROM (
-            {$tbpref}texts 
-            LEFT JOIN {$tbpref}texttags 
+            texts 
+            LEFT JOIN texttags 
             ON TxID = TtTxID
         ) WHERE (1=1) {$wh_lang}{$wh_query}
         GROUP BY TxID {$wh_tag}
@@ -1262,9 +1262,9 @@ function edit_texts_display($message)
             )
         ) AS taglist
         FROM (
-            ({$tbpref}texts LEFT JOIN {$tbpref}texttags ON TxID = TtTxID) 
-            LEFT JOIN {$tbpref}tags2 ON T2ID = TtT2ID
-        ), {$tbpref}languages
+            (texts LEFT JOIN texttags ON TxID = TtTxID) 
+            LEFT JOIN tags2 ON T2ID = TtT2ID
+        ), languages
         WHERE LgID=TxLgID {$wh_lang}{$wh_query} 
         GROUP BY TxID $wh_tag
         ORDER BY {$sorts[$currentsort-1]} 

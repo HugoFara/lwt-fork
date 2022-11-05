@@ -31,7 +31,7 @@ if (isset($_REQUEST['op'])) {
         echo '<h4><span class="bigger">' . $titletext . '</span></h4>';
     
         $message = runsql(
-            'insert into ' . $tbpref . 'words (WoLgID, WoTextLC, WoText, ' .
+            'insert into words (WoLgID, WoTextLC, WoText, ' .
             'WoStatus, WoTranslation, WoSentence, WoRomanization, WoStatusChanged,' .  make_score_random_insert_update('iv') . ') values( ' . 
             $_REQUEST["WoLgID"] . ', ' .
             convert_string_to_sqlsyntax($textlc) . ', ' .
@@ -69,13 +69,13 @@ if (isset($_REQUEST['op'])) {
     //]]>
 </script>
             <?php
-            $len = get_first_value('select WoWordCount as value from ' . $tbpref . 'words where WoID = ' . $wid);
+            $len = get_first_value('select WoWordCount as value from words where WoID = ' . $wid);
             if ($len > 1) {
                 insertExpressions($textlc, $_REQUEST["WoLgID"], $wid, $len, 0);
             } else if ($len == 1) {
                 $hex = strToClassName(prepare_textdata($textlc));
                 do_mysqli_query(
-                    'UPDATE ' . $tbpref . 'textitems2 SET Ti2WoID = ' . $wid . ' 
+                    'UPDATE textitems2 SET Ti2WoID = ' . $wid . ' 
                     WHERE Ti2LgID = ' . $_REQUEST["WoLgID"] . ' AND LOWER(Ti2Text) = ' . convert_string_to_sqlsyntax_notrim_nonull($textlc)
                 );
                 ?>

@@ -29,7 +29,7 @@ function get_word_data($wid)
 {
     global $tbpref;
     $sql = 'SELECT WoText, WoTranslation, WoRomanization 
-    FROM ' . $tbpref . 'words WHERE WoID = ' . $wid;
+    FROM words WHERE WoID = ' . $wid;
     $res = do_mysqli_query($sql);
     $record = mysqli_fetch_assoc($res);
     if (!$record) {
@@ -56,7 +56,7 @@ function set_word_status_database($wid, $status)
 {
     global $tbpref;
     $m1 = runsql(
-        'UPDATE ' . $tbpref . 'words 
+        'UPDATE words 
         SET WoStatus = ' . $status . ', WoStatusChanged = NOW(),' . make_score_random_insert_update('u') . ' 
         WHERE WoID = ' . $wid, 
         'Status changed'

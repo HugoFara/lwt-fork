@@ -40,13 +40,13 @@ $sum15 = 0;
 $sum599 = 0;
 $sumall = 0;
 
-$sql = 'SELECT WoLgID,WoStatus,count(*) AS value FROM ' . $tbpref . 'words GROUP BY WoLgID,WoStatus';
+$sql = 'SELECT WoLgID,WoStatus,count(*) AS value FROM words GROUP BY WoLgID,WoStatus';
 $res = do_mysqli_query($sql);
 $term_stat = null;
 while ($record = mysqli_fetch_assoc($res)) {
     $term_stat[$record['WoLgID']][$record['WoStatus']]=$record['value'];
 }
-$sql = 'SELECT LgID, LgName FROM ' . $tbpref . 'languages where LgName<>"" ORDER BY LgName';
+$sql = 'SELECT LgID, LgName FROM languages where LgName<>"" ORDER BY LgName';
 $res = do_mysqli_query($sql);
 while ($record = mysqli_fetch_assoc($res)) {
     $lang = $record['LgID'];
@@ -165,14 +165,14 @@ $sumkall = 0;
 </tr>
 <?php
 
-$sql = 'select WoLgID,TO_DAYS(curdate())-TO_DAYS(cast(WoCreated as date)) Created,count(WoID) as value from ' . $tbpref . 'words where WoStatus in (1,2,3,4,5,99) GROUP BY WoLgID,Created';
+$sql = 'select WoLgID,TO_DAYS(curdate())-TO_DAYS(cast(WoCreated as date)) Created,count(WoID) as value from words where WoStatus in (1,2,3,4,5,99) GROUP BY WoLgID,Created';
 $res = do_mysqli_query($sql);
 $term_created = null;
 while ($record = mysqli_fetch_assoc($res)) {
     $term_created[$record['WoLgID']][$record['Created']]=$record['value'];
 }
 
-$sql = 'select WoLgID,WoStatus,TO_DAYS(curdate())-TO_DAYS(cast(WoStatusChanged as date)) Changed,count(WoID) as value from ' . $tbpref . 'words GROUP BY WoLgID,WoStatus,WoStatusChanged';
+$sql = 'select WoLgID,WoStatus,TO_DAYS(curdate())-TO_DAYS(cast(WoStatusChanged as date)) Changed,count(WoID) as value from words GROUP BY WoLgID,WoStatus,WoStatusChanged';
 $res = do_mysqli_query($sql);
 $term_active = null;
 $term_known = null;
@@ -201,7 +201,7 @@ while ($record = mysqli_fetch_assoc($res)) {
     }
 }
 
-$sql = 'SELECT LgID, LgName FROM ' . $tbpref . 'languages where LgName<>"" ORDER BY LgName';
+$sql = 'SELECT LgID, LgName FROM languages where LgName<>"" ORDER BY LgName';
 $res = do_mysqli_query($sql);
 while ($record = mysqli_fetch_assoc($res)) {
 

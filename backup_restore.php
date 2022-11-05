@@ -120,7 +120,7 @@ if (isset($_REQUEST['restore'])) {
                 LgRegexpSplitSentences, LgExceptionsSplitSentences, 
                 LgRegexpWordCharacters, LgRemoveSpaces, LgSplitEachChar, 
                 LgRightToLeft 
-                FROM ' . $tbpref . 'languages where LgName<>""'
+                FROM languages where LgName<>""'
             );
             $num_fields = mysqli_num_fields($result);
         } elseif ($table !== 'sentences' && $table !== 'textitems'  
@@ -314,20 +314,20 @@ if (isset($_REQUEST['restore'])) {
     exit();
 } elseif (isset($_REQUEST['empty'])) {
     // EMPTY
-    runsql('TRUNCATE ' . $tbpref . 'archivedtexts', '');
-    runsql('TRUNCATE ' . $tbpref . 'archtexttags', '');
-    runsql('TRUNCATE ' . $tbpref . 'feedlinks', '');
-    runsql('TRUNCATE ' . $tbpref . 'languages', '');
-    runsql('TRUNCATE ' . $tbpref . 'textitems2', '');
-    runsql('TRUNCATE ' . $tbpref . 'newsfeeds', '');
-    runsql('TRUNCATE ' . $tbpref . 'sentences', '');
-    runsql('TRUNCATE ' . $tbpref . 'tags', '');
-    runsql('TRUNCATE ' . $tbpref . 'tags2', '');
-    runsql('TRUNCATE ' . $tbpref . 'texts', '');
-    runsql('TRUNCATE ' . $tbpref . 'texttags', '');
-    runsql('TRUNCATE ' . $tbpref . 'words', '');
-    runsql('TRUNCATE ' . $tbpref . 'wordtags', '');
-    runsql('DELETE FROM ' . $tbpref . 'settings where StKey = \'currenttext\'', '');
+    runsql('TRUNCATE archivedtexts', '');
+    runsql('TRUNCATE archtexttags', '');
+    runsql('TRUNCATE feedlinks', '');
+    runsql('TRUNCATE languages', '');
+    runsql('TRUNCATE textitems2', '');
+    runsql('TRUNCATE newsfeeds', '');
+    runsql('TRUNCATE sentences', '');
+    runsql('TRUNCATE tags', '');
+    runsql('TRUNCATE tags2', '');
+    runsql('TRUNCATE texts', '');
+    runsql('TRUNCATE texttags', '');
+    runsql('TRUNCATE words', '');
+    runsql('TRUNCATE wordtags', '');
+    runsql('DELETE FROM settings where StKey = \'currenttext\'', '');
     optimizedb();
     get_tags($refresh = 1);
     get_texttags($refresh = 1);

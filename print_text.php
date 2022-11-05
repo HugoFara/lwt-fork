@@ -112,7 +112,7 @@ if($annplcmnt == '') {
     $annplcmnt = 0; 
 }
 
-$sql = 'select TxLgID, TxTitle, TxSourceURI from ' . $tbpref . 'texts where TxID = ' . $textid;
+$sql = 'select TxLgID, TxTitle, TxSourceURI from texts where TxID = ' . $textid;
 $res = do_mysqli_query($sql);
 $record = mysqli_fetch_assoc($res);
 $title = $record['TxTitle'];
@@ -120,7 +120,7 @@ $sourceURI = $record['TxSourceURI'];
 $langid = $record['TxLgID'];
 mysqli_free_result($res);
 
-$sql = 'select LgTextSize, LgRemoveSpaces, LgRightToLeft from ' . $tbpref . 'languages where LgID = ' . $langid;
+$sql = 'select LgTextSize, LgRemoveSpaces, LgRightToLeft from languages where LgID = ' . $langid;
 $res = do_mysqli_query($sql);
 $record = mysqli_fetch_assoc($res);
 $textsize = $record['LgTextSize'];
@@ -162,7 +162,7 @@ echo "<option value=\"1\"" . get_selected(1, $annplcmnt) . ">in front of</option
 echo "<option value=\"2\"" . get_selected(2, $annplcmnt) . ">above (ruby)</option>";
 echo "</select> the term.<br />";
 echo "<input type=\"button\" value=\"Print it!\" onclick=\"window.print();\" />  (only the text below the line)";
-if (((int)get_first_value("select length(TxAnnotatedText) as value from " . $tbpref . "texts where TxID = " . $textid)) > 0) {
+if (((int)get_first_value("select length(TxAnnotatedText) as value from texts where TxID = " . $textid)) > 0) {
     echo " &nbsp; | &nbsp; Or <input type=\"button\" value=\"Print/Edit/Delete\" onclick=\"location.href='print_impr_text.php?text=" . $textid . "';\" /> your <b>Improved Annotated Text</b>" . get_annotation_link($textid) . ".";
 } else {
     echo " &nbsp; | &nbsp; <input type=\"button\" value=\"Create\" onclick=\"location.href='print_impr_text.php?edit=1&amp;text=" . $textid . "';\" /> an <b>Improved Annotated Text</b> [<img src=\"icn/tick.png\" title=\"Annotated Text\" alt=\"Annotated Text\" />].";
@@ -179,8 +179,8 @@ Ti2Order,
 CASE WHEN Ti2WordCount > 0 THEN 0 ELSE 1 END as TiIsNotWord, 
 WoID, WoTranslation, WoRomanization, WoStatus 
 FROM (
-    ' . $tbpref . 'textitems2 
-    LEFT JOIN ' . $tbpref . 'words ON (Ti2WoID = WoID) AND (Ti2LgID = WoLgID)
+    textitems2 
+    LEFT JOIN words ON (Ti2WoID = WoID) AND (Ti2LgID = WoLgID)
 ) 
 WHERE Ti2TxID = ' . $textid . ' 
 ORDER BY Ti2Order asc, Ti2WordCount desc';

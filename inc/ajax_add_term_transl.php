@@ -30,7 +30,7 @@ function add_new_term_transl($text, $lang, $data)
     global $tbpref;
     $textlc = mb_strtolower($text, 'UTF-8');
     $dummy = runsql(
-        'INSERT INTO ' . $tbpref . 'words (
+        'INSERT INTO words (
             WoLgID, WoTextLC, WoText, WoStatus, WoTranslation, 
             WoSentence, WoRomanization, WoStatusChanged, 
             ' .  make_score_random_insert_update('iv') . '
@@ -48,7 +48,7 @@ function add_new_term_transl($text, $lang, $data)
     }
     $wid = get_last_key();
     do_mysqli_query(
-        'UPDATE ' . $tbpref . 'textitems2 
+        'UPDATE textitems2 
         SET Ti2WoID = ' . $wid . ' 
         WHERE Ti2LgID = ' . $lang . ' AND LOWER(Ti2Text) =' . convert_string_to_sqlsyntax_notrim_nonull($textlc)
     );
@@ -70,7 +70,7 @@ function edit_term_transl($wid, $new_trans)
     global $tbpref;
     $oldtrans = get_first_value(
         "SELECT WoTranslation AS value 
-        FROM " . $tbpref . "words 
+        FROM words 
         WHERE WoID = " . $wid
     );
     
@@ -84,14 +84,14 @@ function edit_term_transl($wid, $new_trans)
             $oldtrans .= ' ' . get_first_sepa() . ' ' . $new_trans;
         }
         runsql(
-            'UPDATE ' . $tbpref . 'words 
+            'UPDATE words 
             SET WoTranslation = ' . convert_string_to_sqlsyntax($oldtrans) . ' 
             WHERE WoID = ' . $wid, ""
         );
     }
     return get_first_value(
         "SELECT WoTextLC AS value 
-        FROM " . $tbpref . "words 
+        FROM words 
         WHERE WoID = " . $wid
     );
 }
@@ -125,7 +125,7 @@ function do_ajax_add_term_transl($wid, $data)
     } else {
         $cnt_words = (int)get_first_value(
             "SELECT COUNT(WoID) AS value 
-            FROM " . $tbpref . "words 
+            FROM words 
             WHERE WoID = " . $wid
         );
         if ($cnt_words == 1) {

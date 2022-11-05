@@ -31,7 +31,7 @@ function save_text_position($textid, $position)
 {
     global $tbpref;
     runsql(
-        'UPDATE ' . $tbpref . 'texts 
+        'UPDATE texts 
         SET TxPosition = ' . $position . ' 
         WHERE TxID = ' . $textid, 
         ""
@@ -52,7 +52,7 @@ function save_audio_position($textid, $audioposition)
 {
     global $tbpref;
     runsql(
-        'UPDATE ' . $tbpref . 'texts 
+        'UPDATE texts 
         SET TxAudioPosition = ' . $audioposition . ' 
         WHERE TxID = ' . $textid, 
         ""

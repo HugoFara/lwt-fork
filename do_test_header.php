@@ -44,7 +44,7 @@ function get_sql_test_data(&$title, &$p)
     }
     $title .= ' in ' . get_first_value(
         'SELECT LgName AS value 
-        FROM ' . $tbpref . 'languages, ' . $testsql . ' AND LgID = WoLgID 
+        FROM languages, ' . $testsql . ' AND LgID = WoLgID 
         LIMIT 1'
     ); 
     return $testsql;
@@ -66,9 +66,9 @@ function get_lang_test_data(&$title, &$p): string
     $langid = getreq('lang');
     $p = "lang=" . $langid; 
     $title = "All Terms in " . get_first_value(
-        'SELECT LgName AS value FROM ' . $tbpref . 'languages WHERE LgID = ' . $langid
+        'SELECT LgName AS value FROM languages WHERE LgID = ' . $langid
     );
-    $testsql = ' ' . $tbpref . 'words WHERE WoLgID = ' . $langid . ' ';
+    $testsql = ' words WHERE WoLgID = ' . $langid . ' ';
     return $testsql;
 }
 
@@ -88,11 +88,11 @@ function get_text_test_data(&$title, &$p): string
     $textid = getreq('text');
     $p = "text=" . $textid; 
     $title = get_first_value(
-        'SELECT TxTitle AS value FROM ' . $tbpref . 'texts WHERE TxID = ' . $textid
+        'SELECT TxTitle AS value FROM texts WHERE TxID = ' . $textid
     );
     saveSetting('currenttext', $_REQUEST['text']);
     $testsql = 
-    ' ' . $tbpref . 'words, ' . $tbpref . 'textitems2 
+    ' words, textitems2 
     WHERE Ti2LgID = WoLgID AND Ti2WoID = WoID AND Ti2TxID = ' . $textid . ' ';
     return $testsql;
 }
