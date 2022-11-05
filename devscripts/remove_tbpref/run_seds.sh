@@ -15,5 +15,6 @@ for f in $FILES; do
         sed -i "" "s/{\$tbpref}$tbl/$tbl/g" $f
         sed -i "" "s/in_array(\$tbpref \. '$tbl', \$tables)/in_array('$tbl', \$tables)/g" $f
         sed -i "" "s/FROM ' \. \$tbpref \. \$table/FROM ' . \$table/g" $f
+        sed -i "" "s/\$tbpref \. '$tbl/$tbl/g" $f
     done
 done
