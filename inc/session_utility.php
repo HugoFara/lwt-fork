@@ -224,14 +224,14 @@ function get_archivedtexttag_selectoptions($v,$l): string
     if ($l == '') {
         $sql = "select T2ID, T2Text 
         from archivedtexts, " . 
-        $tbpref . "tags2, archtexttags 
+        tags2, archtexttags 
         where T2ID = AgT2ID and AgAtID = AtID 
         group by T2ID 
         order by UPPER(T2Text)"; 
     } else {
         $sql = "select T2ID, T2Text 
         from archivedtexts, tags2, " . 
-        $tbpref . "archtexttags 
+        archtexttags 
         where T2ID = AgT2ID and AgAtID = AtID and AtLgID = " . $l . " 
         group by T2ID 
         order by UPPER(T2Text)"; 
@@ -841,7 +841,7 @@ function write_rss_to_db($texts): string
                 runsql(
                     "DELETE texttags 
                     FROM (" 
-                        . $tbpref . "texttags 
+                        . texttags 
                         LEFT JOIN texts on TtTxID = TxID
                     ) 
                     WHERE TxID IS NULL", 
@@ -3518,7 +3518,7 @@ function get20Sentences($lang, $wordlc, $wid, $jsctlname, $mode): string
         mysqli_free_result($res);
         $removeSpaces = $record["LgRemoveSpaces"];
         if ('MECAB'== strtoupper(trim($record["LgRegexpWordCharacters"]))) {
-            $mecab_file = sys_get_temp_dir() . "/" . $tbpref . "mecab_to_db.txt";
+            $mecab_file = sys_get_temp_dir() . "/mecab_to_db.txt";
             //$mecab_args = ' -F {%m%t\\t -U {%m%t\\t -E \\n ';
             // For instance, "このラーメン" becomes "この    6    68\nラーメン    7    38"
             $mecab_args = ' -F %m\\t%t\\t%h\\n -U %m\\t%t\\t%h\\n -E EOS\\t3\\t7\\n ';
@@ -3693,7 +3693,7 @@ function insert_expression_from_mecab($text, $lid, $wid, $len)
 {
     global $tbpref;
 
-    $db_to_mecab = tempnam(sys_get_temp_dir(), "{$tbpref}db_to_mecab");
+    $db_to_mecab = tempnam(sys_get_temp_dir(), "db_to_mecab");
     $mecab_args = " -F %m\\t%t\\t%h\\n -U %m\\t%t\\t%h\\n -E EOS\\t3\\t7\\n ";
 
     $mecab = get_mecab_path($mecab_args);
@@ -4348,7 +4348,7 @@ function phonetic_reading($text, $lang)
     }
 
     // Japanese is an exception
-    $mecab_file = sys_get_temp_dir() . "/" . $tbpref . "mecab_to_db.txt";
+    $mecab_file = sys_get_temp_dir() . "/mecab_to_db.txt";
     $mecab_args = ' -O yomi ';
     if (file_exists($mecab_file)) { 
         unlink($mecab_file); 

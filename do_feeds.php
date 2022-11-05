@@ -210,7 +210,7 @@ if (isset($_REQUEST['marked_items'])) {
                         runsql(
                             "DELETE texttags 
                             FROM (" 
-                                . $tbpref . "texttags 
+                                . texttags 
                                 LEFT JOIN texts 
                                 ON TtTxID = TxID
                             ) 

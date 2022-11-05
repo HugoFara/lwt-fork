@@ -570,7 +570,7 @@ function update_japanese_word_count($japid)
     global $tbpref;
         
     // STEP 1: write the useful info to a file
-    $db_to_mecab = tempnam(sys_get_temp_dir(), "{$tbpref}db_to_mecab");
+    $db_to_mecab = tempnam(sys_get_temp_dir(), "db_to_mecab");
     $mecab_args = ' -F %m%t\\t -U %m%t\\t -E \\n ';
     $mecab = get_mecab_path($mecab_args);
 
@@ -592,7 +592,7 @@ function update_japanese_word_count($japid)
         unlink($db_to_mecab);
         return;
     }
-    $sql = "INSERT INTO {$tbpref}mecab (MID, MWordCount) values";
+    $sql = "INSERT INTO mecab (MID, MWordCount) values";
     $values = array();
     while (!feof($handle)) {
         $row = fgets($handle, 1024);
@@ -618,7 +618,7 @@ function update_japanese_word_count($japid)
 
     // STEP 3: edit the database
     do_mysqli_query(
-        "CREATE TEMPORARY TABLE {$tbpref}mecab ( 
+        "CREATE TEMPORARY TABLE mecab ( 
             MID mediumint(8) unsigned NOT NULL, 
             MWordCount tinyint(3) unsigned NOT NULL, 
             PRIMARY KEY (MID)
@@ -628,10 +628,10 @@ function update_japanese_word_count($japid)
     do_mysqli_query($sql);
     do_mysqli_query(
         "UPDATE words 
-        JOIN {$tbpref}mecab ON MID = WoID 
+        JOIN mecab ON MID = WoID 
         SET WoWordCount = MWordCount"
     );
-    do_mysqli_query("DROP TABLE {$tbpref}mecab");
+    do_mysqli_query("DROP TABLE mecab");
 
     unlink($db_to_mecab);
 }
