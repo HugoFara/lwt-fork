@@ -1,5 +1,7 @@
+set -e
+
 FILES=`find . -name '*.*' -print0 | xargs -0 grep -l tbpref 2>/dev/null`;
-# FILES=`echo ./edit_words.php`
+# FILES=`echo ./inc/database_connect.php`
 
 for f in $FILES; do
     echo "$f"
@@ -9,5 +11,6 @@ for f in $FILES; do
         sed -i "" "s/' \. \$tbpref \. '$tbl/$tbl/g" $f
         sed -i "" "s/\" \. \$tbpref \. \"$tbl/$tbl/g" $f
         sed -i "" "s/{\$tbpref}$tbl/$tbl/g" $f
+        sed -i "" "s/in_array(\$tbpref \. '$tbl', \$tables)/in_array('$tbl', \$tables)/g" $f
     done
 done
