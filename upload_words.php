@@ -250,7 +250,7 @@ function upload_words_import_terms($fields, $tabs, $file_upl, $col, $lang)
                 }
             }
             $seplen = mb_strlen($wosep, 'UTF-8');
-            $WoTrRepl = $tbpref . 'words.WoTranslation';
+            $WoTrRepl = words.WoTranslation';
             for ($i=1; $i < $seplen; $i++) {
                 $WoTrRepl = 'REPLACE(
                     ' . $WoTrRepl . ', ' . 
@@ -297,7 +297,7 @@ function upload_words_import_terms($fields, $tabs, $file_upl, $col, $lang)
             }
 
             $seplen = mb_strlen($tesep, 'UTF-8');
-            $WoTrRepl = $tbpref . 'tempwords.WoTranslation';
+            $WoTrRepl = tempwords.WoTranslation';
             for ($i=1; $i<$seplen; $i++) {
                 $WoTrRepl = 'REPLACE(
                     ' . $WoTrRepl . ', ' . 

@@ -159,7 +159,7 @@ if (isset($_REQUEST["action"])) {  // Action
             CASE WHEN Ti2WordCount > 0 THEN 0 ELSE 1 END AS TiIsNotWord, 
             WoID, WoTranslation, WoRomanization, WoStatus 
             FROM (' . 
-                $tbpref . 'textitems2 
+                textitems2 
                 LEFT JOIN words 
                 ON (Ti2WoID = WoID) AND (Ti2LgID = WoLgID)
             ) 
