@@ -512,7 +512,7 @@ function adjust_autoincr($table, $key): void
 {
     global $tbpref;
     $val = get_first_value(
-        'SELECT max(' . $key .')+1 AS value FROM ' . $tbpref . $table
+        'SELECT max(' . $key .')+1 AS value FROM ' . $table
     );
     if (!isset($val)) { 
         $val = 1; 
@@ -1260,10 +1260,10 @@ function check_text_with_expressions($id, $lid, $wl, $wl_max, $mw_sql)
     }
     do_mysqli_query('set ' . $init_var . '@a1=0,@a0=0,@b=0,@c="",@d=0,@e=0,@f="",@h=0;');
     do_mysqli_query(
-        'CREATE TEMPORARY TABLE IF NOT EXISTS ' . $tbpref . 'numbers( n  tinyint(3) unsigned NOT NULL);'
+        'CREATE TEMPORARY TABLE IF NOT EXISTS numbers( n  tinyint(3) unsigned NOT NULL);'
     );
-    do_mysqli_query('TRUNCATE TABLE ' . $tbpref . 'numbers');
-    do_mysqli_query('INSERT IGNORE INTO ' . $tbpref . 'numbers(n) VALUES (' . implode('),(', $wl) . ');');
+    do_mysqli_query('TRUNCATE TABLE numbers');
+    do_mysqli_query('INSERT IGNORE INTO numbers(n) VALUES (' . implode('),(', $wl) . ');');
     if ($id>0) {
         $sql = 'SELECT straight_join WoID, sent, TiOrder - (2*(n-1)) TiOrder, n TiWordCount,word';
     } else {
@@ -1316,7 +1316,7 @@ function check_text_with_expressions($id, $lid, $wl, $wl_max, $mw_sql)
         ) word,
         if(@d=0 or ""=@z, NULL, lower(@z)) lword, 
         TiOrder,
-        n FROM ' . $tbpref . 'numbers , temptextitems
+        n FROM numbers , temptextitems
     ) ti, 
     words 
     WHERE lword IS NOT NULL AND WoLgID=' . $lid . ' AND 

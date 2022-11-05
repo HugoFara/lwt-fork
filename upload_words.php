@@ -151,13 +151,13 @@ function upload_words_import_terms($fields, $tabs, $file_upl, $col, $lang)
     } else {
         runsql('SET GLOBAL max_heap_table_size = 1024 * 1024 * 1024 * 2', '');
         runsql(
-            "CREATE TEMPORARY TABLE IF NOT EXISTS {$tbpref}numbers( 
+            "CREATE TEMPORARY TABLE IF NOT EXISTS numbers( 
                 n  tinyint(3) unsigned NOT NULL
             )", 
             ''
         );
         runsql(
-            "INSERT IGNORE INTO {$tbpref}numbers(n) VALUES ('1'),('2'),('3'),
+            "INSERT IGNORE INTO numbers(n) VALUES ('1'),('2'),('3'),
             ('4'),('5'),('6'),('7'),('8'),('9')", 
             ''
         );
@@ -229,7 +229,7 @@ function upload_words_import_terms($fields, $tabs, $file_upl, $col, $lang)
         
         if ($overwrite>3) {
             runsql(
-                "CREATE TEMPORARY TABLE IF NOT EXISTS {$tbpref}merge_words(
+                "CREATE TEMPORARY TABLE IF NOT EXISTS merge_words(
                     MID mediumint(8) unsigned NOT NULL AUTO_INCREMENT, 
                     MText varchar(250) NOT NULL,  
                     MTranslation  varchar(250) NOT NULL, 
@@ -260,27 +260,27 @@ function upload_words_import_terms($fields, $tabs, $file_upl, $col, $lang)
             }
 
             runsql(
-                "INSERT IGNORE INTO {$tbpref}merge_words(MText,MTranslation) 
+                "INSERT IGNORE INTO merge_words(MText,MTranslation) 
                 SELECT b.WoTextLC, 
                 trim(
                     SUBSTRING_INDEX(
                         SUBSTRING_INDEX(
                             b.WoTranslation, 
                             " . convert_string_to_sqlsyntax($wosep[0]) . ", 
-                            {$tbpref}numbers.n
+                            numbers.n
                         ), 
                         " . convert_string_to_sqlsyntax($wosep[0]) . 
                         ", -1
                     )
                 ) name 
-                FROM {$tbpref}numbers 
+                FROM numbers 
                 INNER JOIN (
                     SELECT words.WoTextLC as WoTextLC, $WoTrRepl as WoTranslation 
                     FROM tempwords 
                     LEFT JOIN words 
                     ON words.WoTextLC = tempwords.WoTextLC AND words.WoTranslation != '*' AND words.WoLgID = $lang
                 ) b 
-                ON CHAR_LENGTH(b.WoTranslation)-CHAR_LENGTH(REPLACE(b.WoTranslation, " . convert_string_to_sqlsyntax($wosep[0]) . ", ''))>= {$tbpref}numbers.n-1 
+                ON CHAR_LENGTH(b.WoTranslation)-CHAR_LENGTH(REPLACE(b.WoTranslation, " . convert_string_to_sqlsyntax($wosep[0]) . ", ''))>= numbers.n-1 
                 ORDER BY b.WoTextLC, n", 
                 ''
             );
@@ -307,22 +307,22 @@ function upload_words_import_terms($fields, $tabs, $file_upl, $col, $lang)
             }
 
             runsql(
-                "INSERT IGNORE INTO {$tbpref}merge_words(MText,MTranslation) 
+                "INSERT IGNORE INTO merge_words(MText,MTranslation) 
                 SELECT tempwords.WoTextLC, 
                 trim(
                     SUBSTRING_INDEX(
                         SUBSTRING_INDEX(
                             $WoTrRepl," . 
                             convert_string_to_sqlsyntax($tesep[0]) . " , 
-                            {$tbpref}numbers.n
+                            numbers.n
                         ), " . 
                         convert_string_to_sqlsyntax($tesep[0]) . ", 
                         -1
                     )
                 ) name 
-                FROM {$tbpref}numbers 
+                FROM numbers 
                 INNER JOIN tempwords 
-                ON CHAR_LENGTH(tempwords.WoTranslation)-CHAR_LENGTH(REPLACE($WoTrRepl, " . convert_string_to_sqlsyntax($tesep[0]) . ", ''))>= {$tbpref}numbers.n-1 
+                ON CHAR_LENGTH(tempwords.WoTranslation)-CHAR_LENGTH(REPLACE($WoTrRepl, " . convert_string_to_sqlsyntax($tesep[0]) . ", ''))>= numbers.n-1 
                 ORDER BY tempwords.WoTextLC, n", 
                 ''
             );
@@ -338,14 +338,14 @@ function upload_words_import_terms($fields, $tabs, $file_upl, $col, $lang)
                         ORDER BY MID 
                         SEPERATOR " . convert_string_to_sqlsyntax_notrim_nonull($wosep) . "
                     ) AS Translation 
-                    FROM {$tbpref}merge_words 
+                    FROM merge_words 
                     GROUP BY MText
                 ) A 
                 ON MText=WoTextLC 
                 SET WoTranslation = Translation", 
                 ''
             );
-            runsql("DROP TABLE {$tbpref}merge_words", '');
+            runsql("DROP TABLE merge_words", '');
         }
         // */
         if ($overwrite!=3 and $overwrite!=5) {
@@ -417,11 +417,11 @@ function upload_words_import_terms($fields, $tabs, $file_upl, $col, $lang)
                     SUBSTRING_INDEX(
                         SUBSTRING_INDEX(
                             tempwords.WoTaglist, ',', 
-                            {$tbpref}numbers.n
+                            numbers.n
                         ), ',', -1) name 
-                    FROM {$tbpref}numbers 
+                    FROM numbers 
                     INNER JOIN tempwords 
-                    ON CHAR_LENGTH(tempwords.WoTaglist)-CHAR_LENGTH(REPLACE(tempwords.WoTaglist, ',', ''))>={$tbpref}numbers.n-1 
+                    ON CHAR_LENGTH(tempwords.WoTaglist)-CHAR_LENGTH(REPLACE(tempwords.WoTaglist, ',', ''))>=numbers.n-1 
                     ORDER BY WoTextLC, n) A",
                 ''
             );
@@ -431,17 +431,17 @@ function upload_words_import_terms($fields, $tabs, $file_upl, $col, $lang)
                 FROM (
                     SELECT tempwords.WoTextLC, SUBSTRING_INDEX(
                         SUBSTRING_INDEX(
-                            tempwords.WoTaglist, ',', {$tbpref}numbers.n
+                            tempwords.WoTaglist, ',', numbers.n
                         ), ',', -1) name 
-                    FROM {$tbpref}numbers 
-                    INNER JOIN tempwords ON CHAR_LENGTH(tempwords.WoTaglist)-CHAR_LENGTH(REPLACE(tempwords.WoTaglist, ',', ''))>={$tbpref}numbers.n-1 
+                    FROM numbers 
+                    INNER JOIN tempwords ON CHAR_LENGTH(tempwords.WoTaglist)-CHAR_LENGTH(REPLACE(tempwords.WoTaglist, ',', ''))>=numbers.n-1 
                     ORDER BY WoTextLC, n
                 ) A, tags, words 
                 WHERE name=TgText AND A.WoTextLC=words.WoTextLC AND WoLgID=$lang", 
                 ''
             );
         }
-        runsql("DROP TABLE {$tbpref}numbers", '');
+        runsql("DROP TABLE numbers", '');
         runsql("TRUNCATE tempwords", '');
         if ($fields["tl"]!=0) { 
             get_tags(1); 
@@ -607,13 +607,13 @@ function upload_words_import_tags($fields, $tabs, $file_upl)
         );
     }
     runsql(
-        "CREATE TEMPORARY TABLE IF NOT EXISTS {$tbpref}numbers( 
+        "CREATE TEMPORARY TABLE IF NOT EXISTS numbers( 
             n  tinyint(3) unsigned NOT NULL
         )", 
         ''
     );
     runsql(
-        "INSERT IGNORE INTO {$tbpref}numbers(n) VALUES ('1'),('2'),('3'),
+        "INSERT IGNORE INTO numbers(n) VALUES ('1'),('2'),('3'),
         ('4'),('5'),('6'),('7'),('8'),('9')", 
         ''
     );
@@ -622,15 +622,15 @@ function upload_words_import_tags($fields, $tabs, $file_upl)
         SELECT NAME FROM (
             SELECT SUBSTRING_INDEX(
                 SUBSTRING_INDEX(
-                    tempwords.WoTextLC, ',',  {$tbpref}numbers.n
+                    tempwords.WoTextLC, ',',  numbers.n
                 ), ',', -1) name 
-            FROM {$tbpref}numbers 
+            FROM numbers 
             INNER JOIN tempwords 
-            ON CHAR_LENGTH(tempwords.WoTextLC)-CHAR_LENGTH(REPLACE(tempwords.WoTextLC, ',', ''))>= {$tbpref}numbers.n-1 
+            ON CHAR_LENGTH(tempwords.WoTextLC)-CHAR_LENGTH(REPLACE(tempwords.WoTextLC, ',', ''))>= numbers.n-1 
             ORDER BY WoTextLC, n) A", 
         ''
     );
-    runsql("DROP TABLE {$tbpref}numbers", '');
+    runsql("DROP TABLE numbers", '');
     runsql("TRUNCATE tempwords", '');
     get_tags(1);
     if (!$file_upl) {

@@ -60,7 +60,7 @@ if (isset($_REQUEST['restore'])) {
     $out = "-- " . $fname . "\n";
     foreach ($tables as $table) { 
         // foreach table
-        $result = do_mysqli_query('SELECT * FROM ' . $tbpref . $table);
+        $result = do_mysqli_query('SELECT * FROM ' . $table);
         $num_fields = mysqli_num_fields($result);
         $out .= "\nDROP TABLE IF EXISTS " . $table . ";\n";
         $row2 = mysqli_fetch_row(do_mysqli_query("SHOW CREATE TABLE $tbpref$table"));
@@ -99,7 +99,7 @@ if (isset($_REQUEST['restore'])) {
             $result = do_mysqli_query(
                 'SELECT TxID, TxLgID, TxTitle, TxText, TxAnnotatedText, TxAudioURI, 
                 TxSourceURI 
-                FROM ' . $tbpref . $table
+                FROM ' . $table
             );
             $num_fields = 7;
         } elseif ($table == 'words') {
@@ -107,7 +107,7 @@ if (isset($_REQUEST['restore'])) {
                 'SELECT WoID, WoLgID, WoText, WoTextLC, WoStatus, WoTranslation, 
                 WoRomanization, WoSentence, WoCreated, WoStatusChanged, WoTodayScore,
                 WoTomorrowScore, WoRandom 
-                FROM ' . $tbpref . $table
+                FROM ' . $table
             );
             $num_fields = 13;
         } elseif ($table == 'languages') {
@@ -126,7 +126,7 @@ if (isset($_REQUEST['restore'])) {
         } elseif ($table !== 'sentences' && $table !== 'textitems'  
             && $table !== 'settings'
         ) {
-            $result = do_mysqli_query('SELECT * FROM ' . $tbpref . $table);
+            $result = do_mysqli_query('SELECT * FROM ' . $table);
             $num_fields = mysqli_num_fields($result);
         }
         $out .= "\nDROP TABLE IF EXISTS " . $table . ";\n";
