@@ -40,6 +40,9 @@ for f in $FILES; do
         if [[ "$line" =~ "global $tbpref, $debug" ]]; then
             OK=1
         fi
+        if [[ "$line" =~ "global $debug, $tbpref" ]]; then
+            OK=1
+        fi
 
         if [[ $OK -eq 0 ]]; then
             BADLINE="$line"
@@ -51,7 +54,10 @@ for f in $FILES; do
         echo "Cleaning ${f}"
         sed -i "" "s/^[[:space:]]*global \$tbpref;[[:space:]]*$//g" $f
         sed -i "" "s/^[[:space:]]*global \$tbpref, \$debug;[[:space:]]*$/    global \$debug;/g" $f
+        sed -i "" "s/^[[:space:]]*global \$tbpref, \$langDefs;[[:space:]]*$/    global \$langDefs;/g" $f
+        sed -i "" "s/^[[:space:]]*global \$debug, \$tbpref;[[:space:]]*$/    global \$debug;/g" $f
         sed -i "" "s/^[[:space:]]*\* @global string \$tbpref.*$/ */g" $f
+        sed -i "" "s/^[[:space:]]*\* @global {string} \$tbpref.*$/ */g" $f
 
     else
         echo "Skipping ${f}, has line ${BADLINE}"
