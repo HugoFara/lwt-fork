@@ -45,8 +45,8 @@ for f in $FILES; do
     if [[ $HASBADLINE -eq 0 ]]; then
         echo "Cleaning ${f}"
         sed -i "" "s/^[[:space:]]*global \$tbpref;[[:space:]]*$//g" $f
-        sed -i "" "s/^[[:space:]]*global \$tbpref, \$debug;[[:space:]]*$/    global $debug;/g" $f
-        sed -i "" "s/^[[:space:]]*\* @global string \$tbpref.*$//g" $f
+        sed -i "" "s/^[[:space:]]*global \$tbpref, \$debug;[[:space:]]*$/    global \$debug;/g" $f
+        sed -i "" "s/^[[:space:]]*\* @global string \$tbpref.*$/ */g" $f
 
     else
         echo "Skipping ${f}, has line ${BADLINE}"
