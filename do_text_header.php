@@ -22,7 +22,7 @@ require_once 'inc/langdefs.php' ;
  *
  * @param string $textid ID of the text
  *
- * @global string $tbpref Table name prefix
+ *
  *
  * @since 2.0.3-fork
  *
@@ -32,7 +32,7 @@ require_once 'inc/langdefs.php' ;
  */
 function getData($textid): ?array
 {
-    global $tbpref;
+
     $sql = 
     'SELECT LgName, TxLgID, TxText, TxTitle, TxAudioURI, TxSourceURI, TxAudioPosition 
     FROM texts 

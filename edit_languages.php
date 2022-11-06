@@ -69,7 +69,7 @@ function edit_languages_alert_duplicate()
  */
 function edit_languages_refresh($lid)
 {
-    global $tbpref;
+
     $message2 = runsql(
         'delete from sentences where SeLgID = ' . $lid, 
         "Sentences deleted"
@@ -117,7 +117,7 @@ function edit_languages_refresh($lid)
  */
 function edit_languages_delete($lid)
 {
-    global $tbpref;
+
     $anztexts = get_first_value(
         'select count(TxID) as value 
         from texts 
@@ -165,7 +165,7 @@ function edit_languages_delete($lid)
  */
 function edit_languages_op_save()
 {
-    global $tbpref;
+
     $val = get_first_value(
         'select min(LgID) as value 
         from languages 
@@ -231,7 +231,7 @@ function edit_languages_op_save()
  */
 function edit_languages_op_change($lid) 
 {
-    global $tbpref;
+
     // Get old values
     $sql = "select * from languages where LgID=" . $lid;
     $res = do_mysqli_query($sql);
@@ -451,7 +451,7 @@ function edit_languages_new()
  */
 function edit_languages_change($lid)
 {
-    global $tbpref;
+
     $sql = 'select * from languages where LgID = ' . $lid;
     $res = do_mysqli_query($sql);
     if ($record = mysqli_fetch_assoc($res)) {
@@ -576,7 +576,7 @@ function edit_languages_change($lid)
  */
 function edit_languages_display($message)
 {
-    global $tbpref, $debug;
+    global $debug;
 
     echo error_message_with_hide($message, 0);
     

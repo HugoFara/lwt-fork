@@ -102,7 +102,7 @@ function get_imported_terms($recno, $currentpage, $last_update)
  */
 function show_imported_terms($last_update, $limit, $rtl)
 {
-    global $tbpref;
+
     echo '<table class="sortable tab1"  cellspacing="0" cellpadding="5">
     <tr>';
     ?>

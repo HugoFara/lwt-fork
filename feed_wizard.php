@@ -5,7 +5,7 @@ require_once 'inc/session_utility.php';
 
 function feed_wizard_edit_options()
 {
-    global $tbpref;
+
     pagestart('Feed Wizard', false);
     if(isset($_REQUEST['filter_tags'])) { 
         $_SESSION['wizard']['filter_tags']=$_REQUEST['filter_tags']; 
@@ -505,7 +505,7 @@ function feed_wizard_filter_text()
 
 function feed_wizard_select_text()
 {
-    global $tbpref;
+
     if(isset($_REQUEST['edit_feed']) && !isset($_SESSION['wizard'])) {
         $_SESSION['wizard']['edit_feed']=$_REQUEST['edit_feed'];
         $result = do_mysqli_query(

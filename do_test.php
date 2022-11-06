@@ -29,11 +29,11 @@ require_once 'do_test_table.php';
  * 
  * @return string Language name
  * 
- * @global string $tbpref Database table prefix
+ *
  */
 function get_l2_language_name()
 {
-    global $tbpref;
+
 
     $lang = 'L2';
     if (getreq('lang') != '') {

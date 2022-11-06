@@ -164,7 +164,7 @@ function long_text_check($max_input_vars)
  */
 function long_text_save()
 {
-    global $tbpref;
+
     $langid = (int) $_REQUEST["LgID"];
     $title = $_REQUEST["TxTitle"];
     $source_uri = $_REQUEST["TxSourceURI"];

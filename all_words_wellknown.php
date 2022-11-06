@@ -27,7 +27,7 @@ require_once 'inc/session_utility.php';
  */
 function all_words_wellknown_get_words($txid)
 {
-    global $tbpref;
+
     $sql = "SELECT DISTINCT Ti2Text, LOWER(Ti2Text) AS Ti2TextLC
     FROM ( 
         textitems2 
@@ -54,7 +54,7 @@ function all_words_wellknown_get_words($txid)
  */
 function all_words_wellknown_process_word($status, $term, $termlc, $langid)
 {
-    global $tbpref;
+
     $wid = get_first_value(
         "SELECT WoID AS value FROM words 
         WHERE WoTextLC = " . convert_string_to_sqlsyntax($termlc)
@@ -114,7 +114,7 @@ function all_words_wellknown_process_word($status, $term, $termlc, $langid)
  */
 function all_words_wellknown_main_loop($txid, $status)
 {
-    global $tbpref;
+
     $langid = get_first_value(
         "SELECT TxLgID AS value 
         FROM texts 

@@ -83,13 +83,13 @@ if (isset($audio)) {
  * 
  * @param int $textid Text ID
  * 
- * @global string $tbpref Database table prefix
+ *
  * 
  * @return void
  */
 function do_display_impr_text_page($textid)
 {
-    global $tbpref;
+
     $audio = get_first_value(
         'SELECT TxAudioURI AS value FROM texts 
         WHERE TxID = ' . $_REQUEST['text']

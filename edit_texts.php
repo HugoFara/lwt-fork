@@ -139,13 +139,13 @@ function edit_texts_get_wh_tag($currentlang)
  * 
  * @return string[2] Number of rows edited, the second string is always null.
  * 
- * @global string $tbpref Database table prefix
+ *
  * 
  * @since 2.4.1-fork The second return field is always null 
  */
 function edit_texts_mark_action($markaction, $marked, $actiondata)
 {
-    global $tbpref;
+
     $message = "Multiple Actions: 0";
     if (!isset($marked) || !is_array($marked)) {
         return array($message, null);
@@ -330,11 +330,11 @@ function edit_texts_mark_action($markaction, $marked, $actiondata)
  * 
  * @return string Texts, sentences, and text items deleted. 
  * 
- * @global string $tbpref Database table prefix
+ *
  */
 function edit_texts_delete($txid)
 {
-    global $tbpref;
+
     $message3 = runsql(
         'DELETE FROM textitems2 where Ti2TxID = ' . $txid,
         "Text items deleted"
@@ -372,11 +372,11 @@ function edit_texts_delete($txid)
  * @return string Number of archives saved, texts deleted, sentences deleted, 
  *                text items deleted.
  * 
- * @global string $tbpref Database table prefix
+ *
  */
 function edit_texts_archive($txid)
 {
-    global $tbpref;
+
     $message3 = runsql(
         "DELETE FROM textitems2 WHERE Ti2TxID = $txid",
         "Text items deleted"
@@ -430,13 +430,13 @@ function edit_texts_archive($txid)
  * 
  * @return string Edition message (number of rows edited)
  * 
- * @global string $tbpref Database table prefix
+ *
  * 
  * @since 2.4.1-fork $message1 is unnused
  */
 function edit_texts_do_operation($op, $message1, $no_pagestart)
 {
-    global $tbpref;
+
     if (strlen(prepare_textdata($_REQUEST['TxText'])) > 65000) {
         $message = "Error: Text too long, must be below 65000 Bytes";
         $currentlang = (int) validateLang(
@@ -644,11 +644,11 @@ function edit_texts_new($lid)
  * 
  * @return void
  * 
- * @global string $tbpref Database table prefix
+ *
  */
 function edit_texts_change($txid)
 {
-    global $tbpref;
+
     $sql = "SELECT TxLgID, TxTitle, TxText, TxAudioURI, TxSourceURI, LENGTH(TxAnnotatedText) AS annotlen 
     FROM texts 
     WHERE TxID = {$txid}";
@@ -1134,12 +1134,12 @@ function edit_texts_texts_form($currentlang, $showCounts, $sql, $recno)
  * 
  * @return void
  * 
- * @global string $tbpref Database table prefix
+ *
  * @global int    $debug  Debug mode active or not
  */
 function edit_texts_display($message)
 {
-    global $tbpref, $debug;
+    global $debug;
 
     // Page, Sort, etc.
 

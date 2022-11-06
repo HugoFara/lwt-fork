@@ -26,11 +26,11 @@ require_once 'inc/session_utility.php';
  * 
  * @return string SQL query to use
  * 
- * @global string $tbpref Database table prefix
+ *
  */
 function get_sql_test_data(&$title, &$p)
 {
-    global $tbpref;
+
     $p = "selection=" . $_REQUEST['selection']; 
     $testsql = $_SESSION['testsql'];
     $totalcount = get_first_value('SELECT count(distinct WoID) AS value FROM ' . $testsql);
@@ -58,11 +58,11 @@ function get_sql_test_data(&$title, &$p)
  *
  * @return string SQL query to use
  *
- * @global string $tbpref Database table prefix
+ *
  */
 function get_lang_test_data(&$title, &$p): string 
 {
-    global $tbpref;
+
     $langid = getreq('lang');
     $p = "lang=" . $langid; 
     $title = "All Terms in " . get_first_value(
@@ -80,11 +80,11 @@ function get_lang_test_data(&$title, &$p): string
  *
  * @return string SQL query to use
  *
- * @global string $tbpref Database table prefix
+ *
  */
 function get_text_test_data(&$title, &$p): string
 {
-    global $tbpref;
+
     $textid = getreq('text');
     $p = "text=" . $textid; 
     $title = get_first_value(

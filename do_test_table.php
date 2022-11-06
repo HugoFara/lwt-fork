@@ -22,11 +22,11 @@ require_once 'inc/session_utility.php';
  * 
  * @return string SQL request string
  * 
- * @global string $tbpref Table prefix
+ *
  */
 function get_test_table_sql()
 {
-    global $tbpref;
+
     if (isset($_REQUEST['selection']) && isset($_SESSION['testsql'])) { 
         $testsql = $_SESSION['testsql'];
         $cntlang = get_first_value('SELECT count(distinct WoLgID) AS value FROM ' . $testsql);
@@ -51,7 +51,7 @@ function get_test_table_sql()
 
 function do_test_table_language_settings($testsql)
 {
-    global $tbpref;
+
 
     $lang = get_first_value('SELECT WoLgID AS value FROM ' . $testsql . ' LIMIT 1');
 

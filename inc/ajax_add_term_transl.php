@@ -23,11 +23,11 @@ require_once __DIR__ . '/session_utility.php';
  * 
  * @return string Error message if failure, lowercase $text otherwise
  * 
- * @global string $tbpref Database table prefix
+ *
  */
 function add_new_term_transl($text, $lang, $data) 
 {
-    global $tbpref;
+
     $textlc = mb_strtolower($text, 'UTF-8');
     $dummy = runsql(
         'INSERT INTO words (
@@ -63,11 +63,11 @@ function add_new_term_transl($text, $lang, $data)
  * 
  * @return string WoTextLC, lower version of the word
  * 
- * @global string $tbpref Database table prefix
+ *
  */
 function edit_term_transl($wid, $new_trans)
 {
-    global $tbpref;
+
     $oldtrans = get_first_value(
         "SELECT WoTranslation AS value 
         FROM words 
@@ -104,11 +104,11 @@ function edit_term_transl($wid, $new_trans)
  * 
  * @return string Database alteration message
  * 
- * @global string $tbpref
+ *
  */
 function do_ajax_add_term_transl($wid, $data)
 {
-    global $tbpref;
+
     chdir('..');
     /// Save data
     $success = "";

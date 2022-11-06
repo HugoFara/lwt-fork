@@ -28,7 +28,7 @@ require_once 'inc/simterms.php';
  */
 function insert_new_word($textlc, $translation)
 {
-    global $tbpref;
+
 
     $titletext = "New Term: " . tohtml(prepare_textdata($_REQUEST["WoTextLC"]));
     pagestart_nobody($titletext);
@@ -69,7 +69,7 @@ function insert_new_word($textlc, $translation)
  */
 function edit_term($translation)
 {
-    global $tbpref;
+
 
     $titletext = "Edit Term: " . tohtml(prepare_textdata($_REQUEST["WoTextLC"]));
     pagestart_nobody($titletext);

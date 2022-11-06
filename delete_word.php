@@ -19,11 +19,11 @@ require_once 'inc/session_utility.php';
  * 
  * @return string|null A word
  * 
- * @global string $tbpref 
+ *
  */
 function get_term($wid)
 {
-    global $tbpref;
+
     $term = get_first_value(
         "SELECT WoText AS value 
         FROM words 
@@ -39,11 +39,11 @@ function get_term($wid)
  * 
  * @return string Some edit message, number of affected rows or error message
  * 
- * @global string $tbpref 
+ *
  */
 function delete_word_from_database($wid)
 {
-    global $tbpref;
+
     $m1 = runsql(
         'DELETE FROM words 
         WHERE WoID = ' . $wid, 

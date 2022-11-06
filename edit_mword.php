@@ -170,14 +170,14 @@ function edit_mword_do_operation($term)
  * 
  * @return void
  * 
- * @global string $tbpref Database table prefix.
+ *
  * 
  * @since 2.5.2-fork Use the "wordcount" attribute of $term instead of the 
  * wrong word_count.
  */
 function edit_mword_do_insert($term)
 {
-    global $tbpref;
+
     $titletext = "New Term: " . tohtml($term->textlc);
     pagestart_nobody($titletext);
     echo '<h4><span class="bigger">' . $titletext . '</span></h4>';
@@ -218,11 +218,11 @@ function edit_mword_do_insert($term)
  * 
  * @return void
  * 
- * @global string $tbpref Database table prefix.
+ *
  */
 function edit_mword_do_update($term, $newstatus)
 {
-    global $tbpref;
+
     $titletext = "Edit Term: " . tohtml($term->textlc);
     pagestart_nobody($titletext);
     echo '<h4><span class="bigger">' . $titletext . '</span></h4>';
@@ -288,11 +288,11 @@ function edit_mword_do_update($term, $newstatus)
  * 
  * @return void
  * 
- * @global string $tbpref Database table prefix.
+ *
  */
 function edit_mword_new($text, $tid, $ord, $len) 
 {
-    global $tbpref;
+
 
     $term = new Term();
     $term->lgid = get_first_value(
@@ -324,11 +324,11 @@ function edit_mword_new($text, $tid, $ord, $len)
  * 
  * @return void
  * 
- * @global string $tbpref Database table prefix.
+ *
  */
 function edit_mword_update($wid, $tid, $ord) 
 {
-    global $tbpref;
+
 
     $term = new Term();
 
@@ -356,11 +356,11 @@ function edit_mword_update($wid, $tid, $ord)
  * 
  * @return void
  * 
- * @global string $tbpref Database table prefix.
+ *
  */
 function edit_mword_display_new($term, $tid, $ord, $len)
 {
-    global $tbpref;
+
     $scrdir = getScriptDirectionTag($term->lgid);
     $seid = get_first_value(
         "SELECT Ti2SeID AS value 
@@ -453,11 +453,11 @@ function edit_mword_display_new($term, $tid, $ord, $len)
  * 
  * @return void
  * 
- * @global string $tbpref Database table prefix.
+ *
  */
 function edit_mword_display_change($term, $tid, $ord)
 {
-    global $tbpref;
+
     $scrdir = getScriptDirectionTag($term->lgid);
     $sql = 'SELECT WoTranslation, WoSentence, WoRomanization, WoStatus 
     FROM words WHERE WoID = ' . $term->id;
@@ -568,11 +568,11 @@ function edit_mword_display_change($term, $tid, $ord)
  * 
  * @return void
  * 
- * @global string $tbpref Database table prefix.
+ *
  */
 function edit_mword_page()
 {
-    global $tbpref;
+
 
     if (isset($_REQUEST['op'])) {
         // INS/UPD

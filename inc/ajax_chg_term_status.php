@@ -51,11 +51,11 @@ function get_new_status($oldstatus, $up)
  * 
  * @return string|null HTML-formatted string with plus/minus controls if a success. 
  * 
- * @global string $tbpref Database table prefix
+ *
  */
 function update_word_status($wid, $currstatus)
 {
-    global $tbpref;
+
     if (($currstatus >= 1 && $currstatus <= 5) || $currstatus == 99 || $currstatus == 98) {
         $m1 = (int)runsql(
             'UPDATE words 
@@ -82,11 +82,11 @@ function update_word_status($wid, $currstatus)
  * 
  * @return void
  * 
- * @global string $tbpref Database table prefix.
+ *
  */
 function do_ajax_chg_term_status($wid, $up)
 {
-    global $tbpref;
+
     chdir('..');
 
     $tempstatus = get_first_value(

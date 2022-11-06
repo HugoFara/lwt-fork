@@ -109,11 +109,11 @@ function do_set_test_status_javascript($wid, $status, $stchange)
  * 
  * @return void
  * 
- * @global string $tbpref Database table prefix 
+ *
  */
 function do_set_test_status_content($wid, $status, $oldstatus, $stchange) 
 {
-    global $tbpref;
+
     $word = get_first_value(
         "SELECT WoText AS value FROM words 
         WHERE WoID = " . $wid
@@ -148,11 +148,11 @@ function do_set_test_status_content($wid, $status, $oldstatus, $stchange)
  * 
  * @return void
  * 
- * @global string $tbpref Database table prefix
+ *
  */
 function start_set_text_status()
 {
-    global $tbpref;
+
 
     if (!is_numeric(getreq('status')) && !is_numeric(getreq('stchange'))) {
         my_die('status or stchange should be specified!');

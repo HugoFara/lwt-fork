@@ -23,11 +23,11 @@ require_once 'inc/session_utility.php';
  * @return array{0: string, 1: string, 2: string} The word in plain text, 
  * his translation and his romanization
  * 
- * @global string $tbpref 
+ *
  */
 function get_word_data($wid)
 {
-    global $tbpref;
+
     $sql = 'SELECT WoText, WoTranslation, WoRomanization 
     FROM words WHERE WoID = ' . $wid;
     $res = do_mysqli_query($sql);
@@ -50,11 +50,11 @@ function get_word_data($wid)
  * 
  * @return string Some edit message, number of affected rows or error message
  * 
- * @global string $tbpref 
+ *
  */
 function set_word_status_database($wid, $status)
 {
-    global $tbpref;
+
     $m1 = runsql(
         'UPDATE words 
         SET WoStatus = ' . $status . ', WoStatusChanged = NOW(),' . make_score_random_insert_update('u') . ' 

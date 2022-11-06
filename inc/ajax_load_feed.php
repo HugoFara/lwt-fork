@@ -20,11 +20,11 @@ require_once __DIR__ . '/session_utility.php';
  * 
  * @return array{0: string|int, 1: int} Number of imported feeds and number of duplicated feeds.
  * 
- * @global string $tbpref Database table prefix
+ *
  */
 function get_feeds_list($feed, $nfid)
 {
-    global $tbpref;
+
     $valuesArr = array();
     foreach ($feed as $data) {
         $d_title=convert_string_to_sqlsyntax($data['title']);
@@ -56,11 +56,11 @@ function get_feeds_list($feed, $nfid)
  * 
  * @return void
  * 
- * @global string $tbpref Database table prefix
+ *
  */
 function print_feed_result($imported_feed, $nif, $nfname, $nfid, $nfoptions)
 {
-    global $tbpref;
+
     do_mysqli_query(
         'UPDATE newsfeeds 
         SET NfUpdate="' . time() . '" 
