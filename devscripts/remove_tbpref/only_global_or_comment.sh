@@ -12,6 +12,7 @@
 # echo $FILES
 FILES=`echo ./edit_texts.php`
 
+
 for f in $FILES; do
     # echo "$f"
 
@@ -43,6 +44,8 @@ for f in $FILES; do
 
     if [[ $HASBADLINE -eq 0 ]]; then
         echo "Cleaning ${f}"
+
+        sed -i "" "s/^[[:space:]]*global \$tbpref;[[:space:]]*\n//g" $f
     else
         echo "Skipping ${f}, has line ${BADLINE}"
     fi
