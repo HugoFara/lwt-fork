@@ -151,7 +151,7 @@ function do_test_test_finished($testsql, $totaltests)
  */
 function do_test_test_sentence($wid, $lang, $wordlc)
 {
-    global $debug, $tbpref;
+    global $debug;
     $num = 0;
     $sent = null;
     // Select senetences where at least 70 % of words are known
@@ -431,7 +431,7 @@ function prepare_test_area($testsql, $totaltests, $count, $testtype): int
 function do_test_test_javascript_interaction(
     $wo_record, $wb1, $wb2, $wb3, $testtype, $nosent, $save
 ) {
-    global $tbpref, $langDefs;
+    global $langDefs;
 
     $wid = $wo_record['WoID'];
     $trans = repl_tab_nl($wo_record['WoTranslation']) . 
