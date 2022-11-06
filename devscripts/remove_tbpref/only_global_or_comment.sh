@@ -6,6 +6,11 @@
 #  global $tbpref, $debug;
 # if the line is anything different, the file can't be updated, otherwise it can.
 
+# To check the changes, after running this script, you can run a fancy check:
+# (ref https://stackoverflow.com/questions/18810623/git-diff-to-show-only-lines-that-have-been-modified):
+#    git diff -U0 | grep '^[+-]' | grep -Ev '^(--- a/|\+\+\+ b/)' | sort | uniq
+# which shows that only the correct things were removed.
+
 # Obligatory "I hate bash" note here.
 
 FILES=`find . -name '*.php' -print0 | xargs -0 grep -l tbpref 2>/dev/null`;
