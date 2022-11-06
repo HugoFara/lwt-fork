@@ -8,9 +8,9 @@
 
 # Obligatory "I hate bash" note here.
 
-# FILES=`find . -name '*.php' -print0 | xargs -0 grep -l tbpref 2>/dev/null`;
+FILES=`find . -name '*.php' -print0 | xargs -0 grep -l tbpref 2>/dev/null`;
 # echo $FILES
-FILES=`echo ./edit_texts.php`
+# FILES=`echo ./edit_texts.php`
 
 
 for f in $FILES; do
