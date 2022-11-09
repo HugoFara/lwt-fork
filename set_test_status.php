@@ -86,7 +86,7 @@ function do_set_test_status_javascript($wid, $status, $stchange)
     // Waittime <= 0 causes the page to loop-reloading
     const waittime = <?php 
     echo json_encode((int)getSettingWithDefault('set-test-main-frame-waiting-time')); 
-    ?> + 500;
+    ?> + 50;
     if (waittime <= 0) {
         console.log("aaa");
         window.parent.location.reload();

@@ -1091,7 +1091,7 @@ function showRightFrames(roUrl, ruUrl) {
     top.frames.ru.location.href = ruUrl;
   }
   if ($('#frames-r').length) {
-    $('#frames-r').animate({right: '5px'});
+    $('#frames-r').animate({right: '5px'}, 100);
     return true;
   }
   return false;
@@ -1104,7 +1104,7 @@ function showRightFrames(roUrl, ruUrl) {
  */
 function hideRightFrames() {
   if ($('#frames-r').length) {
-    $('#frames-r').animate({right: '-100%'});
+    $('#frames-r').animate({right: '-100%'}, 100);
     return true;
   }
   return false;
