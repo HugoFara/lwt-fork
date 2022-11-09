@@ -330,6 +330,18 @@ function word_click_event_do_test_test () {
  * @returns {bool} true if nothing was done, false otherwise
  */
 function keydown_event_do_test_test (e) {
+  let solution_shown = ($('.todo').text() == SOLUTION);
+  const RETURN = 13;
+  if (e.which == RETURN && !solution_shown) {
+    $('.word').trigger('click');
+    cClick();
+    return false;
+  }
+  if (e.which == RETURN && solution_shown) {
+    // Passed.
+    showRightFrames('set_test_status.php?wid=' + WID + '&stchange=1');
+    return false;
+  }
   if (e.which == 32 && OPENED == 0) { // space : show sol.
     $('.word').trigger('click');
     cClick();
