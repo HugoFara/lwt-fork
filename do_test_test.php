@@ -92,7 +92,6 @@ function do_test_test_css()
         display:table;
     } 
     body { 
-        display:table-cell; 
         vertical-align:middle; 
     } 
     #body { 
