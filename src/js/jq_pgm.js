@@ -337,7 +337,6 @@ function keydown_event_do_test_test (e) {
     OPENED = 1;
     return false;
   }
-  if (OPENED == 0) return true;
   if (e.which == 38) { // up : status+1
 		showRightFrames('set_test_status.php?wid=' + WID + '&stchange=1');
     return false;
