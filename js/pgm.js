@@ -84,8 +84,10 @@ $('input:submit').last().trigger('click');return!1}else{return!0}}
 function noShowAfter3Secs(){$('#hide3').slideUp()}
 function setTheFocus(){$('.setfocus').trigger('focus').trigger('select')}
 function word_click_event_do_test_test(){run_overlib_test(WBLINK1,WBLINK2,WBLINK3,$(this).attr('data_wid'),$(this).attr('data_text'),$(this).attr('data_trans'),$(this).attr('data_rom'),$(this).attr('data_status'),$(this).attr('data_sent'),$(this).attr('data_todo'));$('.todo').text(SOLUTION);return!1}
-function keydown_event_do_test_test(e){if(e.which==32&&OPENED==0){$('.word').trigger('click');cClick();showRightFrames('show_word.php?wid='+$('.word').attr('data_wid')+'&ann=');OPENED=1;return!1}
-if(OPENED==0)return!0;if(e.which==38){showRightFrames('set_test_status.php?wid='+WID+'&stchange=1');return!1}
+function keydown_event_do_test_test(e){let solution_shown=($('.todo').text()==SOLUTION);const RETURN=13;if(e.which==RETURN&&!solution_shown){$('.word').trigger('click');cClick();return!1}
+if(e.which==RETURN&&solution_shown){showRightFrames('set_test_status.php?wid='+WID+'&stchange=1');return!1}
+if(e.which==32&&OPENED==0){$('.word').trigger('click');cClick();showRightFrames('show_word.php?wid='+$('.word').attr('data_wid')+'&ann=');OPENED=1;return!1}
+if(e.which==38){showRightFrames('set_test_status.php?wid='+WID+'&stchange=1');return!1}
 if(e.which==40){showRightFrames('set_test_status.php?wid='+WID+'&stchange=-1');return!1}
 if(e.which==27){showRightFrames('set_test_status.php?wid='+WID+'&status='+$('.word').attr('data_status'));return!1}
 for(let i=1;i<=5;i++){if(e.which==(48+i)||e.which==(96+i)){showRightFrames('set_test_status.php?wid='+WID+'&status='+i);return!1}}
@@ -165,9 +167,9 @@ SUW=(parseInt($('#chart').attr('data_wo_cnt'))<<4)+(parseInt($('#unknownpercent'
 function do_ajax_edit_impr_text(pagepos,word){if(word=='')$('#editimprtextdata').html('<img src="icn/waiting2.gif" />');const textid=$('#editimprtextdata').attr('data_id');$.post('inc/ajax_edit_impr_text.php',{id:textid,word:word},function(data){eval(data);$.scrollTo(pagepos);$('input.impr-ann-text').on('change',changeImprAnnText);$('input.impr-ann-radio').on('change',changeImprAnnRadio)})}
 function showRightFrames(roUrl,ruUrl){if(roUrl!==undefined){top.frames.ro.location.href=roUrl}
 if(ruUrl!==undefined){top.frames.ru.location.href=ruUrl}
-if($('#frames-r').length){$('#frames-r').animate({right:'5px'});return!0}
+if($('#frames-r').length){$('#frames-r').animate({right:'5px'},100);return!0}
 return!1}
-function hideRightFrames(){if($('#frames-r').length){$('#frames-r').animate({right:'-100%'});return!0}
+function hideRightFrames(){if($('#frames-r').length){$('#frames-r').animate({right:'-100%'},100);return!0}
 return!1}
 function successSound(){document.getElementById('success_sound').pause();document.getElementById('failure_sound').pause();return document.getElementById('success_sound').play()}
 function failureSound(){document.getElementById('success_sound').pause();document.getElementById('failure_sound').pause();return document.getElementById('failure_sound').play()}
