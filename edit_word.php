@@ -188,19 +188,18 @@ if (isset($_REQUEST['op'])) {
         exit();
     }
     
-        if ($_REQUEST['op'] == 'Save') {
-            $output = insert_new_word($textlc, $translation);
-            $wid = $output[0];
-            $message = $output[1];
-            $hex = strToClassName(prepare_textdata($_REQUEST["WoTextLC"]));
-        }
-        else {
-            $output = edit_term($translation);
-            $wid = $output[0];
-            $message = $output[1];
-        }
-        
-        saveWordTags($wid);
+    if ($_REQUEST['op'] == 'Save') {
+        $output = insert_new_word($textlc, $translation);
+        $wid = $output[0];
+        $message = $output[1];
+        $hex = strToClassName(prepare_textdata($_REQUEST["WoTextLC"]));
+    }
+    else {
+        $output = edit_term($translation);
+        $wid = $output[0];
+        $message = $output[1];
+    }
+    saveWordTags($wid);
 
     echo '<p>OK: ' . tohtml($message) . '</p>';
     
