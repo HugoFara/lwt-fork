@@ -182,7 +182,11 @@ if (isset($_REQUEST['op'])) {
     pagestart_nobody($titletext);
     echo '<h4><span class="bigger">' . $titletext . '</span></h4>';
 
-    if (mb_strtolower($text, 'UTF-8') == $textlc) {
+    if (mb_strtolower($text, 'UTF-8') != $textlc) {
+        lowercase_term_not_equal($textlc);
+        pageend();
+        exit();
+    }
     
         if ($_REQUEST['op'] == 'Save') {
             $output = insert_new_word($textlc, $translation);
@@ -197,16 +201,6 @@ if (isset($_REQUEST['op'])) {
         }
         
         saveWordTags($wid);
-
-    } // (mb_strtolower($text, 'UTF-8') == $textlc)
-    
-    else { // (mb_strtolower($text, 'UTF-8') != $textlc)
-        lowercase_term_not_equal($textlc);
-        pageend();
-        exit();
-    
-    }
-    
 
     echo '<p>OK: ' . tohtml($message) . '</p>';
     
