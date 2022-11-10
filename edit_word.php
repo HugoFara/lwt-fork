@@ -203,6 +203,7 @@ function handle_save_or_update(): void
 
 function get_term_and_lang($wid)
 {
+  global $tbpref;
   $sql = "SELECT WoText AS t, WoLgID AS lid FROM {$tbpref}words WHERE WoID = {$wid}";
     if ($wid == '') {
         $tid = $_REQUEST["tid"];
@@ -221,6 +222,18 @@ function get_term_and_lang($wid)
       my_die("Cannot access Term and Language in edit_word.php");
     }
     return [ $term, $lang ];
+}
+
+
+function get_sentence_for_termlc($termlc) {
+  global $tbpref;
+  $tid = $_REQUEST['tid'];
+  $ord = $_REQUEST['ord'];
+  $sql = "select Ti2SeID as value from {$tbpref}textitems2
+  where Ti2TxID = {$tid} and Ti2WordCount = 1 and Ti2Order = {$ord}";
+  $seid = get_first_value($sql);
+  $sent = getSentence($seid, $termlc, (int) getSettingWithDefault('set-term-sentence-count'));
+  return repl_tab_nl($sent[1]);
 }
 
 
@@ -263,12 +276,7 @@ if (isset($_REQUEST['op'])) {
     // NEW
     
     if ($new) {
-         
-        $seid = get_first_value(
-            "SELECT Ti2SeID AS value FROM " . $tbpref . "textitems2 
-            WHERE Ti2TxID = " . $_REQUEST['tid'] . " AND Ti2WordCount = 1 AND Ti2Order = " . $_REQUEST['ord']
-        );
-        $sent = getSentence($seid, $termlc, (int) getSettingWithDefault('set-term-sentence-count'));
+        $sentence = get_sentence_for_termlc($termlc);
             
         ?>
     
@@ -300,7 +308,7 @@ if (isset($_REQUEST['op'])) {
  </tr>
  <tr>
  <td class="td1 right">Sentence<br />Term in {...}:</td>
- <td class="td1"><textarea <?php echo $scrdir; ?> name="WoSentence" class="textarea-noreturn checklength checkoutsidebmp" data_maxlength="1000" data_info="Sentence" cols="35" rows="3"><?php echo tohtml(repl_tab_nl($sent[1])); ?></textarea></td>
+ <td class="td1"><textarea <?php echo $scrdir; ?> name="WoSentence" class="textarea-noreturn checklength checkoutsidebmp" data_maxlength="1000" data_info="Sentence" cols="35" rows="3"><?php echo tohtml($sentence); ?></textarea></td>
  </tr>
         <?php print_similar_terms_tabrow(); ?>
  <tr>
@@ -334,9 +342,7 @@ if (isset($_REQUEST['op'])) {
             }
             $sentence = repl_tab_nl($record['WoSentence']);
             if ($sentence == '' && isset($_REQUEST['tid']) && isset($_REQUEST['ord'])) {
-                $seid = get_first_value("select Ti2SeID as value from " . $tbpref . "textitems2 where Ti2TxID = " . $_REQUEST['tid'] . " and Ti2WordCount = 1 and Ti2Order = " . $_REQUEST['ord']);
-                $sent = getSentence($seid, $termlc, (int) getSettingWithDefault('set-term-sentence-count'));
-                $sentence = repl_tab_nl($sent[1]);
+                $sentence = get_sentence_for_termlc($termlc);
             }
             $transl = repl_tab_nl($record['WoTranslation']);
             if($transl == '*') { 
