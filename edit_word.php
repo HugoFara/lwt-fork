@@ -73,14 +73,13 @@ function edit_term($translation)
         $xx = ', WoStatus = ' .    $newstatus . ', WoStatusChanged = NOW()'; 
     }
 
-    $message = runsql(
-        'update ' . $tbpref . 'words set WoText = ' . 
+    $sql = 'update ' . $tbpref . 'words set WoText = ' . 
         convert_string_to_sqlsyntax($_REQUEST["WoText"]) . ', WoTranslation = ' . 
         convert_string_to_sqlsyntax($translation) . ', WoSentence = ' . 
         convert_string_to_sqlsyntax(repl_tab_nl($_REQUEST["WoSentence"])) . ', WoRomanization = ' .
         convert_string_to_sqlsyntax($_REQUEST["WoRomanization"]) . $xx . ',' . 
-        make_score_random_insert_update('u') . ' where WoID = ' . $_REQUEST["WoID"], "Updated"
-    );
+      make_score_random_insert_update('u') . ' where WoID = ' . $_REQUEST["WoID"];
+    $message = runsql($sql, "Updated");
     $wid = $_REQUEST["WoID"];
     return array($wid, $message);
 }
@@ -259,6 +258,7 @@ function show_form($formdata, $title = "New Term:", $operation = "Save")
 {
 ?>
  <form name="wordform" class="validate" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
+ <input type="hidden" name="WoID" id="langfield" value="<?php echo $formdata->wid; ?>" />
  <input type="hidden" name="WoLgID" id="langfield" value="<?php echo $formdata->lang; ?>" />
  <input type="hidden" name="fromAnn" value="<?php echo $formdata->fromAnn; ?>" />
  <input type="hidden" name="WoOldStatus" value="<?php echo $formdata->status_old; ?>" />
@@ -283,7 +283,7 @@ function show_form($formdata, $title = "New Term:", $operation = "Save")
  </tr>
  <tr>
  <td class="td1 right">Romaniz.:</td>
- <td class="td1"><input type="text" class="checkoutsidebmp" data_info="Romanization" name="WoRomanization" value="" maxlength="100" size="35" value="<?php echo tohtml($formdata->romanization); ?>" /></td>
+ <td class="td1"><input type="text" class="checkoutsidebmp" data_info="Romanization" name="WoRomanization" value="<?php echo tohtml($formdata->romanization); ?>" maxlength="100" size="35" /></td>
  </tr>
  <tr>
  <td class="td1 right">Sentence<br />Term in {...}:</td>
@@ -362,6 +362,14 @@ if (isset($_REQUEST['op'])) {
         
     } else {
         // CHG
+
+        $formdata = new FormData();
+        $formdata->fromAnn = $fromAnn;
+        $formdata->lang = $lang;
+        $formdata->term = $term;
+        $formdata->termlc = $termlc;
+        $formdata->scrdir = $scrdir;
+
         $sql = 'select WoTranslation, WoSentence, WoRomanization, WoStatus from ' . $tbpref . 'words where WoID = ' . $wid;
         $res = do_mysqli_query($sql);
         if ($record = mysqli_fetch_assoc($res)) {
@@ -380,61 +388,16 @@ if (isset($_REQUEST['op'])) {
             if($transl == '*') { 
                 $transl=''; 
             }
-            ?>
-        
-     <form name="editword" class="validate" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
-     <input type="hidden" name="WoLgID" id="langfield" value="<?php echo $lang; ?>" />
-     <input type="hidden" name="fromAnn" value="<?php echo $fromAnn; ?>" />
-     <input type="hidden" name="WoID" value="<?php echo $wid; ?>" />
-     <input type="hidden" name="WoOldStatus" value="<?php echo $record['WoStatus']; ?>" />
-     <input type="hidden" name="WoTextLC" value="<?php echo tohtml($termlc); ?>" />
-     <input type="hidden" name="tid" value="<?php echo getreq('tid'); ?>" />
-     <input type="hidden" name="ord" value="<?php echo getreq('ord'); ?>" />
-     <table class="tab2" cellspacing="0" cellpadding="5">
-     <tr title="Only change uppercase/lowercase!">
-     <td class="td1 right"><b>Edit Term:</b></td>
-     <td class="td1"><input <?php echo $scrdir; ?> class="notempty checkoutsidebmp" data_info="Term" type="text" name="WoText" id="wordfield" value="<?php echo tohtml($term); ?>" maxlength="250" size="35" /> <img src="icn/status-busy.png" title="Field must not be empty" alt="Field must not be empty" />
-     </td></tr>
-            <?php print_similar_terms_tabrow(); ?>
-     <tr>
-     <td class="td1 right">Translation:</td>
-     <td class="td1"><textarea name="WoTranslation" class="setfocus textarea-noreturn checklength checkoutsidebmp" data_maxlength="500" data_info="Translation" cols="35" rows="3"><?php echo tohtml($transl); ?></textarea></td>
-     </tr>
-     <tr>
-     <td class="td1 right">Tags:</td>
-     <td class="td1">
-            <?php echo getWordTags($wid); ?>
-     </td>
-     </tr>
-     <tr>
-     <td class="td1 right">Romaniz.:</td>
-     <td class="td1"><input type="text" class="checkoutsidebmp" data_info="Romanization" name="WoRomanization" maxlength="100" size="35" 
-     value="<?php echo tohtml($record['WoRomanization']); ?>" /></td>
-     </tr>
-     <tr>
-     <td class="td1 right">Sentence<br />Term in {...}:</td>
-     <td class="td1"><textarea <?php echo $scrdir; ?> name="WoSentence" class="textarea-noreturn checklength checkoutsidebmp" data_maxlength="1000" data_info="Sentence" cols="35" rows="3"><?php echo tohtml($sentence); ?></textarea></td>
-     </tr>
-     <tr>
-     <td class="td1 right">Status:</td>
-     <td class="td1">
-            <?php echo get_wordstatus_radiooptions($status); ?>
-     </td>
-     </tr>
-     <tr>
-     <td class="td1 right" colspan="2">  
-            <?php if ($fromAnn !== '') { 
-                echo createDictLinksInEditWin2($lang, 'document.forms[0].WoSentence', 'document.forms[0].WoText');
-            } else {
-                echo createDictLinksInEditWin($lang, $term, 'document.forms[0].WoSentence', isset($_GET['nodict'])?0:1);
-            } ?>
-     &nbsp; &nbsp; &nbsp; 
-     <input type="submit" name="op" value="Change" /></td>
-     </tr>
-     </table>
-     </form>
-     <div id="exsent"><span class="click" onclick="do_ajax_show_sentences(<?php echo $lang; ?>, <?php echo prepare_textdata_js($termlc) . ', ' . prepare_textdata_js("document.forms['editword'].WoSentence") . ', ' . $wid; ?>);"><img src="icn/sticky-notes-stack.png" title="Show Sentences" alt="Show Sentences" /> Show Sentences</span></div>    
-            <?php
+
+            $formdata->wid = $wid;
+            $formdata->translation = $transl;
+            $formdata->tags = getWordTags($wid);
+            $formdata->sentence = $sentence;
+            $formdata->romanization = $record['WoRomanization'];
+            $formdata->status = $status;
+            $formdata->status_old = $record['WoStatus'];
+
+            show_form($formdata, "Edit Term", "Change");
         }
         mysqli_free_result($res);
     }
