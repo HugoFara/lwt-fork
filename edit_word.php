@@ -241,10 +241,11 @@ class FormData
 {
   public $fromAnn = '';
   public $lang;
+  public $wid = 0;
   public $term;
   public $termlc;
   public $srcdir;
-  public $transl = '';
+  public $translation = '';
   public $tags;
   public $romanization = '';
   public $sentence = '';
@@ -254,34 +255,35 @@ class FormData
 }
 
 
-function show_form($formdata)
+function show_form($formdata, $title = "New Term:")
 {
 ?>
  <form name="newword" class="validate" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
- <input type="hidden" name="fromAnn" value="<?php echo $formdata->fromAnn; ?>" />
  <input type="hidden" name="WoLgID" id="langfield" value="<?php echo $formdata->lang; ?>" />
+ <input type="hidden" name="fromAnn" value="<?php echo $formdata->fromAnn; ?>" />
+ <input type="hidden" name="WoOldStatus" value="<?php echo $formdata->status_old; ?>" />
  <input type="hidden" name="WoTextLC" value="<?php echo tohtml($formdata->termlc); ?>" />
- <input type="hidden" name="tid" value="<?php echo $_REQUEST['tid']; ?>" />
- <input type="hidden" name="ord" value="<?php echo $_REQUEST['ord']; ?>" />
+ <input type="hidden" name="tid" value="<?php echo getreq('tid'); ?>" />
+ <input type="hidden" name="ord" value="<?php echo getreq('ord'); ?>" />
  <table class="tab2" cellspacing="0" cellpadding="5">
  <tr title="Only change uppercase/lowercase!">
- <td class="td1 right"><b>New Term:</b></td>
+ <td class="td1 right"><b><?php echo $title; ?></b></td>
  <td class="td1"><input <?php echo $formdata->srcdir; ?> class="notempty checkoutsidebmp" data_info="New Term" type="text" name="WoText" id="wordfield" value="<?php echo tohtml($formdata->term); ?>" maxlength="250" size="35" /> <img src="icn/status-busy.png" title="Field must not be empty" alt="Field must not be empty" />
  </td></tr>
         <?php print_similar_terms_tabrow(); ?>
  <tr>
  <td class="td1 right">Translation:</td>
- <td class="td1"><textarea name="WoTranslation" class="setfocus textarea-noreturn checklength checkoutsidebmp" data_maxlength="500" data_info="Translation" cols="35" rows="3"></textarea></td>
+ <td class="td1"><textarea name="WoTranslation" class="setfocus textarea-noreturn checklength checkoutsidebmp" data_maxlength="500" data_info="Translation" cols="35" rows="3"><?php echo tohtml($formdata->translation); ?></textarea></td>
  </tr>
  <tr>
  <td class="td1 right">Tags:</td>
  <td class="td1">
-        <?php echo getWordTags(0); ?>
+        <?php echo getWordTags($formdata->wid); ?>
  </td>
  </tr>
  <tr>
  <td class="td1 right">Romaniz.:</td>
- <td class="td1"><input type="text" class="checkoutsidebmp" data_info="Romanization" name="WoRomanization" value="" maxlength="100" size="35" /></td>
+ <td class="td1"><input type="text" class="checkoutsidebmp" data_info="Romanization" name="WoRomanization" value="" maxlength="100" size="35" value="<?php echo tohtml($formdata->romanization); ?>" /></td>
  </tr>
  <tr>
  <td class="td1 right">Sentence<br />Term in {...}:</td>
