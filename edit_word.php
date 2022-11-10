@@ -328,7 +328,7 @@ function augment_formdata_for_updates($wid, &$formdata)
     }
 
     $status = $record['WoStatus'];
-    if ($formdata->romAnn == '' && $status >= 98) {
+    if ($formdata->fromAnn == '' && $status >= 98) {
         $status = 1;
     }
     $sentence = repl_tab_nl($record['WoSentence']);
@@ -350,11 +350,10 @@ function augment_formdata_for_updates($wid, &$formdata)
 }
 
 
-if (isset($_REQUEST['op'])) {
-  handle_save_or_update();
-} else {
+function handle_display_form() {
     // FORM
     // edit_word.php?tid=..&ord=..&wid=..
+    global $tbpref;
 
     $wid = getreq('wid');
     [ $term, $lang ] = get_term_and_lang($wid);
@@ -395,6 +394,13 @@ if (isset($_REQUEST['op'])) {
     }
 
     pageend();
+}
+
+
+if (isset($_REQUEST['op'])) {
+  handle_save_or_update();
+} else {
+  handle_display_form();
 }
 
 
