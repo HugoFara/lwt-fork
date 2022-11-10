@@ -328,6 +328,7 @@ if (isset($_REQUEST['op'])) {
     $wid = getreq('wid');
     [ $term, $lang ] = get_term_and_lang($wid);
     $termlc = mb_strtolower($term, 'UTF-8');
+    $scrdir = getScriptDirectionTag($lang);
 
     if ($wid == '') {
         $wid = get_first_value(
@@ -336,12 +337,6 @@ if (isset($_REQUEST['op'])) {
             WHERE WoLgID = " . $lang . " AND WoTextLC = " . convert_string_to_sqlsyntax($termlc)
         );
     }
-    
-    $new = (isset($wid) == false);
-
-    $titletext = ($new ? "New Term" : "Edit Term") . ": " . tohtml($term);
-    pagestart_nobody($titletext);
-    $scrdir = getScriptDirectionTag($lang);
 
     $formdata = new FormData();
     $formdata->fromAnn = $fromAnn;
@@ -349,6 +344,11 @@ if (isset($_REQUEST['op'])) {
     $formdata->term = $term;
     $formdata->termlc = $termlc;
     $formdata->scrdir = $scrdir;
+
+    $new = (isset($wid) == false);
+
+    $titletext = ($new ? "New Term" : "Edit Term") . ": " . tohtml($term);
+    pagestart_nobody($titletext);
 
     if ($new) {
         $formdata->tags = getWordTags(0);
