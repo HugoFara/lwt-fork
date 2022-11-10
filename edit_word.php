@@ -193,10 +193,11 @@ if (isset($_REQUEST['op'])) {
     saveWordTags($wid);
 
     echo '<p>OK: ' . tohtml($message) . '</p>';
-    
-    if ($fromAnn !== '') {
+
+    $fa = getreq("fromAnn"); // from-recno or empty
+    if ($fa !== '') {
         $textlc_js = prepare_textdata_js($textlc);
-        echo "<script>window.opener.do_ajax_edit_impr_text({$fromAnn}, {$textlc_js});</script>";
+        echo "<script>window.opener.do_ajax_edit_impr_text({$fa}, {$textlc_js});</script>";
     } else {
         change_term_display($wid, $translation, $hex);
     }
