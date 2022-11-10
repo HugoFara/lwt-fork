@@ -257,6 +257,13 @@ class FormData
 function show_form($formdata, $title = "New Term:", $operation = "Save")
 {
 ?>
+<script type="text/javascript">
+    $(document).ready(ask_before_exiting);
+    $(window).on('beforeunload',function() {
+        setTimeout(function() {window.parent.frames['ru'].location.href = 'empty.html';}, 0);
+    });
+</script>
+
  <form name="wordform" class="validate" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
  <input type="hidden" name="WoID" id="langfield" value="<?php echo $formdata->wid; ?>" />
  <input type="hidden" name="WoLgID" id="langfield" value="<?php echo $formdata->lang; ?>" />
@@ -334,14 +341,6 @@ if (isset($_REQUEST['op'])) {
 
     $titletext = ($new ? "New Term" : "Edit Term") . ": " . tohtml($term);
     pagestart_nobody($titletext);
-    ?>
-<script type="text/javascript">
-    $(document).ready(ask_before_exiting);
-    $(window).on('beforeunload',function() {
-        setTimeout(function() {window.parent.frames['ru'].location.href = 'empty.html';}, 0);
-    });
-</script>
-    <?php
     $scrdir = getScriptDirectionTag($lang);
 
     $formdata = new FormData();
