@@ -189,15 +189,11 @@ if (isset($_REQUEST['op'])) {
     }
     
     if ($_REQUEST['op'] == 'Save') {
-        $output = insert_new_word($textlc, $translation);
-        $wid = $output[0];
-        $message = $output[1];
+        [ $wid, $message ] = insert_new_word($textlc, $translation);
         $hex = strToClassName(prepare_textdata($_REQUEST["WoTextLC"]));
     }
     else {
-        $output = edit_term($translation);
-        $wid = $output[0];
-        $message = $output[1];
+        [ $wid, $message ] = edit_term($translation);
     }
     saveWordTags($wid);
 
