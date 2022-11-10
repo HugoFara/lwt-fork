@@ -154,14 +154,6 @@ function change_term_display($wid, $translation, $hex): void
 }
 
 
-$translation_raw = repl_tab_nl(getreq("WoTranslation"));
-if ($translation_raw == '' ) { 
-    $translation = '*'; 
-}
-else { 
-    $translation = $translation_raw; 
-}
-
 $fromAnn = getreq("fromAnn"); // from-recno or empty
 
 // INS/UPD
@@ -173,6 +165,10 @@ if (isset($_REQUEST['op'])) {
     $textlc = trim(prepare_textdata($_REQUEST["WoTextLC"]));
     $text = trim(prepare_textdata($_REQUEST["WoText"]));
     $hex = strToClassName(prepare_textdata($_REQUEST["WoTextLC"]));
+    $translation = repl_tab_nl(getreq("WoTranslation"));
+    if ($translation == '' ) {
+      $translation = '*';
+    }
 
     $titlestart = "Edit Term: ";
     if ($_REQUEST['op'] == 'Save') {
