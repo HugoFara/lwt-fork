@@ -29,11 +29,6 @@ require_once 'inc/simterms.php';
 function insert_new_word($textlc, $translation)
 {
     global $tbpref;
-
-    $titletext = "New Term: " . tohtml(prepare_textdata($_REQUEST["WoTextLC"]));
-    pagestart_nobody($titletext);
-    echo '<h4><span class="bigger">' . $titletext . '</span></h4>';
-
     $message = runsql(
         'INSERT INTO ' . $tbpref . 'words 
         (
@@ -71,11 +66,6 @@ function insert_new_word($textlc, $translation)
 function edit_term($translation)
 {
     global $tbpref;
-
-    $titletext = "Edit Term: " . tohtml(prepare_textdata($_REQUEST["WoTextLC"]));
-    pagestart_nobody($titletext);
-    echo '<h4><span class="bigger">' . $titletext . '</span></h4>';
-    
     $oldstatus = $_REQUEST["WoOldStatus"];
     $newstatus = $_REQUEST["WoStatus"];
     $xx = '';
@@ -189,24 +179,23 @@ if (isset($_REQUEST['op'])) {
     
     if (mb_strtolower($text, 'UTF-8') == $textlc) {
     
-        // INSERT
-        
         if ($_REQUEST['op'] == 'Save') {
+            $titletext = "New Term: " . tohtml(prepare_textdata($_REQUEST["WoTextLC"]));
+            pagestart_nobody($titletext);
+            echo '<h4><span class="bigger">' . $titletext . '</span></h4>';
             $output = insert_new_word($textlc, $translation);
             $wid = $output[0];
             $message = $output[1];
             $hex = strToClassName(prepare_textdata($_REQUEST["WoTextLC"]));
-            
-        } // $_REQUEST['op'] == 'Save'
-        
-        // UPDATE
-        
-        else {  // $_REQUEST['op'] != 'Save'
+        }
+        else {
+            $titletext = "Edit Term: " . tohtml(prepare_textdata($_REQUEST["WoTextLC"]));
+            pagestart_nobody($titletext);
+            echo '<h4><span class="bigger">' . $titletext . '</span></h4>';
             $output = edit_term($translation);
             $wid = $output[0];
             $message = $output[1];
-            
-        }  // $_REQUEST['op'] != 'Save'
+        }
         
         saveWordTags($wid);
 
