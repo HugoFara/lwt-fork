@@ -286,9 +286,6 @@ function show_form($formdata)
  <tr>
  <td class="td1 right">Sentence<br />Term in {...}:</td>
  <td class="td1"><textarea <?php echo $scrdir; ?> name="WoSentence" class="textarea-noreturn checklength checkoutsidebmp" data_maxlength="1000" data_info="Sentence" cols="35" rows="3"><?php echo tohtml($formdata->sentence); ?></textarea></td>
- </tr>
-        <?php print_similar_terms_tabrow(); ?>
- <tr>
  <td class="td1 right">Status:</td>
  <td class="td1">
         <?php echo get_wordstatus_radiooptions($formdata->status); ?>
