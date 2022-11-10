@@ -154,14 +154,11 @@ function change_term_display($wid, $translation, $hex): void
 }
 
 
-$fromAnn = getreq("fromAnn"); // from-recno or empty
-
-// INS/UPD
-
-$lang = null;
-$term = null;
-if (isset($_REQUEST['op'])) {
-    
+/**
+ * Add new term or edit existing one, display result.
+ */
+function handle_save_or_update(): void
+{
     $textlc = trim(prepare_textdata($_REQUEST["WoTextLC"]));
     $text = trim(prepare_textdata($_REQUEST["WoText"]));
     $hex = strToClassName(prepare_textdata($_REQUEST["WoTextLC"]));
@@ -201,11 +198,17 @@ if (isset($_REQUEST['op'])) {
     } else {
         change_term_display($wid, $translation, $hex);
     }
-    // if (isset($_REQUEST['op']))
-} else {  
-    // FORM
-    // if (! isset($_REQUEST['op']))
+}
 
+
+$fromAnn = getreq("fromAnn"); // from-recno or empty
+$lang = null;
+$term = null;
+
+if (isset($_REQUEST['op'])) {
+  handle_save_or_update();
+} else {
+    // FORM
     // edit_word.php?tid=..&ord=..&wid=..
     
     $wid = getreq('wid');
