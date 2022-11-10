@@ -166,13 +166,13 @@ $fromAnn = getreq("fromAnn"); // from-recno or empty
 
 // INS/UPD
 
-$hex = null;
 $lang = null;
 $term = null;
 if (isset($_REQUEST['op'])) {
     
     $textlc = trim(prepare_textdata($_REQUEST["WoTextLC"]));
     $text = trim(prepare_textdata($_REQUEST["WoText"]));
+    $hex = strToClassName(prepare_textdata($_REQUEST["WoTextLC"]));
 
     $titlestart = "Edit Term: ";
     if ($_REQUEST['op'] == 'Save') {
@@ -190,7 +190,6 @@ if (isset($_REQUEST['op'])) {
     
     if ($_REQUEST['op'] == 'Save') {
         [ $wid, $message ] = insert_new_word($textlc, $translation);
-        $hex = strToClassName(prepare_textdata($_REQUEST["WoTextLC"]));
     }
     else {
         [ $wid, $message ] = edit_term($translation);
