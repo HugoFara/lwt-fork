@@ -199,15 +199,8 @@ if (isset($_REQUEST['op'])) {
     echo '<p>OK: ' . tohtml($message) . '</p>';
     
     if ($fromAnn !== '') {
-        ?>
-<script type="text/javascript">
-//<![CDATA[
-    window.opener.do_ajax_edit_impr_text(
-        <?php echo $fromAnn; ?>, <?php echo prepare_textdata_js($textlc); ?>
-        );
-//]]>
-</script>
-        <?php
+        $textlc_js = prepare_textdata_js($textlc);
+        echo "<script>window.opener.do_ajax_edit_impr_text({$fromAnn}, {$textlc_js});</script>";
     } else {
         change_term_display($wid, $translation, $hex);
     }
