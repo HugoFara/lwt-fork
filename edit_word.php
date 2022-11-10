@@ -203,39 +203,26 @@ function handle_save_or_update(): void
 
 function get_term_and_lang($wid)
 {
-    if ($wid == '') {    
-        $sql = 
-        'SELECT Ti2Text, Ti2LgID FROM ' . $tbpref . 'textitems2 
-        WHERE Ti2TxID = ' . $_REQUEST['tid'] . ' AND Ti2WordCount = 1 AND Ti2Order = ' . $_REQUEST['ord'];
-        $res = do_mysqli_query($sql);
-        $record = mysqli_fetch_assoc($res);
-        if ($record) {
-            $term = $record['Ti2Text'];
-            $lang = $record['Ti2LgID'];
-        } else {
-            my_die("Cannot access Term and Language in edit_word.php");
-        }
-        mysqli_free_result($res);
-        
-        $termlc = mb_strtolower($term, 'UTF-8');
-    } else {
-
-        $sql = 'SELECT WoText, WoLgID FROM ' . $tbpref . 'words WHERE WoID = ' . $wid;
-        $res = do_mysqli_query($sql);
-        $record = mysqli_fetch_assoc($res);
-        if ($record ) {
-            $term = $record['WoText'];
-            $lang = $record['WoLgID'];
-        } else {
-            my_die("Cannot access Term and Language in edit_word.php");
-        }
-        mysqli_free_result($res);
-        $termlc =    mb_strtolower($term, 'UTF-8');
-        
+  $sql = "SELECT WoText AS t, WoLgID AS lid FROM {$tbpref}words WHERE WoID = {$wid}";
+    if ($wid == '') {
+        $tid = $_REQUEST["tid"];
+        $ord = $_REQUEST["ord"];
+        $sql =  "SELECT Ti2Text AS t, Ti2LgID AS lid
+        FROM {$tbpref}textitems2 
+        WHERE Ti2TxID = {$tid} AND Ti2WordCount = 1 AND Ti2Order = {$ord};";
     }
-
+    $res = do_mysqli_query($sql);
+    $record = mysqli_fetch_assoc($res);
+    mysqli_free_result($res);
+    if ($record) {
+      $term = $record['t'];
+      $lang = $record['lid'];
+    } else {
+      my_die("Cannot access Term and Language in edit_word.php");
+    }
     return [ $term, $lang ];
 }
+
 
 $fromAnn = getreq("fromAnn"); // from-recno or empty
 $lang = null;
