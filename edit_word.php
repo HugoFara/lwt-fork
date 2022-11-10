@@ -328,14 +328,12 @@ function augment_formdata_for_updates($wid, &$formdata)
     }
 
     $status = $record['WoStatus'];
-    if ($fromAnn == '' ) {
-        if ($status >= 98) {
-            $status = 1;
-        }
+    if ($formdata->romAnn == '' && $status >= 98) {
+        $status = 1;
     }
     $sentence = repl_tab_nl($record['WoSentence']);
     if ($sentence == '' && isset($_REQUEST['tid']) && isset($_REQUEST['ord'])) {
-        $sentence = get_sentence_for_termlc($termlc);
+        $sentence = get_sentence_for_termlc($formdata->termlc);
     }
     $transl = repl_tab_nl($record['WoTranslation']);
     if($transl == '*') {
@@ -351,10 +349,6 @@ function augment_formdata_for_updates($wid, &$formdata)
     $formdata->status_old = $record['WoStatus'];
 }
 
-
-$fromAnn = getreq("fromAnn"); // from-recno or empty
-$lang = null;
-$term = null;
 
 if (isset($_REQUEST['op'])) {
   handle_save_or_update();
@@ -376,7 +370,7 @@ if (isset($_REQUEST['op'])) {
     }
 
     $formdata = new FormData();
-    $formdata->fromAnn = $fromAnn;
+    $formdata->fromAnn = getreq("fromAnn");
     $formdata->lang = $lang;
     $formdata->term = $term;
     $formdata->termlc = $termlc;
