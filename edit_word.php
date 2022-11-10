@@ -255,7 +255,7 @@ class FormData
 }
 
 
-function show_form($formdata, $title = "New Term:")
+function show_form($formdata, $title = "New Term:", $operation = "Save")
 {
 ?>
  <form name="newword" class="validate" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
@@ -288,6 +288,8 @@ function show_form($formdata, $title = "New Term:")
  <tr>
  <td class="td1 right">Sentence<br />Term in {...}:</td>
  <td class="td1"><textarea <?php echo $scrdir; ?> name="WoSentence" class="textarea-noreturn checklength checkoutsidebmp" data_maxlength="1000" data_info="Sentence" cols="35" rows="3"><?php echo tohtml($formdata->sentence); ?></textarea></td>
+ </tr>
+ <tr>
  <td class="td1 right">Status:</td>
  <td class="td1">
         <?php echo get_wordstatus_radiooptions($formdata->status); ?>
@@ -296,7 +298,7 @@ function show_form($formdata, $title = "New Term:")
  <tr>
  <td class="td1 right" colspan="2">
         <?php echo createDictLinksInEditWin($formdata->lang, $formdata->term, 'document.forms[0].WoSentence', isset($_GET['nodict'])?0:1); ?>
- &nbsp; &nbsp; &nbsp; <input type="submit" name="op" value="Save" /></td>
+ &nbsp; &nbsp; &nbsp; <input type="submit" name="op" value="<?php echo $operation; ?>" /></td>
  </tr>
  </table>
  </form>
@@ -356,7 +358,7 @@ if (isset($_REQUEST['op'])) {
         $formdata->status = 1;
         $formdata->status_old = 1;
 
-        show_form($formdata);
+        show_form($formdata, "New Term", "Save");
         
     } else {
         // CHG
