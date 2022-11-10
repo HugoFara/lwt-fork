@@ -93,9 +93,6 @@ function edit_term($translation)
  */
 function lowercase_term_not_equal($textlc): void
 {
-    $titletext = "New/Edit Term: " . tohtml(prepare_textdata($_REQUEST["WoTextLC"]));
-    pagestart_nobody($titletext);
-    echo '<h4><span class="bigger">' . $titletext . '</span></h4>';        
     $message = 
     'Error: Term in lowercase must be exactly = "' . 
     $textlc . '", please go back and correct this!'; 
@@ -176,22 +173,24 @@ if (isset($_REQUEST['op'])) {
     
     $textlc = trim(prepare_textdata($_REQUEST["WoTextLC"]));
     $text = trim(prepare_textdata($_REQUEST["WoText"]));
-    
+
+    $titlestart = "Edit Term: ";
+    if ($_REQUEST['op'] == 'Save') {
+      $titlestart = "New Term: ";
+    }
+    $titletext = $titlestart . tohtml(prepare_textdata($_REQUEST["WoTextLC"]));
+    pagestart_nobody($titletext);
+    echo '<h4><span class="bigger">' . $titletext . '</span></h4>';
+
     if (mb_strtolower($text, 'UTF-8') == $textlc) {
     
         if ($_REQUEST['op'] == 'Save') {
-            $titletext = "New Term: " . tohtml(prepare_textdata($_REQUEST["WoTextLC"]));
-            pagestart_nobody($titletext);
-            echo '<h4><span class="bigger">' . $titletext . '</span></h4>';
             $output = insert_new_word($textlc, $translation);
             $wid = $output[0];
             $message = $output[1];
             $hex = strToClassName(prepare_textdata($_REQUEST["WoTextLC"]));
         }
         else {
-            $titletext = "Edit Term: " . tohtml(prepare_textdata($_REQUEST["WoTextLC"]));
-            pagestart_nobody($titletext);
-            echo '<h4><span class="bigger">' . $titletext . '</span></h4>';
             $output = edit_term($translation);
             $wid = $output[0];
             $message = $output[1];
