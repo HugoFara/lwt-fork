@@ -197,6 +197,8 @@ function handle_save_or_update(): void
     } else {
         change_term_display($wid, $translation, $hex);
     }
+
+    pageend();
 }
 
 
@@ -391,8 +393,8 @@ if (isset($_REQUEST['op'])) {
         mysqli_free_result($res);
     }
 
+    pageend();
 }
 
-pageend();
 
 ?>
