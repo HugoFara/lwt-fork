@@ -344,15 +344,14 @@ if (isset($_REQUEST['op'])) {
     <?php
     $scrdir = getScriptDirectionTag($lang);
 
-    // NEW
-    
+    $formdata = new FormData();
+    $formdata->fromAnn = $fromAnn;
+    $formdata->lang = $lang;
+    $formdata->term = $term;
+    $formdata->termlc = $termlc;
+    $formdata->scrdir = $scrdir;
+
     if ($new) {
-        $formdata = new FormData();
-        $formdata->fromAnn = $fromAnn;
-        $formdata->lang = $lang;
-        $formdata->term = $term;
-        $formdata->termlc = $termlc;
-        $formdata->scrdir = $scrdir;
         $formdata->tags = getWordTags(0);
         $formdata->sentence = get_sentence_for_termlc($termlc);
         $formdata->status = 1;
@@ -361,15 +360,6 @@ if (isset($_REQUEST['op'])) {
         show_form($formdata, "New Term", "Save");
         
     } else {
-        // CHG
-
-        $formdata = new FormData();
-        $formdata->fromAnn = $fromAnn;
-        $formdata->lang = $lang;
-        $formdata->term = $term;
-        $formdata->termlc = $termlc;
-        $formdata->scrdir = $scrdir;
-
         $sql = 'select WoTranslation, WoSentence, WoRomanization, WoStatus from ' . $tbpref . 'words where WoID = ' . $wid;
         $res = do_mysqli_query($sql);
         if ($record = mysqli_fetch_assoc($res)) {
