@@ -201,18 +201,8 @@ function handle_save_or_update(): void
 }
 
 
-$fromAnn = getreq("fromAnn"); // from-recno or empty
-$lang = null;
-$term = null;
-
-if (isset($_REQUEST['op'])) {
-  handle_save_or_update();
-} else {
-    // FORM
-    // edit_word.php?tid=..&ord=..&wid=..
-    
-    $wid = getreq('wid');
-    
+function get_term_and_lang($wid)
+{
     if ($wid == '') {    
         $sql = 
         'SELECT Ti2Text, Ti2LgID FROM ' . $tbpref . 'textitems2 
@@ -228,13 +218,6 @@ if (isset($_REQUEST['op'])) {
         mysqli_free_result($res);
         
         $termlc = mb_strtolower($term, 'UTF-8');
-        
-        $wid = get_first_value(
-            "SELECT WoID AS value 
-            FROM " . $tbpref . "words 
-            WHERE WoLgID = " . $lang . " AND WoTextLC = " . convert_string_to_sqlsyntax($termlc)
-        ); 
-        
     } else {
 
         $sql = 'SELECT WoText, WoLgID FROM ' . $tbpref . 'words WHERE WoID = ' . $wid;
@@ -249,6 +232,31 @@ if (isset($_REQUEST['op'])) {
         mysqli_free_result($res);
         $termlc =    mb_strtolower($term, 'UTF-8');
         
+    }
+
+    return [ $term, $lang ];
+}
+
+$fromAnn = getreq("fromAnn"); // from-recno or empty
+$lang = null;
+$term = null;
+
+if (isset($_REQUEST['op'])) {
+  handle_save_or_update();
+} else {
+    // FORM
+    // edit_word.php?tid=..&ord=..&wid=..
+
+    $wid = getreq('wid');
+    [ $term, $lang ] = get_term_and_lang($wid);
+    $termlc = mb_strtolower($term, 'UTF-8');
+
+    if ($wid == '') {
+        $wid = get_first_value(
+            "SELECT WoID AS value 
+            FROM " . $tbpref . "words 
+            WHERE WoLgID = " . $lang . " AND WoTextLC = " . convert_string_to_sqlsyntax($termlc)
+        );
     }
     
     $new = (isset($wid) == false);
