@@ -178,7 +178,7 @@ if (isset($_REQUEST['op'])) {
     if ($_REQUEST['op'] == 'Save') {
       $titlestart = "New Term: ";
     }
-    $titletext = $titlestart . tohtml(prepare_textdata($_REQUEST["WoTextLC"]));
+    $titletext = $titlestart . tohtml($textlc);
     pagestart_nobody($titletext);
     echo '<h4><span class="bigger">' . $titletext . '</span></h4>';
 
