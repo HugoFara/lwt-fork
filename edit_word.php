@@ -258,7 +258,7 @@ class FormData
 function show_form($formdata, $title = "New Term:", $operation = "Save")
 {
 ?>
- <form name="newword" class="validate" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
+ <form name="wordform" class="validate" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
  <input type="hidden" name="WoLgID" id="langfield" value="<?php echo $formdata->lang; ?>" />
  <input type="hidden" name="fromAnn" value="<?php echo $formdata->fromAnn; ?>" />
  <input type="hidden" name="WoOldStatus" value="<?php echo $formdata->status_old; ?>" />
@@ -302,7 +302,7 @@ function show_form($formdata, $title = "New Term:", $operation = "Save")
  </tr>
  </table>
  </form>
- <div id="exsent"><span class="click" onclick="do_ajax_show_sentences(<?php echo $formdata->lang; ?>, <?php echo prepare_textdata_js($formdata->termlc) . ', ' . prepare_textdata_js("document.forms['newword'].WoSentence") . ', 0'; ?>);"><img src="icn/sticky-notes-stack.png" title="Show Sentences" alt="Show Sentences" /> Show Sentences</span></div>    
+ <div id="exsent"><span class="click" onclick="do_ajax_show_sentences(<?php echo $formdata->lang; ?>, <?php echo prepare_textdata_js($formdata->termlc) . ', ' . prepare_textdata_js("document.forms['wordform'].WoSentence") . ', 0'; ?>);"><img src="icn/sticky-notes-stack.png" title="Show Sentences" alt="Show Sentences" /> Show Sentences</span></div>    
 
         <?php
 }
