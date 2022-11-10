@@ -317,6 +317,41 @@ function show_form($formdata, $title = "New Term:", $operation = "Save")
 }
 
 
+function augment_formdata_for_updates($wid, &$formdata)
+{
+    $sql = 'select WoTranslation, WoSentence, WoRomanization, WoStatus from ' . $tbpref . 'words where WoID = ' . $wid;
+    $res = do_mysqli_query($sql);
+    $record = mysqli_fetch_assoc($res);
+    mysqli_free_result($res);
+    if (! $record) {
+      my_die("No matching record for {$wid} ??");
+    }
+
+    $status = $record['WoStatus'];
+    if ($fromAnn == '' ) {
+        if ($status >= 98) {
+            $status = 1;
+        }
+    }
+    $sentence = repl_tab_nl($record['WoSentence']);
+    if ($sentence == '' && isset($_REQUEST['tid']) && isset($_REQUEST['ord'])) {
+        $sentence = get_sentence_for_termlc($termlc);
+    }
+    $transl = repl_tab_nl($record['WoTranslation']);
+    if($transl == '*') {
+        $transl='';
+    }
+
+    $formdata->wid = $wid;
+    $formdata->translation = $transl;
+    $formdata->tags = getWordTags($wid);
+    $formdata->sentence = $sentence;
+    $formdata->romanization = $record['WoRomanization'];
+    $formdata->status = $status;
+    $formdata->status_old = $record['WoStatus'];
+}
+
+
 $fromAnn = getreq("fromAnn"); // from-recno or empty
 $lang = null;
 $term = null;
@@ -361,36 +396,8 @@ if (isset($_REQUEST['op'])) {
         show_form($formdata, "New Term", "Save");
         
     } else {
-        $sql = 'select WoTranslation, WoSentence, WoRomanization, WoStatus from ' . $tbpref . 'words where WoID = ' . $wid;
-        $res = do_mysqli_query($sql);
-        if ($record = mysqli_fetch_assoc($res)) {
-            
-            $status = $record['WoStatus'];
-            if ($fromAnn == '' ) {
-                if ($status >= 98) { 
-                    $status = 1; 
-                }
-            }
-            $sentence = repl_tab_nl($record['WoSentence']);
-            if ($sentence == '' && isset($_REQUEST['tid']) && isset($_REQUEST['ord'])) {
-                $sentence = get_sentence_for_termlc($termlc);
-            }
-            $transl = repl_tab_nl($record['WoTranslation']);
-            if($transl == '*') { 
-                $transl=''; 
-            }
-
-            $formdata->wid = $wid;
-            $formdata->translation = $transl;
-            $formdata->tags = getWordTags($wid);
-            $formdata->sentence = $sentence;
-            $formdata->romanization = $record['WoRomanization'];
-            $formdata->status = $status;
-            $formdata->status_old = $record['WoStatus'];
-
-            show_form($formdata, "Edit Term", "Change");
-        }
-        mysqli_free_result($res);
+        augment_formdata_for_updates($wid, $formdata);
+        show_form($formdata, "Edit Term", "Change");
     }
 
     pageend();
