@@ -15,8 +15,14 @@
 
 require_once __DIR__ . '/start_session.php';
 
-if (isset($_SESSION['LWT-WP-User'])) {
-    $tbpref = $_SESSION['LWT-WP-User'];
+/** The ACTUAL database name that will be used for this wordpress user! */
+$dbname = null;
+
+$lwtwpuser = $_SESSION['LWT-WP-User'];
+if (isset($lwtwpuser)) {
+    global $dbname;
+    $dbname = "{$rootdbname}_{$lwtwpuser}";
+    $tbpref = '';
 } else {
     $url = '';
     if ($_SERVER['REQUEST_METHOD'] == 'GET') {
