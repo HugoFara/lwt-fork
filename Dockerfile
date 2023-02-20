@@ -9,8 +9,8 @@ RUN docker-php-ext-install pdo pdo_mysql mysqli
 COPY . /var/www/html/
 
 # creating connect.inc.php
-ARG DB_HOSTNAME=db
-ARG DB_USER=root
-ARG DB_PASSWORD=root
-ARG DB_DATABASE=learning-with-texts
+ARG DB_HOSTNAME=${DB_HOSTNAME}
+ARG DB_USER=${DB_USER}
+ARG DB_PASSWORD=${DB_PASSWORD}
+ARG DB_DATABASE=${DB_DATABASE}
 RUN printf '<?php\n$server = "%s";\n$userid = "%s";\n$passwd = "%s";\n$dbname = "%s";\n?>' "$DB_HOSTNAME" "$DB_USER" "$DB_PASSWORD" "$DB_DATABASE" > /var/www/html/connect.inc.php

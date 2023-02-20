@@ -5,10 +5,10 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        - DB_HOSTNAME=db
-        - DB_USER=root
-        - DB_PASSWORD=root
-        - DB_DATABASE=learning-with-texts
+        - DB_HOSTNAME=${DB_HOSTNAME}
+        - DB_USER=${DB_USER}
+        - DB_PASSWORD=${DB_PASSWORD}
+        - DB_DATABASE=${DB_DATABASE}
     container_name: lwt
     depends_on:
       - db
