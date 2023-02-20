@@ -32,6 +32,11 @@ As it is self-hosted, you will need a server, which can be your computer.
 
 Start a shell in the downloaded folder an run: ``./INSTALL.sh``. You may need to run ``chmod +x ./INSTALL.sh`` first.
 
+### Docker
+
+Ready to go sample of  `docker-compose.yml` and `.env` are here [./docker-example/](./docker-example/)  
+Detailed instructions: [./docker-example/README.md](./docker-example/README.md)
+
 ### Other Systems
 
 * **Please see**: [docs/install.md](docs/install.md) for detailed instructions.

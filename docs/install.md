@@ -198,6 +198,8 @@ We provide on online image, you can download it using.
 ```bash
 docker pull ghcr.io/hugofara/lwt
 ```
+Create your own `docker-compose.yml` or use one from the example [../docker-example/README.md](../docker-example/README.md)  
+
 
 **If you want to build the image from source**, you can use the following command.
 You can build the image by running
