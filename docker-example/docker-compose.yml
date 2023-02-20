@@ -1,0 +1,25 @@
+version: "3.7"
+services:
+  web:
+    image: ghcr.io/hugofara/lwt:master
+    container_name: lwt
+    depends_on:
+      - db
+    links:
+      - db
+    ports:
+      - "8010:80"
+    restart: unless-stopped
+  db:
+    container_name: lwt_db
+    environment:
+        MYSQL_ALLOW_EMPTY_PASSWORD: "no"
+        MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+    hostname: ${DB_HOSTNAME}
+    image: mariadb:10.7
+    restart: unless-stopped
+    # all user data will be placed in local folder ./lwt_db_data
+    volumes:
+        - ./lwt_db_data:/var/lib/mysql
+# volumes:
+#   lwt_db_data: {}
