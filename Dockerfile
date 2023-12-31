@@ -1,7 +1,7 @@
+FROM php:8.1-apache-bullseye
+
 LABEL org.opencontainers.image.source = "https://github.com/HugoFara/lwt"
 
-
-FROM php:8.1-apache-bullseye
 
 # creating config file php.ini 
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" && \
