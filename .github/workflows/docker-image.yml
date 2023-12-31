@@ -53,7 +53,6 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
-          push: true
           platforms: linux/amd64,linux/386,linux/arm/v5,linux/arm/v7,linux/arm64,linux/mips64le,linux/ppc64le,linux/s390x
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
