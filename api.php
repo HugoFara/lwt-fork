@@ -224,7 +224,7 @@ function word_test_ajax($get_req): array
         $get_req['test_key'], $get_req['selection']
     );
     return get_word_test_ajax(
-        $test_sql, $get_req['word_mode'], 
+        $test_sql,filter_var($get_req['word_mode'], FILTER_VALIDATE_BOOLEAN),
         $get_req['lg_id'], 
         $get_req['word_regex'], $get_req['type']
     );
