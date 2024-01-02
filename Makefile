@@ -25,14 +25,11 @@ minify: src/js/ src/css/ src/themes/
 
 # Do not minify for development version!
 no-minify: src/js/ src/css/ src/themes/
-	cp -r src/js/ .
-	cp src/js/third_party/* js/
-	cp src/js/pgm.js js/
-	cat src/js/* >> pgm/js
+	rm js/pgm.js
 	cat src/js/third_party/* >> js/pgm.js
-	rm -rf js/third_party
+	cat src/js/*.js >> js/pgm.js
 	cp -r src/css .
-	cp -r src/themes/ .
+	cp -r src/themes .
 
 # Clear documentation
 clean-doc:
