@@ -67,13 +67,17 @@ jobs:
           asset_name: ${{ github.ref_name }}-${{ matrix.platform }}
           tag: ${{ github.ref }}
   build-and-push-image:
-    permissions: write-all
+    permissions: 
+      packages: write
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
+
     steps:
+
       - name: Checkout repository
         uses: actions/checkout@v3
+        
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
