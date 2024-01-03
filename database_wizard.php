@@ -3,16 +3,16 @@
 /**
  * \file
  * \brief Create / Edit database connection
- * 
+ *
  * Call: database_wizard.php
- * 
+ *
  * PHP version 8.1
- * 
+ *
  * @category User_Interface
  * @package  Lwt
  * @author   HugoFara <hugo.farajallah@protonmail.com>
  * @license  Unlicense <http://unlicense.org/>
- * @link     https://hugofara.github.io/lwt/docs/html/database__wizard_8php.html
+ * @link     https://hugofara.github.io/lwt/docs/php/files/database-wizard.html
  * @since    2.5.0-fork
  */
 
@@ -22,12 +22,12 @@ require_once 'inc/kernel_utility.php';
 
 /**
  * A connection to database stored as an object.
- * 
+ *
  * @category Database
  * @package  Lwt
  * @author   HugoFara <hugo.farajallah@protonmail.com>
  * @license  Unlicense <http://unlicense.org/>
- * @link     https://hugofara.github.io/lwt/docs/html/database__wizard_8php.html
+ * @link     https://hugofara.github.io/lwt/docs/php/files/database-wizard.html
  */
 class Database_Connection
 {
@@ -54,15 +54,19 @@ class Database_Connection
 
     /**
      * Build a new connection object.
-     * 
+     *
      * @param string $server Server name
      * @param string $userid User ID
      * @param string $passwd Password for this user
      * @param string $dbname Database name
      * @param string $socket Socket to use
      */
-    function __construct(
-        $server = "", $userid = "", $passwd = "", $dbname = "", $socket = ""
+    public function __construct(
+        $server = "",
+        $userid = "",
+        $passwd = "",
+        $dbname = "",
+        $socket = ""
     ) {
         $this->server = $server;
         $this->userid = $userid;
@@ -73,11 +77,11 @@ class Database_Connection
 
     /**
      * Load data from a PHP file.
-     * 
+     *
      * The file is usually connect.inc.php or equivalent.
-     * 
+     *
      * @param string $file_name PHP file to load data from.
-     * 
+     *
      * @return void
      */
     public function loadFile(string $file_name)
@@ -118,9 +122,9 @@ class Database_Connection
 
 /**
  * Save the connection to the file connect.inc.php.
- * 
+ *
  * @param Database_Connection $conn Connection object.
- * 
+ *
  * @return void
  */
 function writeToFile($conn)
@@ -132,25 +136,27 @@ function writeToFile($conn)
 
 /**
  * Execute operation.
- * 
+ *
  * @param string $op Operation to execute.
- * 
+ *
  * @return void
  */
 function doOperation($op)
 {
     $message = null;
-    $dbname = null;
-    $passwd = null;
     $server = null;
-    $socket = null;
     $userid = null;
+    $passwd = null;
+    $dbname = null;
+    $socket = null;
     if ($op == "Autocomplete") {
-        $_SERVER['SERVER_ADDR'];
-        $_SERVER['SERVER_NAME']; 
-    } else if ($op == "Check") {
-        //require_once 'inc/database_connect.php';
-        $server = getreq("server"); 
+        $server = (string) $_SERVER['SERVER_ADDR'];
+        $userid = "";
+        $passwd = "";
+        $dbname = (string) $_SERVER['SERVER_NAME'];
+        $socket = "";
+    } elseif ($op == "Check") {
+        $server = getreq("server");
         $userid = getreq("userid");
         $passwd = getreq("passwd");
         $dbname = getreq("dbname");
@@ -162,18 +168,26 @@ function doOperation($op)
             try {
                 if ($socket != "") {
                     $success = mysqli_real_connect(
-                        $conn, $server, $userid, $passwd, $dbname, 
+                        $conn,
+                        $server,
+                        $userid,
+                        $passwd,
+                        $dbname,
                         socket: $socket
                     );
                 } else {
                     $success = mysqli_real_connect(
-                        $conn, $server, $userid, $passwd, $dbname
+                        $conn,
+                        $server,
+                        $userid,
+                        $passwd,
+                        $dbname
                     );
                 }
                 if (!$success) {
                     $message = "Can't connect!";
-                } else if (mysqli_errno($conn) != 0) {
-                    $message = "ERROR: " . mysqli_error($conn) . 
+                } elseif (mysqli_errno($conn) != 0) {
+                    $message = "ERROR: " . mysqli_error($conn) .
                     " error number: " . mysqli_errno($conn);
                 } else {
                     $message = "Connection established with success!";
@@ -182,15 +196,19 @@ function doOperation($op)
                 $message = (string)$exept;
             }
         }
-    } else if ($op == "Change") {
-        getreq("server"); 
-        getreq("userid");
-        getreq("passwd");
-        getreq("dbname");
-        getreq("socket");
+    } elseif ($op == "Change") {
+        $server = getreq("server");
+        $userid = getreq("userid");
+        $passwd = getreq("passwd");
+        $dbname = getreq("dbname");
+        $socket = getreq("socket");
     }
     $conn = new Database_Connection(
-        $server, $userid, $passwd, $dbname, $socket
+        $server,
+        $userid,
+        $passwd,
+        $dbname,
+        $socket
     );
     if ($op == "Change") {
         writeToFile($conn);
@@ -200,13 +218,13 @@ function doOperation($op)
 
 /**
  * Generate a form to edit the connection.
- * 
+ *
  * @param Database_Connection $conn          Database connection object
  * @param string|null         $error_message Error message to display
- * 
+ *
  * @return void
  */
-function displayForm($conn, $error_message=null)
+function displayForm($conn, $error_message = null)
 {
     pagestart_kernel_nobody("Database Connection Wizard");
     if ($error_message != null) {
@@ -255,7 +273,7 @@ function displayForm($conn, $error_message=null)
 
 /**
  * Display the main form, filled with data from an existing connection file.
- * 
+ *
  * @return void
  */
 function editConnection()
@@ -268,7 +286,7 @@ function editConnection()
 
 /**
  * Display the main form blank.
- * 
+ *
  * @return void
  */
 function createNewConnection()
@@ -278,7 +296,7 @@ function createNewConnection()
 
 if (getreq('op') != '') {
     doOperation(getreq('op'));
-} else if (file_exists('connect.inc.php')) {
+} elseif (file_exists('connect.inc.php')) {
     editConnection();
 } else {
     createNewConnection();

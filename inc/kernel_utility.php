@@ -8,12 +8,21 @@
  * @package Lwt
  * @author  HugoFara <hugo.farajallah@protonmail.com>
  * @license Unlicense <http://unlicense.org/>
- * @link    https://hugofara.github.io/lwt/docs/html/kernel__utility_8php.html
+ * @link    https://hugofara.github.io/lwt/docs/php/files/inc-kernel-utility.html
  * @since   2.0.3-fork
  */
 
  require __DIR__ . '/settings.php';
 
+/**
+ * @var string Version of this current LWT application.
+ */
+ define('LWT_APP_VERSION', '2.10.0-fork');
+
+ /**
+  * @var string Date of the lastest published release of LWT 
+  */
+ define('LWT_RELEASE_DATE', "2023-12-29");
 
 /**
  * Return LWT version for humans
@@ -25,14 +34,13 @@
  *
  * @return string Version number HTML-formatted
  * 
- * @psalm-return '2.9.0-fork (April 14 2023) <span class="red">DEBUG</span>'|'2.9.0-fork (April 14 2023)'
+ * @psalm-return '2.9.1-fork (December 29 2023) <span class="red">DEBUG</span>'|'2.9.1-fork (December 29 2023)'
  */
 function get_version(): string 
 {
     global $debug;
-    $release_number = '2.9.0-fork';
-    $release_date = 'April 14 2023';
-    $version = "$release_number ($release_date)"; 
+    $formattedDate = date("F d Y", strtotime(LWT_RELEASE_DATE));
+    $version = LWT_APP_VERSION . " ($formattedDate)"; 
     if ($debug) {
         $version .= ' <span class="red">DEBUG</span>';
     }
@@ -166,6 +174,9 @@ function get_setting_data()
         'set-tts' => array(
             "dft" => '1', "num" => 0
         ),
+        'set-hts' => array(
+            "dft" => '1', "num" => 0
+        ),
         'set-term-sentence-count' => array(
             "dft" => '1', "num" => 0
         ),
@@ -247,18 +258,22 @@ function remove_spaces($s, $remove)
  * @return string OS-compatible command
  *
  * @since 2.3.1-fork Much more verifications added
+ * @since 2.10.0-fork Support for Mac OS added
  */
 function get_mecab_path($mecab_args = ''): string 
 {
-    $os = strtoupper(substr(PHP_OS, 0, 3));
+    $os = strtoupper(PHP_OS);
     $mecab_args = escapeshellcmd($mecab_args);
-    if ($os == 'LIN') {
+    if (str_starts_with($os, 'LIN') || str_starts_with($os, 'DAR')) {
         if (shell_exec("command -v mecab")) {
             return 'mecab' . $mecab_args; 
         }
-        my_die("MeCab not detected! Please install it and add it to your PATH.");
+        my_die(
+            "MeCab not detected! " . 
+            "Please install it or add it to your PATH (see documentation)."
+        );
     }
-    if ($os == 'WIN') {
+    if (str_starts_with($os, 'WIN')) {
         if (shell_exec('where /R "%ProgramFiles%\\MeCab\\bin" mecab.exe')) { 
             return '"%ProgramFiles%\\MeCab\\bin\\mecab.exe"' . $mecab_args;
         } 
@@ -268,7 +283,10 @@ function get_mecab_path($mecab_args = ''): string
         if (shell_exec('where mecab.exe')) {
             return 'mecab.exe' . $mecab_args; 
         }
-        my_die("MeCab not detected! Install it or add it to the PATH.");
+        my_die(
+            "MeCab not detected! " . 
+            "Install it or add it to the PATH (see documentation)."
+        );
     }
     my_die("Your OS '$os' cannot use MeCab with this version of LWT!");
 }
@@ -548,11 +566,10 @@ function annotation_to_json($ann): string|false
  */
 function getreq($s) 
 {
-    if (isset($_REQUEST[$s]) ) {
+    if (isset($_REQUEST[$s])) {
         return trim($_REQUEST[$s]);
-    } else {
-        return ''; 
     }
+    return '';
 }
 
 /**
@@ -741,7 +758,44 @@ function targetLangFromDict($url)
     }
     // Fallback to Google Translate
     return $parsed_query["tl"] ?? "";
-} 
+}
+
+/**
+ * Parse a SQL file by returning an array of the different queries it contains.
+ * 
+ * @param string $filename File name
+ * 
+ * @return array
+ */
+function parseSQLFile($filename)
+{  
+    $handle = fopen($filename, 'r');
+    if ($handle === false) {
+        return array();
+    }
+    $curr_content = '';
+    while ($stream = fgets($handle)) {
+        // Skip comments
+        if (str_starts_with($stream, '-- ')) {
+            continue;
+        }
+        // Add stream to accumulator
+        $curr_content .= $stream;
+        // Get queries
+        $queries = explode(';' . PHP_EOL, $curr_content);
+        // Replace line by remainders of the last element (incomplete line)
+        $curr_content = array_pop($queries);
+        //var_dump("queries", $queries);
+        foreach ($queries as $query) {
+            $queries_list[] = trim($query);
+        }
+    }
+    if (!feof($handle)) {
+        // Throw error
+    }
+    fclose($handle);
+    return $queries_list;
+}
 
 /*****************
  * Wrappers for PHP <8.0  

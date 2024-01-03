@@ -8,7 +8,7 @@
  * @package Lwt
  * @author  LWT Project <lwt-project@hotmail.com>
  * @license Unlicense <http://unlicense.org/>
- * @link    https://hugofara.github.io/lwt/docs/html/ajax__add__term__transl_8php.html
+ * @link    https://hugofara.github.io/lwt/docs/php/files/inc-ajax-add-term-transl.html
  * @since   1.5.0
  */
 

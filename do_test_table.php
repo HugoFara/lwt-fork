@@ -3,17 +3,17 @@
 /**
  * \file
  * \brief Show test frame with vocab table
- * 
+ *
  * Call: do_test_table.php?lang=[langid]
  * Call: do_test_test.php?text=[textid]
  * Call: do_test_test.php?&selection=1 (SQL via $_SESSION['testsql'])
- * 
+ *
  * PHP version 8.1
- * 
+ *
  * @package Lwt
  * @author  LWT Project <lwt-project@hotmail.com>
  * @license Unlicense <http://unlicense.org/>
- * @link    https://hugofara.github.io/lwt/docs/html/do__test__table_8php.html
+ * @link    https://hugofara.github.io/lwt/docs/php/files/do-test-table.html
  * @since   1.5.4
  */
 
@@ -21,29 +21,29 @@ require_once 'inc/session_utility.php';
 
 /**
  * Set sql request for the word test.
- * 
+ *
  * @return string SQL request string
- * 
+ *
  * @global string $tbpref Table prefix
  */
 function get_test_table_sql()
 {
     global $tbpref;
-    if (isset($_REQUEST['selection']) && isset($_SESSION['testsql'])) { 
+    if (isset($_REQUEST['selection']) && isset($_SESSION['testsql'])) {
         $testsql = $_SESSION['testsql'];
         $cntlang = get_first_value('SELECT count(distinct WoLgID) AS value FROM ' . $testsql);
         if ($cntlang > 1) {
-            echo '<p>Sorry - The selected terms are in ' . $cntlang . 
+            echo '<p>Sorry - The selected terms are in ' . $cntlang .
             ' languages, but tests are only possible in one language at a time.</p>';
             exit();
         }
-    } else if (isset($_REQUEST['lang'])) {
+    } elseif (isset($_REQUEST['lang'])) {
         $testsql = ' ' . $tbpref . 'words where WoLgID = ' . $_REQUEST['lang'] . ' ';
-    } else if (isset($_REQUEST['text'])) {
+    } elseif (isset($_REQUEST['text'])) {
         $testsql = ' ' . $tbpref . 'words, ' . $tbpref . 'textitems2 
         WHERE Ti2LgID = WoLgID AND Ti2WoID = WoID AND Ti2TxID = ' . $_REQUEST['text'] . ' ';
-    } else { 
-        my_die("do_test_table.php called with wrong parameters"); 
+    } else {
+        my_die("do_test_table.php called with wrong parameters");
     }
     return $testsql;
 }
@@ -80,7 +80,7 @@ function do_test_table_language_settings($testsql)
  *
  * @psalm-return list{0|1, 0|1, 0|1, 0|1, 0|1, 0|1}
  */
-function get_test_table_settings(): array 
+function get_test_table_settings(): array
 {
     $currenttabletestsetting1 = getSettingZeroOrOne('currenttabletestsetting1', 1);
     $currenttabletestsetting2 = getSettingZeroOrOne('currenttabletestsetting2', 1);
@@ -89,7 +89,7 @@ function get_test_table_settings(): array
     $currenttabletestsetting5 = getSettingZeroOrOne('currenttabletestsetting5', 0);
     $currenttabletestsetting6 = getSettingZeroOrOne('currenttabletestsetting6', 1);
     return array(
-        $currenttabletestsetting1, $currenttabletestsetting2, $currenttabletestsetting3, 
+        $currenttabletestsetting1, $currenttabletestsetting2, $currenttabletestsetting3,
         $currenttabletestsetting4, $currenttabletestsetting5, $currenttabletestsetting6
     );
 }
@@ -235,12 +235,12 @@ function do_test_table_header(): void
     <?php
 }
 
-function do_test_table_table_content($lang_record, $testsql): void 
+function do_test_table_table_content($lang_record, $testsql): void
 {
     global $debug;
 
-    $textsize = round(((int)$lang_record['LgTextSize']-100)/2, 0)+100;
-    
+    $textsize = round(((int)$lang_record['LgTextSize'] - 100) / 2, 0) + 100;
+
     $regexword = $lang_record['LgRegexpWordCharacters'];
     $rtlScript = $lang_record['LgRightToLeft'];
     $span1 = ($rtlScript ? '<span dir="rtl">' : '');
@@ -252,8 +252,8 @@ function do_test_table_table_content($lang_record, $testsql): void
     AND WoTranslation != \'\' AND WoTranslation != \'*\' 
     ORDER BY WoTodayScore, WoRandom*RAND()';
 
-    if ($debug) { 
-        echo $sql; 
+    if ($debug) {
+        echo $sql;
     }
     $res = do_mysqli_query($sql);
     while ($record = mysqli_fetch_assoc($res)) {
@@ -266,8 +266,11 @@ function do_test_table_row($record, $regexword, $textsize, $span1, $span2): void
 {
     $sent = tohtml(repl_tab_nl($record["WoSentence"]));
     $sent1 = str_replace(
-        "{", ' <b>[', str_replace(
-            "}", ']</b> ', 
+        "{",
+        ' <b>[',
+        str_replace(
+            "}",
+            ']</b> ',
             mask_term_in_sentence($sent, $regexword)
         )
     );
@@ -283,11 +286,13 @@ function do_test_table_row($record, $regexword, $textsize, $span1, $span2): void
     </td>
     <td class="td1 center" nowrap="nowrap">
         <span id="STAT<?php echo $record['WoID']; ?>">
-            <?php 
+            <?php
             echo make_status_controls_test_table(
-                $record['Score'], $record['WoStatus'], $record['WoID']
-            ); 
-            ?>
+                $record['Score'],
+                $record['WoStatus'],
+                $record['WoID']
+            );
+    ?>
         </span>
     </td>
     <td class="td1 center" style="font-size:<?php echo $textsize; ?>%;">
@@ -325,7 +330,7 @@ function do_test_table(): void
     do_test_table_settings($settings);
 
     echo '<table class="sortable tab2" style="width:auto;" cellspacing="0" cellpadding="5">';
-    
+
     do_test_table_header();
     do_test_table_table_content($lang_record, $testsql);
     echo '</table>';

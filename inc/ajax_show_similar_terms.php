@@ -11,7 +11,7 @@
  * @package Lwt
  * @author  LWT Project <lwt-project@hotmail.com>
  * @license Unlicense <http://unlicense.org/>
- * @link    https://hugofara.github.io/lwt/docs/html/ajax__show__similar__terms_8php.html
+ * @link    https://hugofara.github.io/lwt/docs/php/files/inc-ajax-show-similar-terms.html
  * @since   1.5.18
  * 
  * @deprecated Since 2.9.0, it is recommended to use the REST API.

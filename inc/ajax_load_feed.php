@@ -7,7 +7,7 @@
  *  
  * @author  andreask7 <andreask7@users.noreply.github.com>
  * @license Unlicense <http://unlicense.org/>
- * @link    https://hugofara.github.io/lwt/docs/html/ajax__load__feed_8php.html
+ * @link    https://hugofara.github.io/lwt/docs/php/files/inc-ajax-load-feed.html
  * @since   1.6.0-fork
  */
 

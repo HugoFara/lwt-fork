@@ -13,7 +13,7 @@
  * @package Lwt
  * @author  LWT Project <lwt-project@hotmail.com>
  * @license Unlicense <http://unlicense.org/>
- * @link    https://hugofara.github.io/lwt/docs/html/start_8php.html
+ * @link    https://hugofara.github.io/lwt/docs/php/files/start.html
  * @since   1.5.4
  */
 

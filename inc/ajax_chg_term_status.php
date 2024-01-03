@@ -10,7 +10,7 @@
  * @package Lwt
  * @author  LWT Project <lwt-project@hotmail.com>
  * @license Unlicense <http://unlicense.org/>
- * @link    https://hugofara.github.io/lwt/docs/html/ajax__chg__term__status_8php.html
+ * @link    https://hugofara.github.io/lwt/docs/php/files/inc-ajax-chg-term-status.html
  * @since   1.5.4
  */
 

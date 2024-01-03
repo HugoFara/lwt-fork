@@ -672,13 +672,19 @@ if (isset($_REQUEST['allaction'])) {
 
 if (isset($_REQUEST['new']) && isset($_REQUEST['lang'])) {
     // NEW
-    $scrdir = getScriptDirectionTag((int) $_REQUEST['lang']);
+    $lgid = (int) $_REQUEST['lang'];
+    $scrdir = getScriptDirectionTag($lgid);
+    $showRoman = (bool) get_first_value(
+        "SELECT LgShowRomanization AS value
+        FROM {$tbpref}languages 
+        WHERE LgID = $lgid"
+    );    
     
     ?>
 
     <h2>New Term</h2>
     <script type="text/javascript" charset="utf-8">
-        $(document).ready(ask_before_exiting);
+        $(document).ready(lwt_form_check.askBeforeExit);
     </script>  
     <form name="newword" class="validate" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
     <input type="hidden" name="WoLgID" id="langfield" value="<?php echo $_REQUEST['lang']; ?>" />
@@ -706,7 +712,7 @@ if (isset($_REQUEST['new']) && isset($_REQUEST['lang'])) {
     <?php echo getWordTags(0); ?>
     </td>
     </tr>
-    <tr>
+    <tr class="<?php echo ($showRoman ? '' : 'hide'); ?>">
     <td class="td1 right">Romaniz.:</td>
     <td class="td1"><input type="text" class="checkoutsidebmp" data_info="Romanization" name="WoRomanization" value="" maxlength="100" size="40" /></td>
     </tr>
@@ -726,7 +732,7 @@ if (isset($_REQUEST['new']) && isset($_REQUEST['lang'])) {
     'document.forms[\'newword\'].WoSentence', 
     'document.forms[\'newword\'].WoText'); ?>
         &nbsp; &nbsp;
-    <input type="button" value="Cancel" onclick="{resetDirty(); location.href='edit_words.php';}" /> 
+    <input type="button" value="Cancel" onclick="{lwt_form_check.resetDirty(); location.href='edit_words.php';}" /> 
     <input type="submit" name="op" value="Save" /></td>
     </tr>
     </table>
@@ -747,12 +753,13 @@ if (isset($_REQUEST['new']) && isset($_REQUEST['lang'])) {
             $transl=''; 
         }
         $scrdir = ($record['LgRightToLeft'] ? ' dir="rtl" ' : '');
+        $showRoman = $record['LgShowRomanization'];
     
         ?>
     
      <h2>Edit Term</h2>
      <script type="text/javascript" charset="utf-8">
-         $(document).ready(ask_before_exiting);
+         $(document).ready(lwt_form_check.askBeforeExit);
      </script>
      <form name="editword" class="validate" action="<?php echo $_SERVER['PHP_SELF']; ?>#rec<?php echo $_REQUEST['chg']; ?>" method="post">
      <input type="hidden" name="WoID" value="<?php echo $record['WoID']; ?>" />
@@ -781,7 +788,7 @@ if (isset($_REQUEST['new']) && isset($_REQUEST['lang'])) {
             <?php echo getWordTags($record['WoID']); ?>
         </td>
      </tr>
-     <tr>
+     <tr class="<?php echo ($showRoman ? '' : 'hide'); ?>">
         <td class="td1 right">Romaniz.:</td>
         <td class="td1">
             <input type="text" class="checkoutsidebmp" data_info="Romanization" name="WoRomanization" maxlength="100" size="40" 
@@ -802,7 +809,7 @@ if (isset($_REQUEST['new']) && isset($_REQUEST['lang'])) {
         <td class="td1 right" colspan="2">  &nbsp;
             <?php echo createDictLinksInEditWin2($record['WoLgID'], 'document.forms[\'editword\'].WoSentence', 'document.forms[\'editword\'].WoText'); ?>
             &nbsp; &nbsp;
-            <input type="button" value="Cancel" onclick="{resetDirty(); location.href='edit_words.php#rec<?php echo $_REQUEST['chg']; ?>';}" /> 
+            <input type="button" value="Cancel" onclick="{lwt_form_check.resetDirty(); location.href='edit_words.php#rec<?php echo $_REQUEST['chg']; ?>';}" /> 
             <input type="submit" name="op" value="Change" />
         </td>
      </tr>

@@ -8,7 +8,7 @@
  * @package Lwt
  * @author  HugoFara <hugo.farajallah@protonmail.com>
  * @license Unlicense <http://unlicense.org/>
- * @link    https://hugofara.github.io/lwt/docs/html/settings_8php.html
+ * @link    https://hugofara.github.io/lwt/docs/php/files/inc-settings.html
  * @since   2.0.3-fork
  */
 

@@ -3,32 +3,32 @@
 /**
  * \file
  * \brief Display an improved annotated text (frame set)
- * 
+ *
  * Call: display_impr_text.php?text=[textid]
- * 
+ *
  * PHP version 8.1
- * 
+ *
  * @category User_Interface
  * @package Lwt
  * @author  LWT Project <lwt-project@hotmail.com>
  * @license Unlicense <http://unlicense.org/>
- * @link    https://hugofara.github.io/lwt/docs/html/display__impr__text_8php.html
+ * @link    https://hugofara.github.io/lwt/docs/php/files/display-impr-text.html
  * @since   1.5.0
  */
 
-require_once 'inc/session_utility.php'; 
+require_once 'inc/session_utility.php';
 require_once 'inc/mobile_interactions.php';
 require_once 'display_impr_text_header.php';
 require_once 'display_impr_text_text.php';
 
 /**
  * Make the page content to display printed texts on mobile.
- * 
+ *
  * @param int    $textid Text ID
  * @param string $audio  Media URI
- * 
+ *
  * @return     void
- * @deprecated 
+ * @deprecated
  * @since      2.2.0 This function should not longer be used, and should cause issues. Use
  * do_desktop_display_impr_text instead.
  */
@@ -37,31 +37,31 @@ function do_mobile_display_impr_text($textid, $audio)
     do_frameset_mobile_css();
     do_frameset_mobile_js($audio);
     do_frameset_mobile_page_content(
-        "display_impr_text_header.php?text=" . $textid, 
-        "display_impr_text_text.php?text=" . $textid, 
+        "display_impr_text_header.php?text=" . $textid,
+        "display_impr_text_text.php?text=" . $textid,
         false
     );
 }
 
 /**
  * Make the main page content to display printed texts for desktop.
- * 
+ *
  * @param int    $textid Text ID
  * @param string $audio  Media URI
- * 
+ *
  * @return void
  */
 function do_desktop_display_impr_text($textid, $audio)
 {
-    
+
     ?>
 
 <!--
-<frameset border="3" bordercolor="" rows="<?php 
-if (isset($audio)) { 
-    echo (int)getSettingWithDefault('set-text-h-frameheight-with-audio')-90;
-} else { 
-    echo (int)getSettingWithDefault('set-text-h-frameheight-no-audio')-90;
+<frameset border="3" bordercolor="" rows="<?php
+if (isset($audio)) {
+    echo (int)getSettingWithDefault('set-text-h-frameheight-with-audio') - 90;
+} else {
+    echo (int)getSettingWithDefault('set-text-h-frameheight-no-audio') - 90;
 } ?>,*">
     <frame src="display_impr_text_header.php?text=<?php echo $_REQUEST['text']; ?>" scrolling="no" name="header" />            
     <frame src="display_impr_text_text.php?text=<?php echo $_REQUEST['text']; ?>" scrolling="auto" name="text" />
@@ -83,11 +83,11 @@ if (isset($audio)) {
 
 /**
  * Do the page to display printed text.
- * 
+ *
  * @param int $textid Text ID
- * 
+ *
  * @global string $tbpref Database table prefix
- * 
+ *
  * @return void
  */
 function do_display_impr_text_page($textid)

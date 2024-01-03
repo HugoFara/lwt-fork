@@ -3,16 +3,16 @@
 /**
  * \file
  * \brief Delete an expression
- * 
+ *
  * Call: delete_mword.php?wid=[wordid]&tid=[textid]
- * 
+ *
  * PHP version 8.1
- * 
+ *
  * @category Helper_Frame
  * @package Lwt
  * @author  LWT Project <lwt-project@hotmail.com>
  * @license Unlicense <http://unlicense.org/>
- * @link    https://hugofara.github.io/lwt/docs/html/delete__mword_8php.html
+ * @link    https://hugofara.github.io/lwt/docs/php/files/delete-mword.html
  * @since   1.0.3
  */
 
@@ -37,7 +37,7 @@ var context = window.parent.document;
 $('.word<?php echo $wid; ?>', context).each(function(){
 sid = $(this).parent();
 $(this).remove();
-<?php 
+<?php
 if (! $showAll) { ?>
 $('*',sid).removeClass('hide');
 $('.mword', sid).each(function(){

@@ -154,6 +154,11 @@ else {  // if (! isset($_REQUEST['op']))
         $sentence = repl_tab_nl($record['WoSentence']);
         $rom = $record['WoRomanization'];
         $status = $record['WoStatus'];
+        $showRoman = (bool) get_first_value(
+            "SELECT LgShowRomanization AS value
+            FROM {$tbpref}languages 
+            WHERE LgID = $lang"
+        );    
     } else {
         my_die("Term data not found in edit_tword.php");
     }
@@ -166,7 +171,7 @@ else {  // if (! isset($_REQUEST['op']))
 
     ?>
 <script type="text/javascript">
-    $(document).ready(ask_before_exiting);
+    $(document).ready(lwt_form_check.askBeforeExit);
     $(window).on('beforeunload',function() {
         setTimeout(function() {window.parent.frames['ru'].location.href = 'empty.html';}, 0);
     });
@@ -193,7 +198,7 @@ else {  // if (! isset($_REQUEST['op']))
             <?php echo getWordTags($wid); ?>
         </td>
     </tr>
-    <tr>
+    <tr class="<?php echo ($showRoman ? '' : 'hide'); ?>">
         <td class="td1 right">Romaniz.:</td>
         <td class="td1"><input type="text" class="checkoutsidebmp" data_info="Romanization" name="WoRomanization" maxlength="100" size="35" value="<?php echo tohtml($rom); ?>" /></td>
     </tr>

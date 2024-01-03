@@ -127,10 +127,12 @@ The following instruction were tested on Raspbian Stretch.
 
       ```bash
       sudo apt-get update
-      sudo apt-get install apache2 libapache2-mod-php php php-mbstring php-mysql mysql-server
+      sudo apt-get install apache2 libapache2-mod-php php php-mbstring php-mysql php-xml mysql-server
       ```
 
-   2. (Optional) Check if everything is okay:
+      Note: if MySQL is unavailable for your Linux distribution, you can also use MariaDB.
+
+   2. Check if everything is okay:
       * ``php -v`` should show a PHP version equal or above to 8.0.0.
       * <http://locahlhost> should display a nice web page.
       * ``mysql -V`` should work.
@@ -196,12 +198,13 @@ If you want to use LWT again, just do step 7.
 
 ## Run in a Docker container
 
-[Docker](https://docs.docker.com/get-docker/) is the easiest way to install LWT, but it will use more or less 1 GB
-on your system.
+[Docker](https://docs.docker.com/get-docker/) is the easiest way to install LWT, 
+but it will use more or less 1 GB on your system.
 
 ### Using the installer
 
-For an light-weight installation, you may use [HugoFara/lwt-docker-installer](https://github.com/HugoFara/lwt-docker-installer).
+For an light-weight installer, you may use 
+[HugoFara/lwt-docker-installer](https://github.com/HugoFara/lwt-docker-installer).
 
 ### Build image from source
 
@@ -211,7 +214,7 @@ Download the lwt, open a terminal inside it, then type
 docker compose up
 ```
 
-By default the server can be accessed on port 8010 (<http://localhost:8010>).
+By default the server can be accessed on port 8010 (<http://localhost:8010/lwt>).
 
 To remove the created containers run
 
@@ -242,5 +245,7 @@ The official repository is at <https://packagist.org/packages/hugofara/lwt>.
 ## Something Went Wrong
 
 Need more help? You can contact us through  [GitHub](https://github.com/HugoFara/lwt/issues) and [Discord](https://discord.gg/xrkRZR2jtt)!
+
+You can also consult the troubleshooting section of the documentation at <https://hugofara.github.io/lwt/docs/info.html#faq>.
 
 Please note that *PHP below version 8.0 is no longer supported*.

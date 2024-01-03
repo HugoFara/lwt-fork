@@ -65,18 +65,8 @@ if (isset($_REQUEST['op'])) {
    <p><?php echo $message; ?></p>
 
         <?php
-        if (substr($message, 0, 5) != 'Error') {?>
-<script type="text/javascript">
-    //<![CDATA[
-    var context = window.parent.document;
-    var woid = <?php echo prepare_textdata_js($wid); ?>;
-    var status = <?php echo prepare_textdata_js($_REQUEST["WoStatus"]); ?>;
-    var trans = <?php echo prepare_textdata_js($translation . getWordTagList($wid, ' ', 1, 0)); ?>;
-    var roman = <?php echo prepare_textdata_js($_REQUEST["WoRomanization"]); ?>;
-    var title = window.parent.JQ_TOOLTIP?'':make_tooltip(<?php echo prepare_textdata_js($_REQUEST["WoText"]); ?>,trans,roman,status);
-    //]]>
-</script>
-            <?php
+        if (substr($message, 0, 5) != 'Error') {
+            
             $len = get_first_value('select WoWordCount as value from ' . $tbpref . 'words where WoID = ' . $wid);
             if ($len > 1) {
                 insertExpressions($textlc, $_REQUEST["WoLgID"], $wid, $len, 0);
@@ -88,7 +78,19 @@ if (isset($_REQUEST['op'])) {
                 );
                 ?>
 <script type="text/javascript">
-    //<![CDATA[
+    var context = window.parent.document;
+    var woid = <?php echo prepare_textdata_js($wid); ?>;
+    var status = <?php echo prepare_textdata_js($_REQUEST["WoStatus"]); ?>;
+    var trans = <?php echo prepare_textdata_js($translation . getWordTagList($wid, ' ', 1, 0)); ?>;
+    var roman = <?php echo prepare_textdata_js($_REQUEST["WoRomanization"]); ?>;
+    var title = ''; 
+    if (window.parent.LWT_DATA.settings.jQuery_tooltip) {
+        title = make_tooltip(
+            <?php echo prepare_textdata_js($_REQUEST["WoText"]); ?>,
+            trans, roman, status
+        );
+    }
+
     if($('.TERM<?php echo $hex; ?>', context).length){
         $('.TERM<?php echo $hex; ?>', context)
         .removeClass('status0')
@@ -100,7 +102,6 @@ if (isset($_REQUEST['op'])) {
         .attr('title',title);
         $('#learnstatus', context).html('<?php echo addslashes(texttodocount2($_REQUEST['tid'])); ?>');
     }
-    //]]>
 </script>
                 <?php
                 flush();
@@ -124,10 +125,15 @@ else {  // if (! isset($_REQUEST['op']))
     $lang = (int)getreq('lang');
     $text = (int)getreq('text');
     $scrdir = getScriptDirectionTag($lang);
+    $showRoman = (bool) get_first_value(
+        "SELECT LgShowRomanization AS value
+        FROM {$tbpref}languages 
+        WHERE LgID = $lang"
+    );
     pagestart_nobody('');
     ?>
     <script type="text/javascript">
-        $(document).ready(ask_before_exiting);
+        $(document).ready(lwt_form_check.askBeforeExit);
         $(window).on('beforeunload', function() {
             setTimeout(function() {window.parent.frames['ru'].location.href = 'empty.html';}, 0);
         });
@@ -158,7 +164,7 @@ else {  // if (! isset($_REQUEST['op']))
                 <?php echo getWordTags(0); ?>
             </td>
             </tr>
-            <tr>
+            <tr class="<?php echo ($showRoman ? '' : 'hide'); ?>">
                 <td class="td1 right">Romaniz.:</td>
                 <td class="td1">
                     <input type="text" class="checkoutsidebmp" data_info="Romanization" name="WoRomanization" value="" maxlength="100" size="35" />

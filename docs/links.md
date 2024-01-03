@@ -24,11 +24,11 @@
     Part [1](http://www.streetsmartlanguagelearning.com/2012/12/using-learning-with-texts-with-anki-2.html) / [2](http://www.streetsmartlanguagelearning.com/2013/01/using-learning-with-texts-with-anki-2.html) / [3](http://www.streetsmartlanguagelearning.com/2013/01/using-learning-with-texts-with-anki-2_8.html) / [4](http://www.streetsmartlanguagelearning.com/2013/01/using-learning-with-texts-with-anki-2_15.html) / [5](http://www.streetsmartlanguagelearning.com/2013/01/using-learning-with-texts-with-anki-2_21.html)
 * [Learning with Texts for classical languages](https://diyclassics.com/2014/04/11/learning-with-texts-for-classical-languages/)
 * [Chicagoseoul's Blog: Learning with Texts](http://chicagoseoul.wordpress.com/2011/07/19/learning-with-texts/)
-* [Mikoto's Adventures in Japanese: LWT - Learning With Text Introduction](http://mikotoneko.wordpress.com/2012/03/09/lwtp1/)
-* [Mikoto's Adventures in Japanese: LWT - A Guide to Setting up for Japanese Learning](http://mikotoneko.wordpress.com/2012/03/13/lwt-a-guide-to-setting-up-for-japanese-learning/)
-* [Mikoto's Adventures in Japanese: LWT - Tricks of the Trade](http://mikotoneko.wordpress.com/2012/04/06/lwt-tricks-of-the-trade/)
-* [Mikoto's Adventures in Japanese: LWT - Daniel’s Guide for Japanese Usage](http://mikotoneko.wordpress.com/2012/04/17/lwt-daniels-guide-for-japanese-useage/)
-* [Video about Learning With Texts from Language Vlogger FluentCzech](http://www.youtube.com/watch?v=QSLPOATWAU4)
+* [Mikoto's Adventures in Japanese: LWT - Learning With Text Introduction](https://mikotoneko.wordpress.com/2012/03/09/lwtp1/)
+* [Mikoto's Adventures in Japanese: LWT - A Guide to Setting up for Japanese Learning](https://mikotoneko.wordpress.com/2012/03/13/lwt-a-guide-to-setting-up-for-japanese-learning/)
+* [Mikoto's Adventures in Japanese: LWT - Tricks of the Trade](https://mikotoneko.wordpress.com/2012/04/06/lwt-tricks-of-the-trade/)
+* [Mikoto's Adventures in Japanese: LWT - Daniel’s Guide for Japanese Usage](https://mikotoneko.wordpress.com/2012/04/17/lwt-daniels-guide-for-japanese-useage/)
+* [Video about Learning With Texts from Language Vlogger FluentCzech](https://www.youtube.com/watch?v=QSLPOATWAU4)
 * [Fluent In 3 Months: Introducing LWT](http://www.fluentin3months.com/learning-with-texts/)  
 
 ## LWT Forum Threads

@@ -9,7 +9,7 @@
  * @package Lwt
  * @author  LWT Project <lwt-project@hotmail.com>
  * @license Unlicense <http://unlicense.org/>
- * @link    https://hugofara.github.io/lwt/docs/html/ajax__save__setting_8php.html
+ * @link    https://hugofara.github.io/lwt/docs/php/files/inc-ajax-save-setting.html
  * @since   1.2.1
  * @since   2.2.2-fork Refactored, will use GET methods
  * @since   2.6.0-fork Use POST method in priority

@@ -658,6 +658,7 @@ $('img.not_found').on('click', function () {
 
 function do_page(): void
 {
+    session_start();
     $currentlang = validateLang(
         (string) processDBParam("filterlang", 'currentlanguage', '', false)
     );

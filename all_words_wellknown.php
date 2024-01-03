@@ -3,19 +3,19 @@
 /**
  * \file
  * \brief Setting all unknown words to Well Known (99)
- * 
- * Call: all_words_wellknown.php?text=[textid] 
+ *
+ * Call: all_words_wellknown.php?text=[textid]
  *                              (mark all words as well-known)
- *       all_words_wellknown.php?text=[textid]&status=[statusint] 
+ *       all_words_wellknown.php?text=[textid]&status=[statusint]
  *                              (mark with a specific status, normally 98 or 99)
- * 
+ *
  * PHP version 8.1
- * 
+ *
  * @category Helper_Frame
  * @package Lwt
  * @author  LWT Project <lwt-project@hotmail.com>
  * @license Unlicense <http://unlicense.org/>
- * @link    https://hugofara.github.io/lwt/docs/html/all__words__wellknown_8php.html
+ * @link    https://hugofara.github.io/lwt/docs/php/files/all-words-wellknown.html
  * @since   1.0.3
  */
 
@@ -23,9 +23,9 @@ require_once 'inc/session_utility.php';
 
 /**
  * Make the SQL query for all words in the text.
- * 
+ *
  * @param int $txid Text id
- * 
+ *
  * @return mysqli_result|true SQL query.
  */
 function all_words_wellknown_get_words($txid)
@@ -69,15 +69,15 @@ function all_words_wellknown_process_word($status, $term, $termlc, $langid): arr
     } else {
         $message = runsql(
             "INSERT INTO {$tbpref}words (
-                WoLgID, WoText, WoTextLC, WoStatus, WoStatusChanged," 
-                . make_score_random_insert_update('iv') . 
+                WoLgID, WoText, WoTextLC, WoStatus, WoStatusChanged,"
+                . make_score_random_insert_update('iv') .
             ") 
             VALUES( 
-                $langid, " . 
-                convert_string_to_sqlsyntax($term) . ", " . 
-                convert_string_to_sqlsyntax($termlc) . ", $status, NOW(), " .  
+                $langid, " .
+                convert_string_to_sqlsyntax($term) . ", " .
+                convert_string_to_sqlsyntax($termlc) . ", $status, NOW(), " .
                 make_score_random_insert_update('id') .
-            ")", 
+            ")",
             ''
         );
         if (!is_numeric($message)) {
@@ -85,7 +85,7 @@ function all_words_wellknown_process_word($status, $term, $termlc, $langid): arr
         }
         if ((int)$message == 0) {
             error_message_with_hide(
-                "WARNING: No rows modified! Message: $message", 
+                "WARNING: No rows modified! Message: $message",
                 false
             );
         }
@@ -94,7 +94,7 @@ function all_words_wellknown_process_word($status, $term, $termlc, $langid): arr
     }
     $javascript = '';
     if (getSettingWithDefault('set-tooltip-mode') == 1 && $rows > 0) {
-        $javascript .= "title = make_tooltip(" . 
+        $javascript .= "title = make_tooltip(" .
         prepare_textdata_js($term) . ", '*', '', '$status');";
     }
     $javascript .= "$('.TERM" . strToClassName($termlc) . "', context)
@@ -131,7 +131,10 @@ function all_words_wellknown_main_loop($txid, $status): array
     $res = all_words_wellknown_get_words($txid);
     while ($record = mysqli_fetch_assoc($res)) {
         list($modified_rows, $new_js) = all_words_wellknown_process_word(
-            $status, $record['Ti2Text'], $record['Ti2TextLC'], $langid
+            $status,
+            $record['Ti2Text'],
+            $record['Ti2TextLC'],
+            $langid
         );
         $javascript .= $new_js;
         $count += $modified_rows;
@@ -143,7 +146,7 @@ function all_words_wellknown_main_loop($txid, $status): array
         "UPDATE {$tbpref}words 
         JOIN {$tbpref}textitems2 
         ON Ti2WoID = 0 AND LOWER(Ti2Text) = WoTextLC AND Ti2LgID = WoLgID 
-        SET Ti2WoID = WoID", 
+        SET Ti2WoID = WoID",
         ''
     );
 
@@ -152,33 +155,33 @@ function all_words_wellknown_main_loop($txid, $status): array
 
 /**
  * Display the number of edited words.
- * 
+ *
  * @param int $status New status
- * @param int $count  Number of edited words. 
- * 
+ * @param int $count  Number of edited words.
+ *
  * @return void
- * 
+ *
  * @since 2.5.3-fork Improved messages (more clear, and can handle singular/plural)
  */
 function all_words_wellknown_count_terms($status, $count)
-{   
+{
     $message = "<p>";
     if ($status == 98) {
         if ($count > 1) {
             $message .= "Ignored all $count words!";
-        } else if ($count == 1) {
+        } elseif ($count == 1) {
             $message .= "Ignored 1 word.";
         } else {
             $message .= "No new word ignored!";
-        } 
+        }
     } else {
         if ($count > 1) {
             $message .= "You know all $count words well!";
-        } else if ($count == 1) {
+        } elseif ($count == 1) {
             $message .= "1 new word added as known";
         } else {
             $message .= "No new known word added!";
-        } 
+        }
     }
     $message .= "</p>";
     echo $message;
@@ -186,10 +189,10 @@ function all_words_wellknown_count_terms($status, $count)
 
 /**
  * Execute JavaScript to change the display of all words.
- * 
+ *
  * @param int    $txid       Text ID
  * @param string $javascript JavaScript-formatted string.
- * 
+ *
  * @return void
  */
 function all_words_wellknown_javascript($txid, $javascript)
@@ -209,10 +212,10 @@ function all_words_wellknown_javascript($txid, $javascript)
 
 /**
  * Make the main content of the page for all well-known words.
- * 
+ *
  * @param int $txid   Text ID
  * @param int $status New status to apply to words.
- * 
+ *
  * @return void
  */
 function all_words_wellknown_content($txid, $status)
@@ -224,18 +227,18 @@ function all_words_wellknown_content($txid, $status)
 
 /**
  * Make a full HTML page for all well-known words.
- * 
+ *
  * @param int $txid   Text ID
  * @param int $status New status to apply to words.
- * 
+ *
  * @return void
  */
-function all_words_wellknown_full($txid, $status) 
+function all_words_wellknown_full($txid, $status)
 {
     if ($status == 98) {
-        pagestart("Setting all blue words to Ignore", false); 
+        pagestart("Setting all blue words to Ignore", false);
     } else {
-        pagestart("Setting all blue words to Well-known", false); 
+        pagestart("Setting all blue words to Well-known", false);
     }
     all_words_wellknown_content($txid, $status);
     pageend();
@@ -243,7 +246,7 @@ function all_words_wellknown_full($txid, $status)
 
 if (isset($_REQUEST['text'])) {
     all_words_wellknown_full(
-        (int) $_REQUEST['text'], 
+        (int) $_REQUEST['text'],
         isset($_REQUEST['stat']) ? (int) $_REQUEST['stat'] : 99
     );
 }

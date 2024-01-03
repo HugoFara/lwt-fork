@@ -159,7 +159,7 @@ Explanations of the input fields
 * Name: the name is limited to 40 characters, this field must not be empty.
 * Newsfeed url: URL of your RSS/Atom-Feed, this field must not be empty.
 * Article Section: [xpath expression](http://www.w3.org/TR/xpath20/) (i.e.: //div\[@id="content-to-read"\]/p), the [feed wizard](info.html#feed_wizard) can be used to get the right sections, this field must not be empty.
-* Filter Tags: [xpath expression](http://www.w3.org/TR/xpath20/), the [feed wizard](info.html#feed_wizard) can be used to get the right sections.
+* Filter Tags: [xpath expression](http://www.w3.org/TR/xpath20/), the [feed wizard](info.html#feed_wizard) removes sections to include in the text.
 * Options:
   * Edit Text: if this is checked, you can edit your articles before saving.
   * Auto Update Interval: your feed will be updated automatically, when you enter MY FEEDS from the main menu.
@@ -188,7 +188,7 @@ Here you can edit or set up a new newsfeed in 4 steps.
 
     ![Image](../img/39.jpg)
 
-3. This works like step 2. Only the selected sections from step 2 are clickable. Marked text will appear grey, filtered texts will have a red font.  
+3. This works like step 2. Only the selected sections from step 2 are clickable. Marked text will appear grey, excluded texts will have a red font.  
 
     ![Image](../img/40.jpg)  
 
@@ -260,7 +260,7 @@ Chinese Text with annotation (only Romanization/Pinyin):
 
 ## Create, edit, and use an _Improved Annotated Text_
 
-**Motivation:** Annotated texts (as [interlinear text](http://en.wikipedia.org/wiki/Interlinear_gloss)) have been used for language learning for a long time. One example are the word-by-word translations in [Assimil](http://en.assimil.com/) courses. The German [V. F. Birkenbihl](http://web.archive.org/web/20070223080453/http://195.149.74.241/BIRKENBIHL/PDF/MethodEnglish.pdf) proposes the creation of interlinear word-by-word or [hyperliteral](http://learnanylanguage.wikia.com/wiki/Hyperliteral_translations) translations (calling this creation "decoding") in foreign language learning. Learning Latin or Ancient Greek via interlinear texts is quite old as you can see in [this YouTube video](http://www.youtube.com/watch?v=XnEKnezLXJg).  
+**Motivation:** Annotated texts (as [interlinear text](http://en.wikipedia.org/wiki/Interlinear_gloss)) have been used for language learning for a long time. One example are the word-by-word translations in [Assimil](http://en.assimil.com/) courses. The German [V. F. Birkenbihl](http://web.archive.org/web/20070223080453/http://195.149.74.241/BIRKENBIHL/PDF/MethodEnglish.pdf) proposes the creation of interlinear word-by-word or [hyperliteral](http://learnanylanguage.wikia.com/wiki/Hyperliteral_translations) translations (calling this creation "decoding") in foreign language learning. Learning Latin or Ancient Greek via interlinear texts is quite old as you can see in "[014 Latin Interlinear Texts - a forgotten route to language learning.avi](https://www.youtube.com/watch?v=XnEKnezLXJg)".  
 
 LWT's old "Print Screen" offers annotations, but it displays ALL translations of a term. The _Improved Annotated Text_ feature enables you to select the best translation for every word in the text. As a result, you create an L1 word-by-word translation that is displayed above the L2 text. This interlinear text is better suited for language study, especially for beginners.  
 

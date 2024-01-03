@@ -8,7 +8,7 @@
  * @package Lwt
  * @author  LWT Project <lwt-project@hotmail.com>
  * @license Unlicense <http://unlicense.org/>
- * @link    https://hugofara.github.io/lwt/docs/html/mobile__interactions_8php.html
+ * @link    https://hugofara.github.io/lwt/docs/php/files/inc-mobile-interactions.html
  * @since   2.2.0
  * @since   2.2.1 You should not longer use this library as mobile detect is removed.
  *                However, this interface is unchanged for backward compatibility.

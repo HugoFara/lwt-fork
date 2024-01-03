@@ -234,7 +234,7 @@
 			</h2>
 
 			<p>
-				The current version is 2.9.0-fork (April 14 2023).
+				The current version is 2.10.0-fork (December 29 2023).
 				<br>
 				<a href="#CHANGELOG">View the Changelog.</a>
 			</p>
@@ -423,11 +423,12 @@ The local webserver (MAMP) will be automatically stopped by quitting the MAMP ap
 <li>
 <p>Installation of LAMP:</p>
 <pre><code class="language-bash">sudo apt-get update
-sudo apt-get install apache2 libapache2-mod-php php php-mbstring php-mysql mysql-server
+sudo apt-get install apache2 libapache2-mod-php php php-mbstring php-mysql php-xml mysql-server
 </code></pre>
+<p>Note: if MySQL is unavailable for your Linux distribution, you can also use MariaDB.</p>
 </li>
 <li>
-<p>(Optional) Check if everything is okay:</p>
+<p>Check if everything is okay:</p>
 <ul>
 <li>
 <code>php -v</code> should show a PHP version equal or above to 8.0.0.</li>
@@ -498,15 +499,16 @@ sudo service mysql restart
 </ol>
 <p>If you want to use LWT again, just do step 7.</p>
 <h3>Run in a Docker container</h3>
-<p><a href="https://docs.docker.com/get-docker/">Docker</a> is the easiest way to install LWT, but it will use more or less 1 GB
-on your system.</p>
+<p><a href="https://docs.docker.com/get-docker/">Docker</a> is the easiest way to install LWT,
+but it will use more or less 1 GB on your system.</p>
 <h4>Using the installer</h4>
-<p>For an light-weight installation, you may use <a href="https://github.com/HugoFara/lwt-docker-installer">HugoFara/lwt-docker-installer</a>.</p>
+<p>For an light-weight installer, you may use
+<a href="https://github.com/HugoFara/lwt-docker-installer">HugoFara/lwt-docker-installer</a>.</p>
 <h4>Build image from source</h4>
 <p>Download the lwt, open a terminal inside it, then type</p>
 <pre><code class="language-bash">docker compose up
 </code></pre>
-<p>By default the server can be accessed on port 8010 (<a href="http://localhost:8010">http://localhost:8010</a>).</p>
+<p>By default the server can be accessed on port 8010 (<a href="http://localhost:8010/lwt">http://localhost:8010/lwt</a>).</p>
 <p>To remove the created containers run</p>
 <pre><code class="language-bash">docker compose down
 </code></pre>
@@ -535,6 +537,7 @@ The official repository is at <a href="https://packagist.org/packages/hugofara/l
 </ol>
 <h3>Something Went Wrong</h3>
 <p>Need more help? You can contact us through  <a href="https://github.com/HugoFara/lwt/issues">GitHub</a> and <a href="https://discord.gg/xrkRZR2jtt">Discord</a>!</p>
+<p>You can also consult the troubleshooting section of the documentation at <a href="https://hugofara.github.io/lwt/docs/info.html#faq">https://hugofara.github.io/lwt/docs/info.html#faq</a>.</p>
 <p>Please note that <em>PHP below version 8.0 is no longer supported</em>.</p>
 
 			<h2 id="postinstall" name="postinstall">▶ Optional Post-Installation Steps - <a href="#">[↑]</a></h2>
@@ -672,21 +675,21 @@ workaround is to download a Text-To-Speech (TTS) plugin such as <a href="https:/
 			</h2>
 		
 			<p>
-				A <a target="_blank" href="http://www.youtube.com/watch?v=QSLPOATWAU4">video</a> from <a target="_blank" href="http://www.youtube.com/user/FluentCzech">FluentCzech</a>:
+				<a target="_blank" href="https://www.youtube.com/watch?v=QSLPOATWAU4">Learning With Texts</a> 
+				by <a target="_blank" href="https://www.youtube.com/@AnthonyLauder">Anthony Lauder (FluentCzech)</a>:
 				<br /><br />
-				<iframe width="640" height="360" src="http://www.youtube.com/embed/QSLPOATWAU4" frameborder="0" allowfullscreen></iframe>
-				<br /><br />
-				Please have a look at the other great videos of <a target="_blank" href="http://www.youtube.com/user/FluentCzech">FluentCzech</a> that contain many good ideas for language learning! <br />
-				<a target="_blank" href="http://www.anthonylauder.com">Website of FluentCzech (anthonylauder.com)</a>
+				<iframe width="640" height="360" src="https://www.youtube.com/embed/QSLPOATWAU4" frameborder="0" allowfullscreen></iframe>
 				<br /><br />
 			</p>
 
 			<p>
-				A <a target="_blank" href="http://www.youtube.com/watch?v=QnGG-_urLKk">video</a> from <a target="_blank" href="http://www.youtube.com/user/irishpolyglot">Benny the Irish polyglot</a>:
+				<a target="_blank" href="https://www.youtube.com/watch?v=QnGG-_urLKk">
+					Learning With Texts: iPad, computer & mobile FREE language reading interface
+				</a> from <a target="_blank" href="https://www.youtube.com/@irishpolyglot">Benny the Irish polyglot</a>:
 				<br /><br />
-				<iframe width="640" height="360" src="http://www.youtube.com/embed/QnGG-_urLKk" frameborder="0" allowfullscreen></iframe>
+				<iframe width="640" height="360" src="https://www.youtube.com/embed/QnGG-_urLKk" frameborder="0" allowfullscreen></iframe>
 				<br /><br />
-				<a href="http://www.fluentin3months.com/learning-with-texts/" target="_blank">Fluent In 3 Months: Introducing LWT</a>, with <a target="_blank" href="http://lwtfi3m.co/">Benny's own (free) version of LWT</a>.<br />
+				<a href="http://www.fluentin3months.com/learning-with-texts/" target="_blank">Fluent In 3 Months: Introducing LWT</a>.<br />
 			</p>
 
 			<h2 id="links" name="links">▶ Important Links - <a href="#">[↑]</a></h2>
@@ -744,19 +747,19 @@ Part <a href="http://www.streetsmartlanguagelearning.com/2012/12/using-learning-
 <a href="http://chicagoseoul.wordpress.com/2011/07/19/learning-with-texts/">Chicagoseoul's Blog: Learning with Texts</a>
 </li>
 <li>
-<a href="http://mikotoneko.wordpress.com/2012/03/09/lwtp1/">Mikoto's Adventures in Japanese: LWT - Learning With Text Introduction</a>
+<a href="https://mikotoneko.wordpress.com/2012/03/09/lwtp1/">Mikoto's Adventures in Japanese: LWT - Learning With Text Introduction</a>
 </li>
 <li>
-<a href="http://mikotoneko.wordpress.com/2012/03/13/lwt-a-guide-to-setting-up-for-japanese-learning/">Mikoto's Adventures in Japanese: LWT - A Guide to Setting up for Japanese Learning</a>
+<a href="https://mikotoneko.wordpress.com/2012/03/13/lwt-a-guide-to-setting-up-for-japanese-learning/">Mikoto's Adventures in Japanese: LWT - A Guide to Setting up for Japanese Learning</a>
 </li>
 <li>
-<a href="http://mikotoneko.wordpress.com/2012/04/06/lwt-tricks-of-the-trade/">Mikoto's Adventures in Japanese: LWT - Tricks of the Trade</a>
+<a href="https://mikotoneko.wordpress.com/2012/04/06/lwt-tricks-of-the-trade/">Mikoto's Adventures in Japanese: LWT - Tricks of the Trade</a>
 </li>
 <li>
-<a href="http://mikotoneko.wordpress.com/2012/04/17/lwt-daniels-guide-for-japanese-useage/">Mikoto's Adventures in Japanese: LWT - Daniel’s Guide for Japanese Usage</a>
+<a href="https://mikotoneko.wordpress.com/2012/04/17/lwt-daniels-guide-for-japanese-useage/">Mikoto's Adventures in Japanese: LWT - Daniel’s Guide for Japanese Usage</a>
 </li>
 <li>
-<a href="http://www.youtube.com/watch?v=QSLPOATWAU4">Video about Learning With Texts from Language Vlogger FluentCzech</a>
+<a href="https://www.youtube.com/watch?v=QSLPOATWAU4">Video about Learning With Texts from Language Vlogger FluentCzech</a>
 </li>
 <li>
 <a href="http://www.fluentin3months.com/learning-with-texts/">Fluent In 3 Months: Introducing LWT</a>
@@ -857,16 +860,28 @@ THE SOFTWARE.</p>
 </ul>
 
 			<h2 id="learn" name="learn">▶ How to Learn - <a href="#">[↑]</a></h2>
-<p>First, find a text you want to study, preferably with an audio file, and load it into LWT. The <a href="http://lingq.com">LingQ Library</a> has many texts with audio, and only a free registration is needed. Or look into <a href="https://www.lingq.com/en/forum/updates-tips-and-known-issues/where-to-find-good-content-to-import/">this thread</a> in the LingQ Forum, you will find there lots of great links to resources. Or click (within the LingQ library) on "My Imports" - you will find a list of links of "Suggested resources".</p>
-<p>Read the text, look up the new words and expressions (=terms) and save them for review and test. The good thing with LWT: Every saved term will show up with its translation, status, etc. in all other occurrences of the same text and every other text! So you'll see immediately what you already know and how well you know it. And of course you'll see what you don't know!</p>
-<p>Train: load the MP3 file also on your portable MP3 player and listen to it often. Review (by reading again) or test your saved words and expressions.</p>
+<p>First, find a text you want to study, preferably with an audio file, and load it into LWT.
+The <a href="http://lingq.com">LingQ Library</a> has many texts with audio, and only a free registration is needed.
+Or look into <a href="https://forum.lingq.com/t/where-to-find-good-content-to-import/2563">Where to find good content to import (LingQ forum)</a>
+in the LingQ Forum, you will find there lots of great links to resources.
+Or click (within the LingQ library) on "My Imports" - you will find a list of links
+of "Suggested resources".</p>
+<p>Read the text, look up the new words and expressions (=terms) and save them for review and test.
+The good thing with LWT: Every saved term will show up with its translation,
+status, etc. in all other occurrences of the same text and every other text!
+So you'll see immediately what you already know and how well you know it.
+And of course you'll see what you don't know!</p>
+<p>Train: load the MP3 file also on your portable MP3 player and listen to it often.
+Review (by reading again) or test your saved words and expressions.</p>
 <p>In short:</p>
 <ul>
 <li>Listen ▶ Read ▶ Review/Test.</li>
 <li>Listen ▶ Read ▶ Review/Test.</li>
 <li>......</li>
 </ul>
-<p>That's it. It's that simple. You can also watch <a href="http://www.youtube.com/user/lingosteve">Steve Kaufmann's videos on YouTube</a>: "The 7 secrets of language learning", "Language learning FAQ", and many more to learn more eficiently.</p>
+<p>That's it. It's that simple. You can also watch
+<a href="https://www.youtube.com/@Thelinguist">Steve Kaufmann's videos on YouTube</a>:
+"The 7 secrets of language learning", "Language learning FAQ", and many more to learn more eficiently.</p>
 
 			<h2 id="howto" name="howto">▶ How to Use - <a href="#">[↑]</a></h2>
 <h3>Home Screen</h3>
@@ -981,7 +996,7 @@ Actions: You can edit, update, delete a feed or follow the link to the newsfeed.
 <li>Name: the name is limited to 40 characters, this field must not be empty.</li>
 <li>Newsfeed url: URL of your RSS/Atom-Feed, this field must not be empty.</li>
 <li>Article Section: <a href="http://www.w3.org/TR/xpath20/">xpath expression</a> (i.e.: //div[@id="content-to-read"]/p), the <a href="info.html#feed_wizard">feed wizard</a> can be used to get the right sections, this field must not be empty.</li>
-<li>Filter Tags: <a href="http://www.w3.org/TR/xpath20/">xpath expression</a>, the <a href="info.html#feed_wizard">feed wizard</a> can be used to get the right sections.</li>
+<li>Filter Tags: <a href="http://www.w3.org/TR/xpath20/">xpath expression</a>, the <a href="info.html#feed_wizard">feed wizard</a> removes sections to include in the text.</li>
 <li>Options:
 <ul>
 <li>
@@ -1027,7 +1042,7 @@ Actions: You can edit, update, delete a feed or follow the link to the newsfeed.
 <p><img src="../img/39.jpg" alt="Image"></p>
 </li>
 <li>
-<p>This works like step 2. Only the selected sections from step 2 are clickable. Marked text will appear grey, filtered texts will have a red font.</p>
+<p>This works like step 2. Only the selected sections from step 2 are clickable. Marked text will appear grey, excluded texts will have a red font.</p>
 <p><img src="../img/40.jpg" alt="Image"></p>
 </li>
 <li>
@@ -1067,7 +1082,7 @@ Actions: You can edit, update, delete a feed or follow the link to the newsfeed.
 <p>Chinese Text with annotation (only Romanization/Pinyin):</p>
 <p><img src="../img/21.jpg" alt="Image"></p>
 <h3>Create, edit, and use an Improved Annotated Text</h3>
-<p><strong>Motivation:</strong> Annotated texts (as <a href="http://en.wikipedia.org/wiki/Interlinear_gloss">interlinear text</a>) have been used for language learning for a long time. One example are the word-by-word translations in <a href="http://en.assimil.com/">Assimil</a> courses. The German <a href="http://web.archive.org/web/20070223080453/http://195.149.74.241/BIRKENBIHL/PDF/MethodEnglish.pdf">V. F. Birkenbihl</a> proposes the creation of interlinear word-by-word or <a href="http://learnanylanguage.wikia.com/wiki/Hyperliteral_translations">hyperliteral</a> translations (calling this creation "decoding") in foreign language learning. Learning Latin or Ancient Greek via interlinear texts is quite old as you can see in <a href="http://www.youtube.com/watch?v=XnEKnezLXJg">this YouTube video</a>.</p>
+<p><strong>Motivation:</strong> Annotated texts (as <a href="http://en.wikipedia.org/wiki/Interlinear_gloss">interlinear text</a>) have been used for language learning for a long time. One example are the word-by-word translations in <a href="http://en.assimil.com/">Assimil</a> courses. The German <a href="http://web.archive.org/web/20070223080453/http://195.149.74.241/BIRKENBIHL/PDF/MethodEnglish.pdf">V. F. Birkenbihl</a> proposes the creation of interlinear word-by-word or <a href="http://learnanylanguage.wikia.com/wiki/Hyperliteral_translations">hyperliteral</a> translations (calling this creation "decoding") in foreign language learning. Learning Latin or Ancient Greek via interlinear texts is quite old as you can see in "<a href="https://www.youtube.com/watch?v=XnEKnezLXJg">014 Latin Interlinear Texts - a forgotten route to language learning.avi</a>".</p>
 <p>LWT's old "Print Screen" offers annotations, but it displays ALL translations of a term. The <em>Improved Annotated Text</em> feature enables you to select the best translation for every word in the text. As a result, you create an L1 word-by-word translation that is displayed above the L2 text. This interlinear text is better suited for language study, especially for beginners.</p>
 <p><strong>Method:</strong> While listening to the audio, first follow the blue annotations in your native language while listening and understanding. Later, after understanding the text fully, you read the foreign language text alone. Repeat this often. After these steps, you listen to the text passively or do shadowing.</p>
 <p>On the Print Screen, click on "Create" an Improved Annotated Text. The system creates a default annotated text.</p>
@@ -1154,23 +1169,45 @@ $tbpref = "setname";   // only the table set "setname"
 <h3>Site Unreachable</h3>
 <p>If you see "The webpage is not available", "We have trouble finding that site".</p>
 <p><img src="../img/prob1.png" alt="Image"></p>
-<p>Answer: Your local webserver (Apache) is not running. Please start it via EasyPHP or MAMP control program/panel.</p>
+<p>Answer: Your local webserver (Apache) is not running.
+Please start it via EasyPHP or MAMP control program/panel.</p>
+<h3>Blank page</h3>
+<p>You PHP version is probably too low. Try to use PHP 8 at least.</p>
 <h3>URL not found (404)</h3>
 <p><img src="../img/prob2.png" alt="Image"></p>
-<p>Answer: The server is running, but the application is not found. Maybe the Uniform Resource Identifier (URI) is wrong or misspelled. Please check/correct it. Or the URI is correct, and the application is installed, but not in the correct directory <em>lwt</em> below <em>htdocs</em>. Please install/copy/move it into the correct directory.</p>
+<p>Answer: The server is running, but the application is not found.
+Maybe the Uniform Resource Identifier (URI) is wrong or misspelled.
+Please check/correct it. Or the URI is correct, and the application is installed,
+but not in the correct directory <em>lwt</em> below <em>htdocs</em>.
+Please install/copy/move it into the correct directory.</p>
 <h3>Database connection error</h3>
 <p><img src="../img/prob3.png" alt="Image"></p>
-<p>Answer: Either the database (MySQL) is not running, or the database connection parameters in <em>../htlwt/connect.inc.php</em> are wrong. Please check/correct the database connection parameters and/or start MySQL via the MAMP or EasyPHP control program/panel.</p>
+<p>Answer: Either the database (MySQL) is not running, or the database connection
+parameters in <em>../htlwt/connect.inc.php</em> are wrong.
+Please check/correct the database connection parameters and/or start MySQL via the MAMP or EasyPHP control program/panel.</p>
 <h3>Cannot find connect.inc.php</h3>
 <p><img src="../img/prob4.png" alt="Image"></p>
-<p>Answer: The Webserver and the database is running, but the database connection parameter file <em>../htlwt/connect.inc.php</em> is not found. Please rename one of the connection files (according to your server) to <em>../htlwt/connect.inc.php</em>.</p>
+<p>Answer: The Webserver and the database is running, but the database connection parameter file <em>../htlwt/connect.inc.php</em> is not found.
+Please rename one of the connection files (according to your server) to <em>../htlwt/connect.inc.php</em>.</p>
 <h3>Do not run on Linux after installation/update</h3>
 <p>If LWT installed or updated LWT on Linux, but the application does not run as expected.</p>
-<p>Answer 1: The Webserver does not have full access to all LWT files (insufficient rights). Open a terminal window, go to the directory where the directory "lwt" has been created with all LWT files, e. g.<br>
+<p>Answer 1: The Webserver does not have full access to all LWT files (insufficient rights).
+Open a terminal window, go to the directory where the directory "lwt" has been created with all LWT files, e. g.<br>
 <strong>cd /var/www/html</strong><br>
 Now execute:
 <strong>sudo chmod -R 755 lwt</strong>.</p>
-<p>Answer 2: The PHP "mbstring" extension is not installed. Please install it: <a href="https://askubuntu.com/questions/491629/how-to-install-php-mbstring-extension-in-ubuntu">see this article</a>.</p>
+<p>Answer 2: The PHP "mbstring" extension is not installed.
+Please install it: <a href="https://askubuntu.com/questions/491629/how-to-install-php-mbstring-extension-in-ubuntu">see this article</a>.</p>
+<h3>MeCab not detected!</h3>
+<p>LWT cannot find MeCab, you can do the following steps:</p>
+<p>On Linux or Mac:</p>
+<ol>
+<li>Open a terminal.</li>
+<li>Type <code>mecab -v</code> to get the current MeCab version. If nothing is displayed MeCab is not installed.</li>
+<li>If MeCab is already installed, the path may be missing. If you are using MAMP type</li>
+</ol>
+<pre><code class="language-bash">printf 'export PATH="/usr/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"' &gt;&gt; /Applications/MAMP/Library/bin/envvars
+</code></pre>
 
 			<h2 id="ipad" name="ipad">▶ Setup for Tablets - <a href="#">[↑]</a></h2>
 <blockquote>
@@ -2185,21 +2222,148 @@ ones are marked like "v1.0.0-fork".</p>
 <h3>[Unreleased]</h3>
 <h4>Added</h4>
 <ul>
+<li>Support for Japanese with MeCab on Mac! This was added thanks to
+<a href="https://github.com/quopquai">quopquai</a> on <a href="https://github.com/HugoFara/lwt/issues/135">#135</a>.</li>
+<li>New globals (<a href="https://github.com/HugoFara/lwt/issues/163">#163</a>):
+<ul>
+<li>On <code>inc/kernel_utility.php</code>: <code>LWT_APP_VERSION</code> and <code>LWT_RELEASE_DATE</code>.</li>
+<li>On <code>api.php</code>: <code>LWT_API_VERSION</code> and <code>LWT_API_RELEASE_DATE</code>.</li>
+<li>
+<code>src/js/jq_pgm.js</code>: <code>LWT_DATA</code>.</li>
+<li>
+<code>unloadformcheck.js</code> now declares a new object <code>lwt_form_check</code> that contains
+all the functions needed.</li>
+</ul>
+</li>
+<li>Important additions to Text-To-Speech (TTS):
+<ul>
+<li>Word can be read on hover or on click.
+Pull request <a href="https://github.com/HugoFara/lwt/pull/147">#147</a> by
+<a href="https://github.com/ProgramComputer">@ProgramComputer</a>.</li>
+<li>You can add a custom text reader with the new voice API feature!
+A courtesy of <a href="https://github.com/ProgramComputer">@ProgramComputer</a> on pull request
+<a href="https://github.com/HugoFara/lwt/pull/153">#153</a>.
+A feature first requested on <a href="https://github.com/HugoFara/lwt/issues/143">#143</a>.
+Discussion in open on <a href="https://github.com/HugoFara/lwt/discussions/174">#174</a>.</li>
+<li>New JS functions: <code>readTextWithExternal</code> to read a text with an external
+application and <code>speechDispatcher</code> that can choose a text reader
+(browser or third party).</li>
+</ul>
+</li>
+<li>Starts a cleaner database management. Database schema is defined in
+<code>db/schema/baseline.sql</code> and no longer in PHP code.</li>
+<li>You can choose to add romanization for languages that don't need it in the language
+settings (<a href="https://github.com/HugoFara/lwt/issues/119">#119</a>).</li>
+</ul>
+<h4>Changed</h4>
+<ul>
+<li>Adds missing documentation in the Docker image:
+<ul>
+<li>MarkDown files in the root folder are now included.
+See <a href="https://github.com/HugoFara/lwt/issues/160">#160</a>.
+It adds <code>README.md</code> and <code>UNLICENSE.md</code>.</li>
+<li>Adds <code>docs/info.html</code> and <code>docs/index.html</code> from <a href="https://github.com/HugoFara/lwt/pull/146">#146</a>.</li>
+</ul>
+</li>
+<li>Multi-word creation was reviewed to use a simpler code.</li>
+<li>On word review, status + 1 can be set only after word display. Before, you could
+press key up at any time to increase term status, but keydown was effective only
+after solution display (<a href="https://github.com/HugoFara/lwt/issues/159">#159</a>).</li>
+<li>New files:
+<ul>
+<li>
+<code>inc/feeds.php</code> and <code>inc/tags.php</code>, stemmed from <code>inc/session_utility.php</code>.
+It should not lead to any code or behaviour change.</li>
+<li>
+<code>src/js/overlib_interface.js</code>, stemmed from <code>src/js/pgm.js</code>. It contains all the
+overlib interactions.</li>
+</ul>
+</li>
+<li>For audio URI, raises the characters length limit from 200 to 2048
+(<a href="https://github.com/HugoFara/lwt/issues/144">#144</a>).</li>
+<li>Database creation and migration is now handled directly in SQL, for a safer
+behavior.</li>
+<li>Docker changes:
+<ul>
+<li>By default, the images now runs at localhot/lwt and no longer in the
+root folder (<a href="https://github.com/HugoFara/lwt-docker-installer/pull/4">installer #4</a>
+and <a href="https://github.com/HugoFara/lwt/pull/169">#169</a>).</li>
+<li>Image updated from <code>apache-buster</code> to <code>apache-bullseye</code>.</li>
+</ul>
+</li>
+</ul>
+<h4>Fixed</h4>
+<ul>
+<li>The database wizard was broken since 2.9.0.</li>
+<li>It was impossible to change a word status on hover since 2.9.1.</li>
+<li>Avoids JavaScript error on editing a language when on dictionary field is empty.</li>
+<li>For some feeds, feed wizard session was not working due to ill-configured session.
+Solves <a href="https://github.com/HugoFara/lwt/issues/129">#129</a>, thanks to the help of PR
+<a href="https://github.com/HugoFara/lwt/pull/168">#168</a>.</li>
+<li>Text reading position was not working consistently when adding several known words.</li>
+<li>Japanese was always requiring MeCab for TTS, even if it was not used
+(<a href="https://github.com/HugoFara/lwt/pull/155">#155</a>).</li>
+<li>Multi-words:
+<ul>
+<li>Tooltip was not properly saved (<a href="https://github.com/HugoFara/lwt/pull/170">#170</a>).</li>
+<li>Translation may be escaped two times (<a href="https://github.com/HugoFara/lwt/pull/170">#170</a>).</li>
+<li>Fixes <a href="https://github.com/HugoFara/lwt/pull/170">#170</a>: on creation,
+multi-word was always displayed before the text it encompasses,
+without removing this text.</li>
+<li>Tootltip title was not properly saved, normally without incidence on user display.</li>
+<li>Fixes <a href="https://github.com/HugoFara/lwt/issues/69">#69</a>: having the same
+multi-word on multiple texts was displaying it at many positions on creation.</li>
+</ul>
+</li>
+<li>Japanese:
+<ul>
+<li>Parsing Japanese texts with MeCab was creating warnings when the text was not
+finishing by a punctation mark.</li>
+<li>Multi-words were not saved with MeCab parsing on Japanese.</li>
+</ul>
+</li>
+<li>On word review (test):
+<ul>
+<li>the space keyboard shortcut may have been inoperating.</li>
+<li>On <code>api.php</code>, tests were always set to "multi-word" due to a missing variable
+type conversion. Pull request <a href="https://github.com/HugoFara/lwt/pull/175">#175</a>.</li>
+</ul>
+</li>
+<li>An explicit dependency to <a href="https://www.php.net/manual/en/book.dom.php">php-dom</a> was
+missing in <code>INSTALL.sh</code> (and <code>composer.json</code>), as stated in
+<a href="https://github.com/HugoFara/lwt/pull/178">#178</a>.</li>
+</ul>
+<h4>Deprecated</h4>
+<ul>
+<li>Using any function from <code>unloadformcheck.js</code> without using <code>lwt_form_check</code> is deprecated.</li>
+<li>
+<code>get_database_prefixes</code> is deprecated, superseded by <code>getDatabasePrefix</code> which is much cleaner.</li>
+<li>Globals defined in <code>jq_pgm.js</code> are going into a single global <code>LWT_DATA</code>.</li>
+</ul>
+<h3>2.9.1-fork (December 29 2023)</h3>
+<h4>Added in 2.9.1-fork</h4>
+<ul>
 <li>New tools for documentation:
 <ul>
 <li>New JavaScript documentation with <a href="https://jsdoc.app/">JSDoc</a>! You will find it under <code>docs/js/</code>.</li>
 <li>Better PHP documentation using <a href="https://phpdoc.org/">phpDocumentor</a>. The new documentation is at <code>docs/php/</code>.</li>
 </ul>
 </li>
-<li>New constant <code>LWT_LANGUAGES_ARRAY</code>, that replaces <code>$langDefs</code> (in <code>inc/langdefs.php</code>). Part of <a href="https://github.com/HugoFara/lwt/issues/163">#163</a>.</li>
+<li>New constant <code>LWT_LANGUAGES_ARRAY</code>, that replaces <code>$langDefs</code> (in <code>inc/langdefs.php</code>).
+Part of <a href="https://github.com/HugoFara/lwt/issues/163">#163</a>.</li>
 </ul>
-<h4>Changed</h4>
+<h4>Changed in 2.9.1-fork</h4>
 <ul>
 <li>PHP files header docblocks are expanded, notably with a PHP version, package and category name.</li>
-<li>Japanese number are now parsed by MeCab. Big thanks to <a href="https://github.com/ProgramComputer">@ProgramComputer</a> for his pull request <a href="https://github.com/HugoFara/lwt/pull/149">#149</a>!</li>
-<li>Removes dead feeds from the demo database, as signalled in <a href="https://github.com/HugoFara/lwt/issues/148">#148</a>.</li>
+<li>Japanese number are now parsed by MeCab. Big thanks to
+<a href="https://github.com/ProgramComputer">@ProgramComputer</a> for his pull request
+<a href="https://github.com/HugoFara/lwt/pull/149">#149</a>!</li>
+<li>Removes dead feeds from the demo database, as signaled in
+<a href="https://github.com/HugoFara/lwt/issues/148">#148</a>.</li>
+<li>Patch update to the REST API to 0.1.1: requests on GET with empty payload were
+resulting in error.</li>
 </ul>
-<h4>Fixed</h4>
+<h4>Fixed in 2.9.1-fork</h4>
 <ul>
 <li>Fixes <a href="https://github.com/HugoFara/lwt/issues/113">#113</a>: changing a language name
 was making text-to-speech unusable and may prompt a warning.</li>
@@ -2207,10 +2371,10 @@ was making text-to-speech unusable and may prompt a warning.</li>
 <li>Since 2.9.0, audio position was not saved properly.</li>
 <li>On <code>upload_words.php</code>, "update only empty fields" was broken.</li>
 <li>Translation were not set by default properly when editing terms translations table.</li>
-<li>The field MeCab was set for japanese even when not asked for.
-Signalled on PR <a href="https://github.com/HugoFara/lwt/pull/155">#155</a>, thanks to
+<li>The field MeCab was set for Japanese even when not asked for.
+Signaled on PR <a href="https://github.com/HugoFara/lwt/pull/155">#155</a>, thanks to
 <a href="https://github.com/ProgramComputer">@ProgramComputer</a>.</li>
-<li>Since 2.8.1, japanese word romanization was not displayed any more.
+<li>Since 2.8.1, Japanese word romanization was not displayed any more.
 Thanks to 아르노 for signalling the bug on Discord!</li>
 <li>The go slower/faster feature on audio was broken
 (<a href="https://github.com/HugoFara/lwt/issues/138">#138</a>), as functions <code>click_slower</code>
@@ -2224,12 +2388,25 @@ This is fixed, and the SQL file was made more readable.</li>
 to install the demo DB out of LWT (related to <a href="https://github.com/HugoFara/lwt/issues/78">#78</a>).</li>
 <li>Deleting a language deletes the language (<a href="https://github.com/HugoFara/lwt/issues/151">#151</a>).
 Before it was setting the language to empty values.</li>
+<li>On media select, the lwt folder name was prepended to the media folder,
+resulting in broken path (<a href="https://github.com/HugoFara/lwt/issues/161">#161</a>).</li>
+<li>With the REST API, requests with an empty query were resulting in an error.</li>
+<li>
+<code>no-minify</code> composer command was fixed, suggested as a part of
+PR <a href="https://github.com/HugoFara/lwt/pull/154/files">#154</a> by
+<a href="https://github.com/ProgramComputer">@ProgramComputer</a>.</li>
 </ul>
-<h4>Deprecated</h4>
+<h4>Deprecated in 2.9.1-fork</h4>
 <ul>
-<li>PHP documentation using Doxygen (under <code>/docs/html</code>) is now deprecated and will be removed in 3.0.0.</li>
+<li>PHP documentation using Doxygen (under <code>docs/html</code>) is now deprecated and will be removed in 3.0.0.</li>
 <li>Using <code>$langDefs</code> is deprecated in favor of <code>LWT_LANGUAGES_ARRAY</code> (<a href="https://github.com/HugoFara/lwt/issues/163">#163</a>).</li>
 <li>Calling the global function <code>new_pos</code> to set audio position is deprecated. Please use <code>lwt_audio_controller.setPosition</code>.</li>
+</ul>
+<h4>Full Changelog for 2.9.1-fork</h4>
+<ul>
+<li>
+<a href="https://github.com/HugoFara/lwt/compare/2.9.0...2.9.1">2.9.0...2.9.1</a>
+</li>
 </ul>
 <h3>2.9.0-fork (December 24 2023)</h3>
 <h4>Added in 2.9.0-fork</h4>

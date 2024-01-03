@@ -4,6 +4,8 @@
 docker/*
 # Documentation
 docs/*
+!docs/**/index.html
+!docs/**/info.html
 # NPM, for debugging only
 node_modules/*
 # Phive products
@@ -13,11 +15,12 @@ tools/*
 # phpDocumentor cache
 .phpdoc/*
 
-*.md
 .dockerignore
 .git
 .gitignore
+
 # MarkDown and PHP documentation generation
 Doxyfile
+
 # Media files for LWT
 media/*

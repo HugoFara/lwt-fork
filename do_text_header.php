@@ -3,15 +3,15 @@
 /**
  * \file
  * \brief Responsible for drawing the header when reading texts
- * 
+ *
  * Call: do_text_header.php?text=[textid]
- * 
+ *
  * PHP version 8.1
- * 
+ *
  * @package Lwt
  * @author  LWT Project <lwt-project@hotmail.com>
  * @license Unlicense <http://unlicense.org/>
- * @link    https://hugofara.github.io/lwt/docs/html/do__text__header_8php.html
+ * @link    https://hugofara.github.io/lwt/docs/php/files/do-text-header.html
  * @since   1.0.3
  */
 
@@ -35,7 +35,7 @@ require_once 'inc/langdefs.php' ;
 function getData($textid)
 {
     global $tbpref;
-    $sql = 
+    $sql =
     'SELECT LgName, TxLgID, TxText, TxTitle, TxAudioURI, TxSourceURI, TxAudioPosition 
     FROM ' . $tbpref . 'texts 
     JOIN ' . $tbpref . 'languages ON TxLgID = LgID 
@@ -50,7 +50,7 @@ function getData($textid)
  * Print the main title row.
  *
  * @param int    $textid Text ID
- * @param string $langid Language ID to navigate between 
+ * @param string $langid Language ID to navigate between
  *                       texts of same language
  *
  * @since 2.0.4-fork
@@ -65,11 +65,14 @@ function do_header_row($textid, $langid): void
     </a>
     </div>
     <div>
-        <?php 
+        <?php
         echo getPreviousAndNextTextLinks(
-            $textid, 'do_text.php?start=', false, ''
+            $textid,
+            'do_text.php?start=',
+            false,
+            ''
         );
-        ?>
+    ?>
     </div>
     <div>
         <a href="do_test.php?text=<?php echo $textid; ?>" target="_top">
@@ -110,16 +113,16 @@ function do_title($title, $sourceURI): void
 {
     ?>
     <h1>READ ▶ 
-        <?php 
-        echo tohtml($title);
-        if (isset($sourceURI) && !str_starts_with(trim($sourceURI), '#')) { 
-            ?>
+        <?php
+    echo tohtml($title);
+    if (isset($sourceURI) && !str_starts_with(trim($sourceURI), '#')) {
+        ?>
         <a href="<?php echo $sourceURI ?>" target="_blank">
             <img src="<?php echo get_file_path('icn/chain.png') ?>" title="Text Source" alt="Text Source" />
         </a>
-            <?php 
-        } 
-        ?>
+            <?php
+    }
+    ?>
     </h1>
     <?php
 }
@@ -171,7 +174,7 @@ function do_settings($textid): void
  * @param string $languageName Full name of the language (i. e.: "English")
  *
  * @global string $tbpref
- * 
+ *
  * @since 2.0.3-fork
  * @since 2.9.1-fork Function may work even when the language name was manually changed.
  */
@@ -186,6 +189,10 @@ function browser_tts($text, $languageName): void
     $languageCode = getLanguageCode($lg_id, LWT_LANGUAGES_ARRAY);
     // Phonetic reading for this text
     $phoneticText = phonetic_reading($text, $languageCode);
+    $voiceApi = get_first_value(
+        "SELECT LgTTSVoiceAPI AS value FROM {$tbpref}languages 
+        WHERE LgID = $lg_id"
+    );
     ?>
 <script type="text/javascript">
 
@@ -195,12 +202,13 @@ function browser_tts($text, $languageName): void
         text: <?php echo json_encode($phoneticText); ?>,
 
         /// {string} ISO code for the language
-        lang: getLangFromDict(WBLINK3) || <?php echo json_encode($languageCode); ?>,
+        lang: getLangFromDict(LWT_DATA.language.translator_link) || <?php echo json_encode($languageCode); ?>,
 
-        /// {string} Rate at wich the speech is done
+        /// {string} Rate at wich the speech is done, deprecated since 2.10.0
         rate: 0.8
-
     };
+
+    LWT_DATA.language.ttsVoiceApi = <?php echo json_encode($voiceApi); ?>;
 
     /** 
      * Check browser compatibility before reading 
@@ -211,7 +219,7 @@ function browser_tts($text, $languageName): void
             return;
         } 
         readRawTextAloud(
-            text_reader.text, getLangFromDict(WBLINK3) || text_reader.lang 
+            text_reader.text, getLangFromDict(LWT_DATA.language.translator_link) || text_reader.lang 
         );
     }
 
@@ -286,23 +294,23 @@ function save_audio_position($textid): void
  * Main function for displaying header. It will print HTML content.
  *
  * @param string|int $textid    ID of the required text
- * @param bool       $only_body If true, only show the inner body. If false, create a 
+ * @param bool       $only_body If true, only show the inner body. If false, create a
  *                          complete HTML document.
  *
  * @since 2.0.3-fork
  */
-function do_text_header_content($textid, $only_body=true): void
+function do_text_header_content($textid, $only_body = true): void
 {
     $record = getData($textid);
     $title = (string) $record['TxTitle'];
     if (isset($record['TxAudioURI'])) {
         $media = (string) $record['TxAudioURI'];
-    } else { 
+    } else {
         $media = '';
     }
     $media = trim($media);
-    
-    
+
+
     saveSetting('currenttext', $textid);
 
     if (!$only_body) {

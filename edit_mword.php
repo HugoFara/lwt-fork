@@ -16,7 +16,7 @@
  * @package Lwt
  * @author  LWT Project <lwt-project@hotmail.com>
  * @license Unlicense <http://unlicense.org/>
- * @link    https://hugofara.github.io/lwt/docs/html/edit__mword_8php.html
+ * @link    https://hugofara.github.io/lwt/docs/php/files/edit-mword.html
  * @since   1.0.3-fork
  */
 
@@ -31,14 +31,13 @@ require_once 'inc/classes/Term.php';
  */
 function export_term_js_dict($term): string 
 {
+    $translation = $term->translation . getWordTagList($term->id, ' ', 1, 0);
     $raw_answer = json_encode(
         array(
             "woid" => $term->id,
-            "text" =>  $term->text,
+            "text" => $term->text,
             "romanization" => $term->roman,
-            "translation" => prepare_textdata_js(
-                $term->translation . getWordTagList($term->id, ' ', 1, 0)
-            ),
+            "translation" => $translation,
             "status" => $term->status
         )
     );
@@ -213,17 +212,16 @@ function edit_mword_do_update($term, $newstatus)
     $term->status = (int) $_REQUEST["WoStatus"];
     ?>
     <script type="text/javascript">
-    //<![CDATA[
         function update_mword(mword, oldstatus) {
             const context = window.parent.document;
             let title = '';
-            if (window.parent.JQ_TOOLTIP) 
+            if (window.parent.LWT_DATA.settings.jQuery_tooltip) 
                 title = make_tooltip(
-                    mword.text, mword.trans, mword.roman, mword.status
+                    mword.text, mword.translation, mword.romanization, mword.status
                 );
             $('.word' + mword.woid, context)
-            .attr('data_trans', mword.trans)
-            .attr('data_rom', mword.roman)
+            .attr('data_trans', mword.translation)
+            .attr('data_rom', mword.romanization)
             .attr('title', title)
             .removeClass('status' + oldstatus)
             .addClass('status' + mword.status)
@@ -234,7 +232,6 @@ function edit_mword_do_update($term, $newstatus)
             <?php echo export_term_js_dict($term); ?>, 
             <?php echo (int) $_REQUEST['WoOldStatus']; ?>
         );
-    //]]>
     </script>
     <?php
     return $message;
@@ -332,11 +329,17 @@ function edit_mword_display_new($term, $tid, $ord, $len)
     $sent = getSentence(
         $seid, $term->textlc, (int) getSettingWithDefault('set-term-sentence-count')
     );
+    $showRoman = (bool) get_first_value(
+        "SELECT LgShowRomanization AS value
+        FROM {$tbpref}languages JOIN {$tbpref}texts 
+        ON TxLgID = LgID
+        WHERE TxID = $tid"
+    );
 
     ?>
 
     <script type="text/javascript">
-        $(document).ready(ask_before_exiting);
+        $(document).ready(lwt_form_check.askBeforeExit);
         $(window).on('beforeunload',function() {
             setTimeout(function() {
                 window.parent.frames['ru'].location.href = 'empty.html';
@@ -370,7 +373,7 @@ function edit_mword_display_new($term, $tid, $ord, $len)
                 <?php echo getWordTags(0); ?>
             </td>
         </tr>
-        <tr>
+        <tr class="<?php echo ($showRoman ? '' : 'hide'); ?>">
             <td class="td1 right">Romaniz.:</td>
             <td class="td1">
                 <input type="text" class="checkoutsidebmp" data_info="Romanization" name="WoRomanization" value="" maxlength="100" size="35" />
@@ -423,6 +426,13 @@ function edit_mword_display_change($term, $tid, $ord)
     $sql = 'SELECT WoTranslation, WoSentence, WoRomanization, WoStatus 
     FROM ' . $tbpref . 'words WHERE WoID = ' . $term->id;
     $res = do_mysqli_query($sql);
+    $showRoman = (bool) get_first_value(
+        "SELECT LgShowRomanization AS value
+        FROM {$tbpref}languages JOIN {$tbpref}texts 
+        ON TxLgID = LgID
+        WHERE TxID = $tid"
+    );
+
     if ($record = mysqli_fetch_assoc($res)) {
         $status = $record['WoStatus'];
         if ($status >= 98) { 
@@ -448,7 +458,7 @@ function edit_mword_display_change($term, $tid, $ord)
         ?>
     
     <script type="text/javascript">
-        $(document).ready(ask_before_exiting);
+        $(document).ready(lwt_form_check.askBeforeExit);
         $(window).on('beforeunload',function() {
             setTimeout(function() {
                 window.parent.frames['ru'].location.href = 'empty.html';
@@ -488,7 +498,7 @@ function edit_mword_display_change($term, $tid, $ord)
                 <?php echo getWordTags($term->id); ?>
             </td>
         </tr>
-        <tr>
+        <tr class="<?php echo ($showRoman ? '' : 'hide'); ?>">
             <td class="td1 right">Romaniz.:</td>
             <td class="td1">
                 <input type="text" class="checkoutsidebmp" data_info="Romanization" 

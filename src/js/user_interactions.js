@@ -32,8 +32,8 @@ function quickMenuRedirection(value) {
  * @param {string}   attrs        A group of attributes to add 
  * @param {int}      length       Number of words, should correspond to WoWordCount
  * @param {string}   hex          Lowercase formatted version of the text.
- * @param {bool}     showallwords Set to false if a group if multi-words should be 
- *                                displayed as index
+ * @param {bool}     showallwords true: multi-word is a superscript, show mw index + words
+ *                                false: only show the multiword, hide the words
  * @returns {undefined}
  * 
  * @since 2.5.2-fork Don't hide multi-word index when inserting new multi-word. 
@@ -41,27 +41,33 @@ function quickMenuRedirection(value) {
 function newExpressionInteractable(text, attrs, length, hex, showallwords) {
 
     const context = window.parent.document;
+    // From each multi-word group
     for (key in text) {
-        const words = $('span[id^="ID-'+ key +'-"]', context).not(".hide"); 
-        const text_refresh = (
-            words.attr('data_code') !== undefined 
-            && words.attr('data_code') <= length);
+        // Remove any previous multi-word of same length + same position
         $('#ID-' + key + '-' + length, context).remove();
-        let i = '';
+
+        // From text, select the first mword smaller than this one, or the first 
+        // word in this mword
+        let next_term_key = '';
         for (let j = length - 1; j > 0; j--) {
-            if (j==1)
-                i = '#ID-' + key + '-1';
+            if (j == 1)
+                next_term_key = '#ID-' + key + '-1';
             if ($('#ID-' + key + '-' + j, context).length) {
-                i = '#ID-' + key + '-' + j;
+                next_term_key = '#ID-' + key + '-' + j;
                 break;
             }
         }
-        $(i, context)
-        .before('<span id="ID-' + key + '-' + length + '"' + attrs + '>' 
-        + text[key] + '</span>');
-        const el = $('#ID-' + key + '-' + length, context);
-        el.addClass('order' + key).attr('data_order', key);
-        const txt = el
+        // Add the multi-word marker before
+        $(next_term_key, context)
+        .before(
+            '<span id="ID-' + key + '-' + length + '"' + attrs + '>' + text[key] + 
+            '</span>'
+        );
+
+        // Change multi-word properties
+        const multi_word = $('#ID-' + key + '-' + length, context);
+        multi_word.addClass('order' + key).attr('data_order', key);
+        const txt = multi_word
             .nextUntil(
                 $('#ID-' + (parseInt(key) + length * 2 - 1) + '-1', context),
                 '[id$="-1"]'
@@ -71,14 +77,18 @@ function newExpressionInteractable(text, attrs, length, hex, showallwords) {
             })
             .get().join("");
         const pos = $('#ID-' + key + '-1', context).attr('data_pos');
-        el.attr('data_text', txt).attr('data_pos', pos);
-        if (!showallwords) {
-            if (true || text_refresh) {
-                //refresh_text(el);
-            } else {
-                el.addClass('hide');
-            }
+        multi_word.attr('data_text', txt).attr('data_pos', pos);
+
+        // Hide the next words if necessary
+        if (showallwords) {
+            return;
         }
+        const next_words = [];
+        // TODO: overlapsing multi-words
+        for (let i = 0; i < length * 2 - 1; i++) {
+            next_words.push('span[id="ID-' + (parseInt(key) + i) + '-1"]');
+        }
+        $(next_words.join(','), context).hide();
     }
 }
 
@@ -94,7 +104,7 @@ function prepareTextInteractions() {
     $('.word').on('click', word_click_event_do_text_text);
     $('#thetext').on('selectstart','span',false).on(
         'mousedown','.wsty',
-        {annotation: ANNOTATIONS_MODE}, 
+        {annotation: LWT_DATA.settings.annotations_mode}, 
         mword_drag_n_drop_select);
     $('#thetext').on('click', '.mword', mword_click_event_do_text_text);
     $('.word').on('dblclick', word_dblclick_event_do_text_text);
@@ -118,7 +128,7 @@ function prepareTextInteractions() {
  */
 function goToLastPosition() {
     // Last registered position to go to
-    const lookPos = POS;
+    const lookPos = LWT_DATA.text.reading_position;
     // Position to scroll to
     let pos = 0;
     if (lookPos > 0) {
@@ -166,7 +176,9 @@ function saveAudioPosition(text_id, pos) {
  * Get the phonetic version of a text.
  * 
  * @param {string} text Text to convert to phonetics.
- * @param {string} lang Language, either two letters code or four letters (BCP 47)
+ * @param {string} lang Language, either two letters code or four letters (BCP 47).
+ * 
+ * @deprecated Since 2.10.0 use getPhoneticTextAsync
  */
 function getPhoneticText(text, lang) {
     let phoneticText;
@@ -205,9 +217,93 @@ async function getPhoneticTextAsync(text, lang) {
         }
     );
 }
+  
 
 /**
- * Read a text aloud, only work with a phonetic version.
+ * Replace any searchValue on object value by replaceValue with deepth.
+ * 
+ * @param {dict} obj Object to search in
+ * @param {string} searchValue Value to find
+ * @param {string} replaceValue Value to replace with
+ * */
+function deepReplace(obj, searchValue, replaceValue) {
+    for (let key in obj) {
+        if (typeof obj[key] === 'object') {
+            // Recursively search nested objects
+            deepReplace(obj[key], searchValue, replaceValue);
+        } else if (typeof obj[key] === 'string' && obj[key].includes(searchValue)) {
+            // If the property is a string and contains the searchValue, replace it
+            obj[key] = obj[key].replace(searchValue, replaceValue);
+        }
+    }
+  }
+  
+/**
+ * Find the first string starting with searchValue in object.
+ * 
+ * @param {dict}   obj         Object to search in
+ * @param {string} searchValue Value to search
+ */
+function deepFindValue(obj, searchValue) {
+    for (const key in obj) {
+        if (obj.hasOwnProperty(key)) {
+            if (typeof obj[key] === 'string' && obj[key].startsWith(searchValue)) {
+                return obj[key];
+            } else if (typeof obj[key] === 'object') {
+                const result = deepFindValue(obj[key], searchValue);
+                if (result) {
+                    return result;
+                }
+            }
+        }
+    }
+    return null; // Return null if no matching string is found
+}
+
+
+function readTextWithExternal(text, voice_api, lang) {
+    let fetchRequest = JSON.parse(voice_api);
+
+    // TODO: can expose more vars to Request
+    deepReplace(fetchRequest, 'lwt_term', text)
+    deepReplace(fetchRequest, 'lwt_lang', lang)
+
+
+    fetchRequest.options.body = JSON.stringify(fetchRequest.options.body)
+
+    fetch(fetchRequest.input, fetchRequest.options)
+    .then(response => response.json())
+    .then(data => {
+        const encodeString = deepFindValue(data, 'data:')
+        const utter = new Audio(encodeString)
+        utter.play()
+    })
+    .catch(error => {
+        console.error(error)
+    });
+}
+
+function cookieTTSSettings(language) {
+    const prefix = 'tts[' + language;
+    let lang_settings = {};
+    const num_vals = ['Rate', 'Pitch'];
+    const cookies = ['Rate', 'Pitch', 'Voice'];
+    let cookie_val;
+    for (let cook in cookies) {
+        cookie_val = getCookie(prefix + cook + ']');
+        if (cookie_val) {
+            if (num_vals.includes(cook)) {
+                lang_settings[cook.toLowerCase()] = parseFloat(cookie_val);
+            } else {
+                lang_settings[cook.toLowerCase()] = cookie_val;
+            }
+        }
+    }
+    return lang_settings;
+} 
+
+/**
+ * Read a text aloud, works with a phonetic version only.
  * 
  * @param {string} text  Text to read, won't be parsed further.
  * @param {string} lang  Language code with BCP 47 convention  
@@ -221,31 +317,30 @@ async function getPhoneticTextAsync(text, lang) {
  */
  function readRawTextAloud(text, lang, rate, pitch, voice) {
     let msg = new SpeechSynthesisUtterance();
-    const trimmed = lang.substring(0, 2);
-    const prefix = 'tts[' + trimmed;
+    const tts_settings = cookieTTSSettings(lang.substring(0, 2));
     msg.text = text;
     if (lang) {
         msg.lang = lang;
     }
     // Voice is a string but we have to assign a SpeechSynthesysVoice
-    const useVoice = voice || getCookie(prefix + 'Voice]');
+    const useVoice = voice || tts_settings.voice;
     if (useVoice) {
         const voices = window.speechSynthesis.getVoices();
         for (let i = 0; i < voices.length; i++) {
             if (voices[i].name === useVoice) {
                 msg.voice = voices[i];
             }
-          }
+        }
     }
     if (rate) {
         msg.rate = rate;
-    } else if (getCookie(prefix + 'Rate]')) {
-        msg.rate = parseInt(getCookie(prefix + 'Rate]'), 10);
+    } else if (tts_settings.rate) {
+        msg.rate = tts_settings.rate;
     }
     if (pitch) {
         msg.pitch = pitch;
-    } else if (getCookie(prefix + 'Pitch]')) {
-        msg.pitch = parseInt(getCookie(prefix + 'Pitch]'), 10);
+    } else if (tts_settings.pitch) {
+        msg.pitch = tts_settings.pitch;
     }
     window.speechSynthesis.speak(msg);
     return msg;
@@ -263,8 +358,8 @@ async function getPhoneticTextAsync(text, lang) {
  * 
  * @since 2.9.0 Accepts "voice" as a new optional argument
  */
-function readTextAloud(text, lang, rate, pitch, voice) {
-    if (lang.startsWith('ja')) {
+function readTextAloud(text, lang, rate, pitch, voice, convert_to_phonetic) {
+    if (convert_to_phonetic) {
         getPhoneticTextAsync(text, lang)
             .then(
                 function (data) {
@@ -275,5 +370,21 @@ function readTextAloud(text, lang, rate, pitch, voice) {
             );
     } else {
         readRawTextAloud(text, lang, rate, pitch, voice);
+    }
+}
+
+
+function speechDispatcher(term, lang_abbr, lang_data) {
+    const loc_data = lang_data ?? LWT_DATA.language;
+    const loc_lang_abbr = lang_abbr ?? loc_data.abbr;
+    if (loc_data.ttsVoiceApi) {
+        readTextWithExternal(term, loc_data.ttsVoiceApi, loc_lang_abbr);
+    } else {
+        const convert_to_phonetic = loc_data.word_parsing == 'mecab';
+        const lang_settings = cookieTTSSettings(loc_lang_abbr.substring(0, 2));
+        readTextAloud(
+            term, loc_lang_abbr, lang_settings.rate, lang_settings.pitch, 
+            lang_settings.voice, convert_to_phonetic
+        );
     }
 }

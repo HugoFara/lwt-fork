@@ -69,7 +69,7 @@ if ($translation != '*') {
 <script type="text/javascript">
     const context = window.parent.document;
     let title = '';
-    if (window.parent.JQ_TOOLTIP)
+    if (window.parent.LWT_DATA.settings.jQuery_tooltip)
         title = make_tooltip(
             <?php echo prepare_textdata_js($_REQUEST['text']); ?>,
             <?php echo prepare_textdata_js($translation); ?>,

@@ -12,7 +12,7 @@
  * @package Lwt_Documentation
  * @author  HugoFara <hugo.farajallah@protonmail.com>
  * @license Unlicense <http://unlicense.org/>
- * @link    https://hugofara.github.io/lwt/docs/html/minifier_8php.html
+ * @link    https://hugofara.github.io/lwt/docs/php/files/src-php-minifier.html
  * @since   2.0.3-fork
  * @since   2.9.1-fork $jsFiles was replaced by LWT_JS_FILES and $cssFiles by 
  *                      LWT_CSS_FILES
@@ -22,14 +22,16 @@ use MatthiasMullie\Minify;
 
 
 /**
- * @var string[] LWT_JS_FILES All the paths of JS files to be minified
+ * @var string[] LWT_JS_FILES All the paths of JS files to be minified.
+ * 
+ * @since 2.10.0-fork Adds src/js/overlib_interface.js
  */
 define(
     'LWT_JS_FILES', 
     array(
         'src/js/audio_controller.js', 'src/js/third_party/countuptimer.js', 
         'src/js/jq_feedwizard.js', 
-        'src/js/jq_pgm.js', 'src/js/pgm.js', 
+        'src/js/jq_pgm.js', 'src/js/overlib_interface.js', 'src/js/pgm.js', 
         'src/js/translation_api.js', 'src/js/unloadformcheck.js',
         'src/js/third_party/sorttable.js', 'src/js/user_interactions.js', 
     )

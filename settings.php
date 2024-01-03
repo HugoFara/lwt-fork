@@ -111,6 +111,11 @@ if (isset($_REQUEST['op'])) {
                 1 : 0
             )
         );
+        
+        saveSetting(
+            'set-hts',  
+            $_REQUEST['set-hts']
+        );
     
         saveSetting(
             'set-archivedtexts-per-page',
@@ -204,7 +209,7 @@ echo error_message_with_hide($message, true);
 
 ?>
 <script type="text/javascript" charset="utf-8">
-    $(document).ready(ask_before_exiting);
+    $(document).ready(lwt_form_check.askBeforeExit);
 </script>
 <form class="validate" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
 <table class="tab1" cellspacing="0" cellpadding="5">
@@ -568,7 +573,7 @@ echo error_message_with_hide($message, true);
     </tr>
     <!-- ******************************************************* -->
     <tr>
-        <th class="th1 center">Text to Speech</th>
+        <th class="th1 center" rowspan="2">Text to Speech</th>
         <td class="td1 center">Save Audio Files to Disk</td>
         <td class="td1 center">
             <input type="checkbox" name="set-tts" value="1" 
@@ -577,6 +582,22 @@ echo error_message_with_hide($message, true);
         <td class="td1 center">
             <img src="icn/status-busy.png" title="Field must not be empty" 
             alt="Field must not be empty" />
+        </td>
+    </tr>
+    <!-- ******************************************************* -->
+    <tr>
+        <td class="td1 center">Read word aloud</td>
+        <td class="td1 center">
+            <select name="set-hts" class="notempty respinput">
+            <?php
+            echo get_hts_selectoptions(
+                getSettingWithDefault('set-hts')
+            );
+            ?>
+            </select>
+        </td>
+        <td class="td1 center">
+            <img src="icn/status-busy.png" title="Field must not be empty" alt="Field must not be empty" />
         </td>
     </tr>
     <!-- ******************************************************* -->
@@ -728,10 +749,10 @@ echo error_message_with_hide($message, true);
     <tr>
         <td class="td1 right" colspan="4">
             <input type="button" value="&lt;&lt; Back" 
-            onclick="{resetDirty(); location.href='index.php';}" />
+            onclick="{lwt_form_check.resetDirty(); location.href='index.php';}" />
             <span class="nowrap"></span>
             <input type="button" value="Reset all settings to default" 
-            onclick="{resetDirty(); location.href='settings.php?op=reset';}" />
+            onclick="{lwt_form_check.resetDirty(); location.href='settings.php?op=reset';}" />
             <span class="nowrap"></span>
             <input type="submit" name="op" value="Save" />
         </td>

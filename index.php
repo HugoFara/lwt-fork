@@ -12,7 +12,7 @@
  * @package Lwt
  * @author  LWT Project <lwt-project@hotmail.com>
  * @license Unlicense <http://unlicense.org/>
- * @link    https://hugofara.github.io/lwt/docs/html/index_8php.html
+ * @link    https://hugofara.github.io/lwt/docs/php/files/index.html
  * @since   1.0.3
  * 
  * "Learning with Texts" (LWT) is free and unencumbered software 

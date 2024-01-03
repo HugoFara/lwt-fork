@@ -22,7 +22,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="lwt_icon.png"/></td>
   <td id="projectalign">
-   <div id="projectname">Learning with Texts - Fork<span id="projectnumber">&#160;2.9.0-fork</span>
+   <div id="projectname">Learning with Texts - Fork<span id="projectnumber">&#160;2.9.1-fork</span>
    </div>
    <div id="projectbrief">Learn foreign languages with texts</div>
   </td>
@@ -76,7 +76,7 @@ $(function() {
 <div class="contents">
 <div class="textblock"><p>This project's changelog. Versions marked with "-fork" come from the community, other versions come from the canonical LWT ("official" branch on Git). For git tags, official releases are marked like "v1.0.0", while unofficial ones are marked like "v1.0.0-fork".</p>
 <h1><a class="anchor" id="autotoc_md30"></a>
-[Unreleased]</h1>
+2.9.1-fork (December 29 2023)</h1>
 <h2><a class="anchor" id="autotoc_md31"></a>
 Added</h2>
 <ul>
@@ -92,23 +92,35 @@ Changed</h2>
 <ul>
 <li>PHP files header docblocks are expanded, notably with a PHP version, package and category name.</li>
 <li>Japanese number are now parsed by MeCab. Big thanks to <a href="https://github.com/ProgramComputer">@ProgramComputer</a> for his pull request <a href="https://github.com/HugoFara/lwt/pull/149">#149</a>!</li>
+<li>Removes dead feeds from the demo database, as signaled in <a href="https://github.com/HugoFara/lwt/issues/148">#148</a>.</li>
+<li>Patch update to the REST API to 0.1.1: requests on GET with empty payload were resulting in error.</li>
 </ul>
 <h2><a class="anchor" id="autotoc_md33"></a>
 Fixed</h2>
 <ul>
 <li>Fixes <a href="https://github.com/HugoFara/lwt/issues/113">#113</a>: changing a language name was making text-to-speech unusable and may prompt a warning.</li>
-<li>Since 2.9.0, tests may be unable to run due to a missing key in an AJAX request ("type"). This is fixed.</li>
+<li>Since 2.9.0, tests may be unable to run due to a missing key in an AJAX request ("type").</li>
 <li>Since 2.9.0, audio position was not saved properly.</li>
 <li>On <code><a class="el" href="upload__words_8php.html" title="Import terms from file or Text area.">upload_words.php</a></code>, "update only empty fields" was broken.</li>
 <li>Translation were not set by default properly when editing terms translations table.</li>
-<li>The field MeCab was set for japanese even when not asked for. Signalled on PR <a href="https://github.com/HugoFara/lwt/pull/155">#155</a>, thanks to <a href="https://github.com/ProgramComputer">@ProgramComputer</a>.</li>
-<li>Since 2.8.1, japanese word romanization was not displayed any more. Thanks to 아르노 for signalling the bug on Discord!</li>
+<li>The field MeCab was set for Japanese even when not asked for. Signaled on PR <a href="https://github.com/HugoFara/lwt/pull/155">#155</a>, thanks to <a href="https://github.com/ProgramComputer">@ProgramComputer</a>.</li>
+<li>Since 2.8.1, Japanese word romanization was not displayed any more. Thanks to 아르노 for signalling the bug on Discord!</li>
+<li>The go slower/faster feature on audio was broken (<a href="https://github.com/HugoFara/lwt/issues/138">#138</a>), as functions <code>click_slower</code> and <code>click_faster</code> were declared two times in <code>src/js/audio_controller.js</code>.</li>
+<li>When opening a text, text position was not saved and a <code>text_id is unknown</code> error was triggered.</li>
+<li>Do not display an error on step 2 of feed wizard at first initialization (<a href="https://github.com/HugoFara/lwt/issues/129">#129</a>).</li>
+<li>It was impossible to install the demo database if they was more or less than one instruction a line. This is fixed, and the SQL file was made more readable.</li>
+<li>Changes <code>WoStatusChange</code> default value to '1970-01-01 01:00:01', it was impossible to install the demo DB out of LWT (related to <a href="https://github.com/HugoFara/lwt/issues/78">#78</a>).</li>
+<li>Deleting a language deletes the language (<a href="https://github.com/HugoFara/lwt/issues/151">#151</a>). Before it was setting the language to empty values.</li>
+<li>On media select, the lwt folder name was prepended to the media folder, resulting in broken path (<a href="https://github.com/HugoFara/lwt/issues/161">#161</a>).</li>
+<li>With the REST API, requests with an empty query were resulting in an error.</li>
+<li><code>no-minify</code> composer command was fixed, suggested as a part of PR <a href="https://github.com/HugoFara/lwt/pull/154/files">#154</a> by <a href="https://github.com/ProgramComputer">@ProgramComputer</a>.</li>
 </ul>
 <h2><a class="anchor" id="autotoc_md34"></a>
 Deprecated</h2>
 <ul>
-<li>PHP documentation using Doxygen (under <code>/docs/html</code>) is now deprecated and will be removed in 3.0.0.</li>
+<li>PHP documentation using Doxygen (under <code>docs/html</code>) is now deprecated and will be removed in 3.0.0.</li>
 <li>Using <code>$langDefs</code> is deprecated in favor of <code>LWT_LANGUAGES_ARRAY</code> (<a href="https://github.com/HugoFara/lwt/issues/163">#163</a>).</li>
+<li>Calling the global function <code>new_pos</code> to set audio position is deprecated. Please use <code>lwt_audio_controller.setPosition</code>.</li>
 </ul>
 <h1><a class="anchor" id="autotoc_md35"></a>
 2.9.0-fork (December 24 2023)</h1>

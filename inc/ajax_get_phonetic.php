@@ -8,7 +8,7 @@
  * @package Lwt
  * @author  HugoFara <hugo.farajallah@protonmail.com>
  * @license Unlicense <http://unlicense.org/>
- * @link    https://hugofara.github.io/lwt/docs/html/ajax__get__phonetic_8php.html
+ * @link    https://hugofara.github.io/lwt/docs/php/files/inc-ajax-get-phonetic.html
  * @since   2.3.0-fork
  * 
  * @deprecated Use ajax.php with action_type=get_phonetic instead. Deprecated in 2.9.0.

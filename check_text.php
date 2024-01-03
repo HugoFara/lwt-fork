@@ -3,17 +3,17 @@
 /**
  * \file
  * \brief Check (parse & split) a Text (into sentences/words)
- * 
+ *
  * Call: check_text.php?...
  *      op=Check ... do the check
- * 
+ *
  * PHP version 8.1
- * 
+ *
  * @category User_Interface
  * @package Lwt
  * @author  LWT Project <lwt-project@hotmail.com>
  * @license Unlicense <http://unlicense.org/>
- * @link    https://hugofara.github.io/lwt/docs/html/check__text_8php.html
+ * @link    https://hugofara.github.io/lwt/docs/php/files/check-text.html
  * @since   1.0.3
  */
 
@@ -23,17 +23,17 @@ require_once 'inc/session_utility.php';
 
 /**
  * Do the check text operation.
- * 
+ *
  * @param string $text Text to check.
  * @param int    $lgid Language ID.
- * 
+ *
  * @return void
  */
 function do_operation($text, $lgid)
 {
     echo '<p><input type="button" value="&lt;&lt; Back" onclick="history.back();" /></p>';
     if (strlen(prepare_textdata($text)) > 65000) {
-        echo "<p>Error: Text too long, must be below 65000 Bytes.</p>"; 
+        echo "<p>Error: Text too long, must be below 65000 Bytes.</p>";
     } else {
         splitCheckText($text, $lgid, -1);
     }
@@ -42,9 +42,9 @@ function do_operation($text, $lgid)
 
 /**
  * Display the main form for the check text page.
- * 
+ *
  * @global string $tbpref
- * 
+ *
  * @return void
  */
 function display_form()
@@ -58,6 +58,10 @@ function display_form()
         $url = $lg_record["LgGoogleTranslateURI"];
         $return[$lg_record["LgID"]] = langFromDict($url);
     }
+    $languages_option = get_languages_selectoptions(
+        getSetting('currentlanguage'), 
+        '[Choose...]'
+    );
     ?>
 
     <script type="text/javascript" charset="utf-8">
@@ -74,7 +78,7 @@ function display_form()
             $('#TxText').attr('lang', language_data[lid]);
         }
 
-        $(document).ready(ask_before_exiting);
+        $(document).ready(lwt_form_check.askBeforeExit);
         $(document).ready(change_textboxes_language);
      </script>
 <form class="validate" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
@@ -83,9 +87,7 @@ function display_form()
     <td class="td1 right">Language:</td>
     <td class="td1">
         <select name="TxLgID" id="TxLgID" class="notempty setfocus" onchange="change_textboxes_language();">
-            <?php
-            echo get_languages_selectoptions(getSetting('currentlanguage'), '[Choose...]');
-            ?>
+            <?php echo $languages_option;?>
         </select> 
         <img src="icn/status-busy.png" title="Field must not be empty" alt="Field must not be empty" />
     </td>

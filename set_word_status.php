@@ -59,7 +59,7 @@ function set_word_status_ajax($wid, $status): void
     const wordid = parseInt(<?php echo $wid; ?>, 10);
     const status = parseInt(<?php echo $status; ?>, 10);
     $.post(
-        'api.php/v1/' + wordid + '/status/' + status,
+        'api.php/v1/terms/' + wordid + '/status/' + status,
         {}, 
         function (data) {
             if (data == "" || "error" in data) {
@@ -122,7 +122,7 @@ function set_word_status_javascript($tid, $wid, $status, $word, $trans, $roman)
         let context = window.parent.document.getElementById('frame-l');
         let contexth = window.parent.document.getElementById('frame-h');
         let title = '';
-        if (!window.parent.JQ_TOOLTIP) {
+        if (!window.parent.LWT_DATA.settings.jQuery_tooltip) {
             title = make_tooltip(word, trans, roman, status);
         }
         $('.word' + wid, context)

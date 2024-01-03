@@ -11,7 +11,7 @@
  * @author   chaosarium <leonluleonlu@gmail.com>
  * @author   HugoFara <Hugo.Farajallah@protonmail.com>
  * @license  Unlicense <http://unlicense.org/>
- * @link     https://hugofara.github.io/lwt/docs/html/text__to__speech__settings_8php.html
+ * @link     https://hugofara.github.io/lwt/docs/php/files/text-to-speech-settings.html
  * @since    2.2.2-fork
  */
 
@@ -70,12 +70,13 @@ function tts_language_options()
     $output = '';
     foreach (get_languages() as $language => $language_id) {
         $languageCode = getLanguageCode($language_id, LWT_LANGUAGES_ARRAY);
-        $output .= '<option value="' . $languageCode . '">' . 
-        $language . 
-        '</option>';
+        $output .= sprintf(
+            '<option value="%s">%s</option>', $languageCode, $language
+        );
     }
     return $output;
 }
+
 
 /**
  * Prepare a from for all the TTS settings.
@@ -84,7 +85,7 @@ function tts_language_options()
  */
 function tts_settings_form()
 {
-    ?>    
+    ?>
 <form class="validate" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
     <table class="tab1" cellspacing="0" cellpadding="5">
         <tr>
@@ -97,7 +98,7 @@ function tts_settings_form()
             <td class="td1 center">Language code</td>
             <td class="td1 center">
             <select name="LgName" id="get-language" class="notempty respinput" 
-            onchange="populateVoiceList();">
+            onchange="tts_settings.populateVoiceList();">
                 <?php echo tts_language_options(); ?>
             </select>
             </td>
@@ -144,8 +145,7 @@ function tts_settings_form()
         <tr>
             <td class="td1 right" colspan="4">
                 <input type="button" value="Cancel" 
-                onclick=
-                "{resetDirty(); location.href='text_to_speech_settings.php';}" /> 
+                onclick="tts_settings.clickCancel();" /> 
                 <input type="submit" name="op" value="Save" />
             </td>
         </tr>
@@ -168,7 +168,7 @@ function tts_demo()
     >Lorem ipsum dolor sit amet...</textarea>
 </td>
 <td class="td1 right">
-    <input type="button" onclick="readingDemo();" value="Read"/>
+    <input type="button" onclick="tts_settings.readingDemo();" value="Read"/>
 </td>
     <?php
 }
@@ -181,94 +181,162 @@ function tts_demo()
 function tts_js()
 {
     $lid = (int) getSetting('currentlanguage');
+    $lg_code = getLanguageCode($lid, LWT_LANGUAGES_ARRAY);
     ?>
 <script type="text/javascript" charset="utf-8">
-    /** @var Current language being learnt. */
-    const CURRENT_LANGUAGE = <?php 
-    echo json_encode(getLanguageCode($lid, LWT_LANGUAGES_ARRAY)); 
-    ?>;
+
+    const tts_settings = {
+        /** @var string current_language Current language being learnt. */
+        current_language: <?php echo json_encode($lg_code); ?>,
+
+        autoSetCurrentLanguage: function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('lang')) {
+                tts_settings.current_language = urlParams.get('lang');
+            }
+        },
+
+        /**
+         * Get the language country code from the page. 
+         * 
+         * @returns {string} Language code (e. g. "en")
+         */
+        getLanguageCode: function() {
+            return $('#get-language').val();
+        },
+
+        /** 
+         * Gather data in the page to read the demo.
+         * 
+         * @returns {undefined}
+         */
+        readingDemo: function() {
+            const lang = tts_settings.getLanguageCode();
+            readTextAloud(
+                $('#tts-demo').val(),
+                lang,
+                parseFloat($('#rate').val()),
+                parseFloat($('#pitch').val()),
+                $('#voice').val()
+            );
+        },
+
+
+        /**
+         * Set the Text-to-Speech data using cookies
+         */
+        presetTTSData: function() {
+            const lang_name = tts_settings.current_language;
+            $('#get-language').val(lang_name);
+            $('#voice').val(getCookie('tts[' + lang_name + 'RegName]'));
+            $('#rate').val(getCookie('tts[' + lang_name + 'Rate]'));
+            $('#pitch').val(getCookie('tts[' + lang_name + 'Pitch]'));
+        },
+
+        /**
+         * Populate the languages region list.
+         * 
+         * @returns {undefined}
+         */
+        populateVoiceList: function() {
+            let voices = window.speechSynthesis.getVoices();
+            $('#voice').empty();
+            const languageCode = getLanguageCode();
+            for (i = 0; i < voices.length ; i++) {
+                if (voices[i].lang != languageCode && !voices[i].default)
+                    continue;
+                let option = document.createElement('option');
+                option.textContent = voices[i].name;
+
+                if (voices[i].default) {
+                    option.textContent += ' -- DEFAULT';
+                }
+
+                option.setAttribute('data-lang', voices[i].lang);
+                option.setAttribute('data-name', voices[i].name);
+                $('#voice')[0].appendChild(option);
+            }
+        },
+
+        clickCancel: function() {
+            lwt_form_check.resetDirty(); 
+            location.href = 'text_to_speech_settings.php';
+        }
+    };
+
+    /**
+     * @deprecated Since 2.10.0-fork
+     */
+    const CURRENT_LANGUAGE = tts_settings.current_language;
+
 
     /**
      * Get the language country code from the page. 
      * 
      * @returns {string} Language code (e. g. "en")
+     * 
+     * @deprecated Since 2.10.0-fork
      */
     function getLanguageCode()
     {
-        return $('#get-language').val();
+        return tts_settings.getLanguageCode();
     }
 
     /** 
      * Gather data in the page to read the demo.
      * 
      * @returns {undefined}
+     * 
+     * @deprecated Since 2.10.0-fork
      */
     function readingDemo()
     {
-        const lang = getLanguageCode();
-        readTextAloud(
-            $('#tts-demo').val(),
-            lang,
-            parseFloat($('#rate').val()),
-            parseFloat($('#pitch').val()),
-            $('#voice').val()
-        );
+        return tts_settings.readingDemo();
     }
 
     /**
      * Set the Text-to-Speech data using cookies
+     * 
+     * @deprecated Since 2.10.0-fork
      */
     function presetTTSData()
     {
-        $('#get-language').val(CURRENT_LANGUAGE);
-        $('#voice').val(
-            getCookie(
-                'tts[' + CURRENT_LANGUAGE + 'RegName]'
-            )
-        );
-        $('#rate').val(getCookie('tts[' + CURRENT_LANGUAGE + 'Rate]'));
-        $('#pitch').val(getCookie('tts[' + CURRENT_LANGUAGE + 'Pitch]'));
+        return tts_settings.presetTTSData()
     }
 
     /**
      * Populate the languages region list.
      * 
      * @returns {undefined}
+     * 
+     * @deprecated Since 2.10.0-fork
      */
     function populateVoiceList() {
-        voices = window.speechSynthesis.getVoices();
-        $('#voice').empty();
-        const languageCode = getLanguageCode();
-        for (i = 0; i < voices.length ; i++) {
-            if (voices[i].lang != languageCode && !voices[i].default)
-                continue;
-            let option = document.createElement('option');
-            option.textContent = voices[i].name;
-
-            if (voices[i].default) {
-                option.textContent += ' -- DEFAULT';
-            }
-
-            option.setAttribute('data-lang', voices[i].lang);
-            option.setAttribute('data-name', voices[i].name);
-            $('#voice')[0].appendChild(option);
-        }
+        return tts_settings.populateVoiceList();
     }
 
-    $(presetTTSData);
-    $(populateVoiceList);
+    $(tts_settings.autoSetCurrentLanguage);
+    $(tts_settings.presetTTSData);
+    $(tts_settings.populateVoiceList);
 </script>
     <?php
 }
 
 /**
- * Make only a partial, embadable page for text-to-speech settings.
+ * Make only a partial, embedable page for text-to-speech settings.
  * 
  * @return void
  */
 function tts_settings_minimal_page()
 {
     tts_settings_form();
+    ?>
+    <p>
+        <b>Note</b>: language settings depend on your web browser, as different web
+        browser have different ways to read languages. Saving anything here will save
+        it as a cookie on your browser and will not be accessible by the LWT database. 
+    </p>
+    <?php
     tts_js();
 }
 
@@ -313,12 +381,9 @@ function tts_save_settings($form): void
     */
     $cookie_options = array(
         'expires' => strtotime('+5 years'),
-        'domain' => 
-        ($_SERVER['HTTP_HOST'] != 'localhost') ? $_SERVER['HTTP_HOST'] : false,
         'path' => '/',
         'samesite' => 'Strict' // None || Lax || Strict
     );
-    //setcookie($prefix . ']', $record['LgID'], $cookie_options);
     setcookie($prefix . 'Voice]', $form['LgVoice'], $cookie_options);
     setcookie($prefix . 'Rate]', $form['LgTTSRate'], $cookie_options);
     setcookie($prefix . 'Pitch]', $form['LgPitch'], $cookie_options);

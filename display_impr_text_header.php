@@ -2,15 +2,15 @@
 /**
  * \file
  * \brief Display an improved annotated text (top frame)
- * 
+ *
  * Call: display_impr_text_header.php?text=[textid]
- * 
+ *
  * PHP version 8.1
- * 
+ *
  * @package Lwt
  * @author  LWT Project <lwt-project@hotmail.com>
  * @license Unlicense <http://unlicense.org/>
- * @link    https://hugofara.github.io/lwt/docs/html/display__impr__text__header_8php.html
+ * @link    https://hugofara.github.io/lwt/docs/php/files/display-impr-text-header.html
  * @since   1.5.0
  */
 
@@ -18,19 +18,19 @@ require_once 'inc/session_utility.php';
 
 /**
  * Return the useful data for the header part of a printed text.
- * 
+ *
  * @param int $textid Text ID
- * 
- * @return array{0: string, 1: string, 2: string} Text title, 
+ *
+ * @return array{0: string, 1: string, 2: string} Text title,
  * text audio and source URI
- * 
+ *
  * @global string $tbpref Database table prefix.
  */
 function do_diplay_impr_text_header_data($textid)
 {
     global $tbpref;
 
-    $sql = 
+    $sql =
     'SELECT TxLgID, TxTitle, TxAudioURI, TxSourceURI 
     FROM ' . $tbpref . 'texts
     WHERE TxID = ' . $textid;
@@ -46,16 +46,16 @@ function do_diplay_impr_text_header_data($textid)
 
     $title = $record['TxTitle'];
     $sourceURI = $record['TxSourceURI'];
-    mysqli_free_result($res); 
+    mysqli_free_result($res);
 
     saveSetting('currenttext', $textid);
     return array($title, $audio, $sourceURI);
 }
 
 /**
- * Echo JavaScript area containing behaviors to show/hide 
+ * Echo JavaScript area containing behaviors to show/hide
  * translations and annotations.
- * 
+ *
  * @return void
  */
 function do_diplay_impr_text_header_js()
@@ -106,16 +106,22 @@ function do_diplay_impr_text_header_js()
 
 /**
  * Make the header content to display a printed text.
- * 
+ *
  * @param string $title     Text title
  * @param int    $textid    Text ID
  * @param string $audio     Audio URI
  * @param string $sourceURI Text source link
- * 
+ *
  * @return void
  */
 function do_diplay_impr_text_header_content($title, $textid, $audio, $sourceURI)
 {
+    $text_links = getPreviousAndNextTextLinks(
+        $textid, 
+        'display_impr_text.php?text=', 
+        true, 
+        ' &nbsp; &nbsp; '
+    );
     ?>
     <h1><?php echo tohtml($title); ?></h1>
 <div class="flex-spaced">
@@ -136,8 +142,8 @@ function do_diplay_impr_text_header_content($title, $textid, $audio, $sourceURI)
                 <img src="'.get_file_path('icn/chain.png').'" title="Text Source" alt="Text Source" />
             </a>';
         }
-        echo getPreviousAndNextTextLinks($textid, 'display_impr_text.php?text=', true, ' &nbsp; &nbsp; ');
-        ?>
+        echo $text_links;
+    ?>
     </div>
     <div>
         <img class="click" src="icn/cross.png" title="Close Window" alt="Close Window" onclick="top.close();" />
@@ -149,9 +155,9 @@ function do_diplay_impr_text_header_content($title, $textid, $audio, $sourceURI)
 
 /**
  * Main function to generate a complete header for a specific text.
- * 
+ *
  * @param int $textid Text ID.
- * 
+ *
  * @return void
  */
 function do_diplay_impr_text_header_main($textid)

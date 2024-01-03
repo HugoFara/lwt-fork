@@ -12,7 +12,7 @@
  * @package Lwt
  * @author  LWT Project <lwt-project@hotmail.com>
  * @license Unlicense <http://unlicense.org/>
- * @link    https://hugofara.github.io/lwt/docs/html/ajax__show__imported__terms_8php.html
+ * @link    https://hugofara.github.io/lwt/docs/php/files/inc-ajax-show-imported-terms.html
  * @since   1.2.0
  * 
  * @deprecated 2.9.0 Use the REST API instead.

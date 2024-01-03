@@ -3,15 +3,15 @@
 /**
  * \file
  * \brief Display an improved annotated text (text frame)
- * 
+ *
  * Call: display_impr_text_text.php?text=[textid]
- * 
+ *
  * PHP version 8.1
- * 
+ *
  * @package Lwt
  * @author  LWT Project <lwt-project@hotmail.com>
  * @license Unlicense <http://unlicense.org/>
- * @link    https://hugofara.github.io/lwt/docs/html/display__impr__text__text_8php.html
+ * @link    https://hugofara.github.io/lwt/docs/php/files/display-impr-text-text.html
  * @since   1.5.0
  */
 
@@ -19,10 +19,10 @@ require_once 'inc/session_utility.php';
 
 /**
  * Return the annotatino of a text.
- * 
+ *
  * @param int $textid Text ID
- * 
- * @return string Text annotations 
+ *
+ * @return string Text annotations
  */
 function get_annotated_text($textid)
 {
@@ -37,10 +37,10 @@ function get_annotated_text($textid)
 
 /**
  * Get settings for this text.
- * 
+ *
  * @param int $textid Text ID
- * 
- * @return array{0: int, 1: bool} Text size, and if this text 
+ *
+ * @return array{0: int, 1: bool} Text size, and if this text
  * is rigth-to-left.
  */
 function get_display_impr_text_text_data($textid)
@@ -62,11 +62,11 @@ function get_display_impr_text_text_data($textid)
 
 /**
  * Prepare JavaScript interactions for the text content.
- * 
+ *
  * @return void
  */
 function do_diplay_impr_text_text_js()
-{  
+{
     ?>
 <script type="text/javascript">
     //<![CDATA[
@@ -108,11 +108,11 @@ function do_diplay_impr_text_text_js()
 
 /**
  * Make the main content for a printed text.
- * 
+ *
  * @param string $ann       Annotations separated b tabulations "\t"
  * @param string $textsize  Text size
- * @param bool   $rtlScript True if this text is right-to-left 
- * 
+ * @param bool   $rtlScript True if this text is right-to-left
+ *
  * @return void
  */
 function do_diplay_impr_text_text_area($ann, $textsize, $rtlScript)
@@ -129,11 +129,11 @@ function do_diplay_impr_text_text_area($ann, $textsize, $rtlScript)
 
 /**
  * Parse the annotations (translation/romanization) and return them.
- * 
+ *
  * @param string[] $vals Annotations values
- * 
+ *
  * @return array{0: string, 1: string} Translation and romanization.
- * 
+ *
  * @global string $tbpref Database table prefix.
  */
 function get_word_annotations($vals)
@@ -150,14 +150,14 @@ function get_word_annotations($vals)
                 FROM " . $tbpref . "words WHERE WoID = " . $wid
             );
             if (!isset($rom)) {
-                $rom = ''; 
+                $rom = '';
             }
         }
     }
-    if ($c > 3) { 
-        $trans = $vals[3]; 
+    if ($c > 3) {
+        $trans = $vals[3];
     }
-    if ($trans == '*') { 
+    if ($trans == '*') {
         $trans = $vals[1] . " "; // <- U+200A HAIR SPACE
     }
     return array($trans, $rom);
@@ -165,10 +165,10 @@ function get_word_annotations($vals)
 
 /**
  * Display a single word item.
- * 
+ *
  * @param string $item     Word item, values separated by a tabulation.
  * @param string $textsize Text size
- * 
+ *
  * @return void
  */
 function do_display_impr_text_text_word($item, $textsize)
@@ -178,41 +178,41 @@ function do_display_impr_text_text_word($item, $textsize)
         list($trans, $rom) = get_word_annotations($vals);
         echo ' <ruby>
             <rb>
-                <span class="click anntermruby" style="color:black;"' . 
-                ($rom == '' ? '' : (' title="' . tohtml($rom) . '"')) . '>' . 
-                    tohtml($vals[1]) . 
+                <span class="click anntermruby" style="color:black;"' .
+                ($rom == '' ? '' : (' title="' . tohtml($rom) . '"')) . '>' .
+                    tohtml($vals[1]) .
                 '</span>
             </rb>
             <rt>
                 <span class="click anntransruby2">' . tohtml($trans) . '</span>
             </rt>
         </ruby> ';
-    } else if (count($vals) >= 2) {
+    } elseif (count($vals) >= 2) {
         echo str_replace(
             "¶",
             '</p>
-            <p style="font-size:' . $textsize . 
+            <p style="font-size:' . $textsize .
             '%;line-height: 1.3; margin-bottom: 10px;">',
             " " . tohtml($vals[1])
-        ); 
+        );
     }
 }
 
 /**
  * Main function to do a complete printed text text content.
- * 
+ *
  * @param int|null $textid Text ID, we will use page request if not provided.
- * 
+ *
  * @return void
  */
-function do_display_impr_text_text_main($textid=null)
+function do_display_impr_text_text_main($textid = null)
 {
     if ($textid === null) {
         $textid = (int)getreq('text');
     }
     do_diplay_impr_text_text_js();
     $ann = get_annotated_text($textid);
-    if ($textid==0 || strlen($ann) <= 0) {
+    if ($textid == 0 || strlen($ann) <= 0) {
         header("Location: edit_texts.php");
         exit();
     }

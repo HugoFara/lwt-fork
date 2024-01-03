@@ -15,14 +15,24 @@ require_once __DIR__ . '/inc/ajax_edit_impr_text.php';
 
 
 /**
+ * @var string Version of this current LWT API.
+ */
+define('LWT_API_VERSION', "0.1.1");
+
+/**
+ * @var string Date of the last released change of the LWT API.
+ */
+define('LWT_API_RELEASE_DATE', "2023-12-29");
+
+/**
  * Send JSON response and exit.
- * 
+ *
  * @param int   $status Status code to display
  * @param mixed $data   Any data to return
- * 
+ *
  * @return never
  */
-function send_response($status = 200, $data = null) 
+function send_response($status = 200, $data = null)
 {
     header('Content-Type: application/json');
     http_response_code($status);
@@ -32,16 +42,16 @@ function send_response($status = 200, $data = null)
 
 /**
  * Check if an API endpoint exists.
- * 
+ *
  * @param string $method     Method name (e.g. 'GET' or 'POST')
  * @param string $requestURI The URI being requested.
- * 
+ *
  * @return string The first matching endpoint
  */
-function endpoint_exits($method, $requestUri) 
+function endpoint_exits($method, $requestUri)
 {
     // Set up API endpoints
-    $endpoints = [ 
+    $endpoints = [
         'media-files' => [ 'GET' ],
 
         'phonetic-reading' => [ 'GET' ],
@@ -68,14 +78,14 @@ function endpoint_exits($method, $requestUri)
         //'terms/(?<term-id>\d+)/status/(?<new-status>\d+)' => [ 'POST' ],
 
         'texts' => [ 'POST' ],
-        
+
         //'texts/(?<text-id>\d+)/annotation' => [ 'POST' ],
         //'texts/(?<text-id>\d+)/audio-position' => [ 'POST' ],
         //'texts/(?<text-id>\d+)/reading-position' => [ 'POST' ],
 
         'texts/statistics' => [ 'GET' ],
 
-        'version' => [ 'GET' ], 
+        'version' => [ 'GET' ],
 
         // 'regexp/test' => [ 'POST' ], as of LWT 2.9.0, no usage was found
     ];
@@ -92,10 +102,10 @@ function endpoint_exits($method, $requestUri)
     }
     // endpoint without prepending URL, like 'version'
     $req_endpoint = rtrim(str_replace($matches[1], '', $uri_query), '/');
-    $methods_allowed = array(); 
+    $methods_allowed = array();
     if (array_key_exists($req_endpoint, $endpoints)) {
         $methods_allowed = $endpoints[$req_endpoint];
-    } else { 
+    } else {
         $first_elem = preg_split('/\//', $req_endpoint)[0];
         if (array_key_exists($first_elem, $endpoints)) {
             $methods_allowed = $endpoints[$first_elem];
@@ -121,24 +131,24 @@ function endpoint_exits($method, $requestUri)
  *
  * @return string[] JSON-encoded version
  *
- * @psalm-return array{version: '0.1.0', release_date: '2023-12-24'}
+ * @psalm-return array{version: '0.1.1', release_date: '2023-12-29'}
  */
 function rest_api_version($get_req): array
 {
     return array(
-        "version"      => "0.1.0",
-        "release_date" => "2023-12-24"
+        "version"      => LWT_API_VERSION,
+        "release_date" => LWT_API_RELEASE_DATE
     );
 }
 
 /**
  * List the audio and video files in the media folder.
- * 
+ *
  * @param array $get_req Unnused
- * 
+ *
  * @return string[] Path of media files
  */
-function media_files($get_req) 
+function media_files($get_req)
 {
     return get_media_paths();
 }
@@ -179,7 +189,7 @@ function get_word_test_ajax($testsql, $word_mode, $lgid, $wordregex, $testtype):
         $output = array(
             "word_id" => 0,
             "word_text" => '',
-            "group" => '' 
+            "group" => ''
         );
         return $output;
     }
@@ -188,17 +198,23 @@ function get_word_test_ajax($testsql, $word_mode, $lgid, $wordregex, $testtype):
     } else {
         // $nosent == FALSE, mode 1-3
         list($sent, $_) = do_test_test_sentence(
-            $word_record['WoID'], $lgid, $word_record['WoTextLC']
+            $word_record['WoID'],
+            $lgid,
+            $word_record['WoTextLC']
         );
         if ($sent === null) {
             $sent = "{" . $word_record['WoText'] . "}";
         }
     }
     list($html_sentence, $save) = do_test_get_term_test(
-        $word_record, $sent, $testtype, $word_mode, $wordregex
+        $word_record,
+        $sent,
+        $testtype,
+        $word_mode,
+        $wordregex
     );
     $solution = get_test_solution($testtype, $word_record, $word_mode, $save);
-    
+
     return array(
         "word_id" => $word_record['WoID'],
         "solution" => $solution,
@@ -212,7 +228,7 @@ function get_word_test_ajax($testsql, $word_mode, $lgid, $wordregex, $testtype):
  * Return the next word to test.
  *
  * @param array $get_req Array with the fields {
- *                          test_key: string, selection: string, word_mode: bool, 
+ *                          test_key: string, selection: string, word_mode: bool,
  *                          lg_id: int, word_regex: string, type: int
  *                       }
  *
@@ -221,12 +237,15 @@ function get_word_test_ajax($testsql, $word_mode, $lgid, $wordregex, $testtype):
 function word_test_ajax($get_req): array
 {
     $test_sql = do_test_test_get_projection(
-        $get_req['test_key'], $get_req['selection']
+        $get_req['test_key'],
+        $get_req['selection']
     );
     return get_word_test_ajax(
-        $test_sql, $get_req['word_mode'], 
-        $get_req['lg_id'], 
-        $get_req['word_regex'], $get_req['type']
+        $test_sql,
+        filter_var($get_req['word_mode'], FILTER_VALIDATE_BOOLEAN),
+        $get_req['lg_id'],
+        $get_req['word_regex'],
+        $get_req['type']
     );
 }
 
@@ -239,10 +258,11 @@ function word_test_ajax($get_req): array
  *
  * @psalm-return array{count: int}
  */
-function tomorrow_test_count($get_req): array 
+function tomorrow_test_count($get_req): array
 {
     $test_sql = do_test_test_get_projection(
-        $get_req['test_key'], $get_req['selection']
+        $get_req['test_key'],
+        $get_req['selection']
     );
     $output = array(
         "count" => do_test_get_tomorrow_tests_count($test_sql)
@@ -250,7 +270,7 @@ function tomorrow_test_count($get_req): array
     return $output;
 }
 
-    
+
 /**
  * Get the file path using theme.
  *
@@ -316,25 +336,27 @@ function sentences_with_new_term($get_req): array
  *
  * @psalm-return array{similar_terms: string}
  */
-function similar_terms($get_req): array 
+function similar_terms($get_req): array
 {
     return array("similar_terms" => print_similar_terms(
-        (int)$get_req["lg_id"], 
+        (int)$get_req["lg_id"],
         (string) $get_req["term"]
     ));
 }
 
 /**
  * Return the list of imported terms.
- * 
+ *
  * @param array $get_req Get request with fields "last_update", "page" and "count".
- * 
- * @return array 
+ *
+ * @return array
  */
 function imported_terms($get_req)
 {
     return imported_terms_list(
-        $get_req["last_update"], $get_req["page"], $get_req["count"]
+        $get_req["last_update"],
+        $get_req["page"],
+        $get_req["count"]
     );
 }
 
@@ -348,7 +370,8 @@ function imported_terms($get_req)
 function term_translations($get_req): array
 {
     return \Lwt\Ajax\Improved_Text\get_term_translations(
-        (string)$get_req["term_lc"], (int)$get_req["text_id"]
+        (string)$get_req["term_lc"],
+        (int)$get_req["text_id"]
     );
 }
 
@@ -357,23 +380,23 @@ function term_translations($get_req): array
  * Error message when the provided action_type does not match anything known.
  *
  * @param array $post_req GET request used
- * @param bool  $action_exists Set to true if the action is recognized but not 
+ * @param bool  $action_exists Set to true if the action is recognized but not
  * the action_type
  *
  * @return array JSON-encoded error message.
  *
  * @psalm-return array{error: string}
  */
-function unknown_get_action_type($get_req, $action_exists=false): array
+function unknown_get_action_type($get_req, $action_exists = false): array
 {
     if ($action_exists) {
-        $message = 'action_type with value "' . $get_req["action_type"] . 
+        $message = 'action_type with value "' . $get_req["action_type"] .
         '" with action "' . $get_req["action"] . '" does not exist!';
     } else {
-        $message = 'action_type with value "' . $get_req["action_type"] . 
-        '" with default action (' . $get_req["action"] . ') does not exist'; 
+        $message = 'action_type with value "' . $get_req["action_type"] .
+        '" with default action (' . $get_req["action"] . ') does not exist';
     }
-    return array("error" => $message); 
+    return array("error" => $message);
 }
 
 // --------------------------------- POST REQUESTS ---------------------
@@ -411,7 +434,8 @@ function save_setting($post_req): array
 function set_annotation($post_req): array
 {
     $result = save_impr_text(
-        (int)$post_req["text_id"], $post_req['elem'], 
+        (int)$post_req["text_id"],
+        $post_req['elem'],
         json_decode($post_req['data'])
     );
     $raw_answer = array();
@@ -432,10 +456,11 @@ function set_annotation($post_req): array
  *
  * @psalm-return array{audio: 'Audio position set'}
  */
-function set_audio_position($post_req): array 
+function set_audio_position($post_req): array
 {
     save_audio_position(
-        (int)$post_req["text_id"], (int)$post_req["position"]
+        (int)$post_req["text_id"],
+        (int)$post_req["position"]
     );
     return array(
         "audio" => "Audio position set"
@@ -451,10 +476,11 @@ function set_audio_position($post_req): array
  *
  * @psalm-return array{text: 'Reading position set'}
  */
-function set_text_position($post_req): array 
+function set_text_position($post_req): array
 {
     save_text_position(
-        (int)$post_req["text_id"], (int)$post_req["position"]
+        (int)$post_req["text_id"],
+        (int)$post_req["position"]
     );
     return array("text" => "Reading position set");
 }
@@ -472,7 +498,8 @@ function set_text_position($post_req): array
 function increment_term_status($post_req): array
 {
     $result = ajax_increment_term_status(
-        (int)$post_req['term_id'], (bool)$post_req['status_up']
+        (int)$post_req['term_id'],
+        (bool)$post_req['status_up']
     );
     $raw_answer = array();
     if ($result == '') {
@@ -518,7 +545,8 @@ function set_term_status($post_req): array
 function update_translation($post_req): array
 {
     $result = do_ajax_check_update_translation(
-        (int)$post_req['term_id'], trim($post_req['translation'])
+        (int)$post_req['term_id'],
+        trim($post_req['translation'])
     );
     $raw_answer = array();
     if (str_starts_with($result, "Error")) {
@@ -542,13 +570,15 @@ function add_translation($post_req): array
 {
     $text = trim($post_req['term_text']);
     $result = add_new_term_transl(
-        $text, (int)$post_req['lg_id'], trim($post_req['translation'])
+        $text,
+        (int)$post_req['lg_id'],
+        trim($post_req['translation'])
     );
     $raw_answer = array();
     if (is_array($result)) {
         $raw_answer["term_id"] = (int) $result[0];
         $raw_answer["term_lc"] = (string) $result[1];
-    } else if ($result == mb_strtolower($text, 'UTF-8')) {
+    } elseif ($result == mb_strtolower($text, 'UTF-8')) {
         $raw_answer["add"] = $result;
     } else {
         $raw_answer["error"] = $result;
@@ -560,35 +590,36 @@ function add_translation($post_req): array
  * Notify of an error on POST method.
  *
  * @param array $post_req POST request used
- * @param bool  $action_exists Set to true if the action is recognized but not 
+ * @param bool  $action_exists Set to true if the action is recognized but not
  * the action_type
  *
  * @return string[] JSON-encoded error message
  *
  * @psalm-return array{error: string}
  */
-function unknown_post_action_type($post_req, $action_exists=false): array
+function unknown_post_action_type($post_req, $action_exists = false): array
 {
     if ($action_exists) {
-        $message = 'action_type with value "' . $post_req["action_type"] . 
-        '" with action "' . $post_req["action"] . '" does not exist!'; 
+        $message = 'action_type with value "' . $post_req["action_type"] .
+        '" with action "' . $post_req["action"] . '" does not exist!';
     } else {
-        $message = 'action_type with value "' . $post_req["action_type"] . 
-        '" with default action (' . $post_req["action"] . ') does not exist'; 
+        $message = 'action_type with value "' . $post_req["action_type"] .
+        '" with default action (' . $post_req["action"] . ') does not exist';
     }
-    return array("error" => $message); 
+    return array("error" => $message);
 }
 
 /**
  * Main handler for any provided request, while answer the result.
- * 
+ *
  * @param string     $method     Method name (e.g. 'GET' or 'POST')
  * @param string     $requestURI The URI being requested.
  * @param array|null $post_param Post arguments, usually equal to $_POST
- * 
+ *
  * @return never
  */
-function request_handler($method, $requestUri, $post_param) {
+function request_handler($method, $requestUri, $post_param)
+{
     // Extract requested endpoint from URI
     $req_endpoint = endpoint_exits($method, $requestUri);
     $endpoint_fragments = preg_split("/\//", $req_endpoint);
@@ -596,7 +627,12 @@ function request_handler($method, $requestUri, $post_param) {
     // Process endpoint request
     if ($method === 'GET') {
         // Handle GET request for each endpoint
-        parse_str(parse_url($requestUri, PHP_URL_QUERY), $req_param);
+        $uri_query = parse_url($requestUri, PHP_URL_QUERY);
+        if ($uri_query == null) {
+            $req_param = array();
+        } else {
+            parse_str($uri_query, $req_param);
+        }
         switch ($endpoint_fragments[0]) {
             case 'media-files':
                 $answer = media_files($req_param);
@@ -605,7 +641,7 @@ function request_handler($method, $requestUri, $post_param) {
             case 'phonetic-reading':
                 $answer = get_phonetic_reading($req_param);
                 send_response(200, $answer);
-                break; 
+                break;
             case 'review':
                 switch ($endpoint_fragments[1]) {
                     case 'next-word':
@@ -618,8 +654,8 @@ function request_handler($method, $requestUri, $post_param) {
                         break;
                     default:
                         send_response(
-                            404, 
-                            ['error' => 'Endpoint Not Found' . 
+                            404,
+                            ['error' => 'Endpoint Not Found' .
                             $endpoint_fragments[1]]
                         );
                 }
@@ -645,8 +681,8 @@ function request_handler($method, $requestUri, $post_param) {
                         break;
                     default:
                         send_response(
-                            404, 
-                            ['error' => 'Endpoint Not Found: ' . 
+                            404,
+                            ['error' => 'Endpoint Not Found: ' .
                             $endpoint_fragments[1]]
                         );
                 }
@@ -655,22 +691,22 @@ function request_handler($method, $requestUri, $post_param) {
                 if ($endpoint_fragments[1] == "imported") {
                     $answer = imported_terms($req_param);
                     send_response(200, $answer);
-                } else if (ctype_digit($endpoint_fragments[1])) {
+                } elseif (ctype_digit($endpoint_fragments[1])) {
                     if ($endpoint_fragments[2] == 'translations') {
                         $req_param['term_id'] = $endpoint_fragments[1];
                         $answer = term_translations($req_param);
                         send_response(200, $answer);
                     } else {
                         send_response(
-                            404, 
-                            ['error' => 'Expected "translation", Got ' . 
+                            404,
+                            ['error' => 'Expected "translation", Got ' .
                             $endpoint_fragments[2]]
                         );
                     }
                 } else {
                     send_response(
-                        404, 
-                        ['error' => 'Endpoint Not Found' . 
+                        404,
+                        ['error' => 'Endpoint Not Found' .
                         $endpoint_fragments[1]]
                     );
                 }
@@ -681,20 +717,21 @@ function request_handler($method, $requestUri, $post_param) {
                     send_response(200, $answer);
                 } else {
                     send_response(
-                        404, 
-                        ['error' => 'Expected "statistics", Got ' . 
+                        404,
+                        ['error' => 'Expected "statistics", Got ' .
                         $endpoint_fragments[1]]
                     );
                 }
+                break;
             case 'version':
                 $answer = rest_api_version($req_param);
                 send_response(200, $answer);
                 break;
-            // Add more GET handlers for other endpoints
+                // Add more GET handlers for other endpoints
             default:
                 send_response(
-                    404, 
-                    ['error' => 'Endpoint Not Found: ' . 
+                    404,
+                    ['error' => 'Endpoint Not Found: ' .
                     $endpoint_fragments[0]]
                 );
         }
@@ -708,8 +745,8 @@ function request_handler($method, $requestUri, $post_param) {
             case 'texts':
                 if (!ctype_digit($endpoint_fragments[1])) {
                     send_response(
-                        404, 
-                        ['error' => 'Text ID (Integer) Expected, Got ' . 
+                        404,
+                        ['error' => 'Text ID (Integer) Expected, Got ' .
                         $endpoint_fragments[1]]
                     );
                 }
@@ -729,8 +766,8 @@ function request_handler($method, $requestUri, $post_param) {
                         break;
                     default:
                         send_response(
-                            404, 
-                            ['error' => 'Endpoint Not Found: ' . 
+                            404,
+                            ['error' => 'Endpoint Not Found: ' .
                             $endpoint_fragments[2]]
                         );
                 }
@@ -743,43 +780,43 @@ function request_handler($method, $requestUri, $post_param) {
                             $post_param['status_up'] = 0;
                             $answer = increment_term_status($post_param);
                             send_response(200, $answer);
-                        } else if ($endpoint_fragments[3] == 'up') {
+                        } elseif ($endpoint_fragments[3] == 'up') {
                             $post_param['status_up'] = 1;
                             $answer = increment_term_status($post_param);
                             send_response(200, $answer);
-                        } else if (ctype_digit($endpoint_fragments[3])) {
+                        } elseif (ctype_digit($endpoint_fragments[3])) {
                             $post_param['status'] = (int) $endpoint_fragments[3];
                             $answer = set_term_status($post_param);
                             send_response(200, $answer);
                         } else {
                             send_response(
-                                404, 
-                                ['error' => 'Endpoint Not Found: ' . 
+                                404,
+                                ['error' => 'Endpoint Not Found: ' .
                                 $endpoint_fragments[3]]
                             );
                         }
-                    } else if ($endpoint_fragments[2] == 'translations') {
+                    } elseif ($endpoint_fragments[2] == 'translations') {
                         $answer = update_translation($post_param);
                         send_response(200, $answer);
                     } else {
                         send_response(
-                            404, 
+                            404,
                             [
-                                'error' => 
-                                '"status" or "translations"' . 
+                                'error' =>
+                                '"status" or "translations"' .
                                 ' Expected, Got ' . $endpoint_fragments[2]
                             ]
                         );
                     }
-                } else if ($endpoint_fragments[1] == 'new') {
+                } elseif ($endpoint_fragments[1] == 'new') {
                     $answer = add_translation($post_param);
                     send_response(200, $answer);
                 } else {
                     send_response(
-                        404, 
+                        404,
                         [
-                            'error' => 
-                            'Term ID (Integer) or "new" Expected,' . 
+                            'error' =>
+                            'Term ID (Integer) or "new" Expected,' .
                             ' Got ' . $endpoint_fragments[1]
                         ]
                     );
@@ -787,8 +824,8 @@ function request_handler($method, $requestUri, $post_param) {
                 break;
             default:
                 send_response(
-                    404, 
-                    ['error' => 'Endpoint Not Found On POST: ' . 
+                    404,
+                    ['error' => 'Endpoint Not Found On POST: ' .
                     $endpoint_fragments[0]]
                 );
         }
@@ -802,7 +839,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET' && $_SERVER['REQUEST_METHOD'] !== 'POST
 } else {
     request_handler(
         $_SERVER['REQUEST_METHOD'],
-        $_SERVER['REQUEST_URI'], 
+        $_SERVER['REQUEST_URI'],
         $_POST
     );
 }

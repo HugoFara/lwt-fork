@@ -3,11 +3,11 @@
 /**
  * \file
  * \brief Delete a word
- * 
+ *
  * Call: delete_word.php?wid=[wordid]&tid=[textid]
- * 
+ *
  * PHP version 8.1
- * 
+ *
  * @category Helper_Frame
  * @author LWT Project <lwt-project@hotmail.com>
  * @since  1.0.3
@@ -17,12 +17,12 @@ require_once 'inc/session_utility.php';
 
 /**
  * Return the term corresponding to the ID.
- * 
+ *
  * @param string $wid ID of the word
- * 
+ *
  * @return string A word
- * 
- * @global string $tbpref 
+ *
+ * @global string $tbpref
  */
 function get_term($wid)
 {
@@ -37,26 +37,26 @@ function get_term($wid)
 
 /**
  * Edit the word from the database.
- * 
+ *
  * @param string $wid ID of the word to delete
- * 
+ *
  * @return string Some edit message, number of affected rows or error message
- * 
- * @global string $tbpref 
+ *
+ * @global string $tbpref
  */
 function delete_word_from_database($wid)
 {
     global $tbpref;
     $m1 = runsql(
         'DELETE FROM ' . $tbpref . 'words 
-        WHERE WoID = ' . $wid, 
+        WHERE WoID = ' . $wid,
         ''
     );
     adjust_autoincr('words', 'WoID');
     runsql(
         "UPDATE  " . $tbpref . "textitems2 
         SET Ti2WoID  = 0 
-        WHERE Ti2WordCount=1 AND Ti2WoID  = " . $wid, 
+        WHERE Ti2WordCount=1 AND Ti2WoID  = " . $wid,
         ''
     );
     return $m1;
@@ -64,11 +64,11 @@ function delete_word_from_database($wid)
 
 /**
  * Do the JavaScript action for changing display of the word.
- * 
+ *
  * @param string $wid ID of the word to delete
  * @param int    $tid Text ID
- * 
- * @return void 
+ *
+ * @return void
  */
 function delete_word_javascript($wid, $tid)
 {
@@ -87,7 +87,7 @@ function delete_word_javascript($wid, $tid)
         const context = window.parent.document;
         const elem = $('.word' + wid, context);
         let title = "";
-        if (!window.parent.document.getElementById('frame-l').JQ_TOOLTIP) { 
+        if (!window.parent.document.LWT_DATA.settings.jQuery_tooltip) { 
             const ann = elem.attr('data_ann');
             title = make_tooltip(
                 <?php echo prepare_textdata_js(get_term($wid)); ?>, 
@@ -118,12 +118,12 @@ function delete_word_javascript($wid, $tid)
 
 /**
  * Make the HTML content of the page when deleting a word.
- * 
+ *
  * @param int    $tid  Text ID
  * @param string $wid  ID of the word to delete
  * @param string $term The deleted word
  * @param string $m1   Some edit message, number of affected rows or error message
- * 
+ *
  * @return void
  */
 function delete_word_page_content($tid, $wid, $term, $m1)
@@ -139,15 +139,15 @@ function delete_word_page_content($tid, $wid, $term, $m1)
  * Complete workflow for deleting a word.
  * It edits the database, show the success message
  * and do JavaScript action to change its display.
- * 
+ *
  * @param int    $textid ID of the affected text
  * @param string $wordid ID of the word to delete
- * 
+ *
  * @return void
- * 
+ *
  * @since 2.0.4-fork
  */
-function do_delete_word($textid, $wordid) 
+function do_delete_word($textid, $wordid)
 {
     $term = get_term($wordid);
     $m1 = delete_word_from_database($wordid);

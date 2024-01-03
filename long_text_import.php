@@ -13,7 +13,7 @@
  * @package Lwt
  * @author  LWT Project <lwt-project@hotmail.com>
  * @license Unlicense <http://unlicense.org/>
- * @link    https://hugofara.github.io/lwt/docs/html/long__text__import_8php.html
+ * @link    https://hugofara.github.io/lwt/docs/php/files/long-text-import.html
  * @since   1.5.9
  */
 
@@ -103,8 +103,8 @@ function long_text_check($max_input_vars): void
             ?>
 <script type="text/javascript">
     //<![CDATA[
-        $(document).ready(ask_before_exiting);
-        makeDirty();
+        $(document).ready(lwt_form_check.askBeforeExit);
+        lwt_form_check.makeDirty();
     //]]>
 </script>
 <form enctype="multipart/form-data"  action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
@@ -121,9 +121,9 @@ function long_text_check($max_input_vars): void
     </tr>
     <tr>
         <td class="td1 right" colspan="2">
-            <input type="button" value="Cancel" onclick="{resetDirty(); location.href='index.php';}" /> 
+            <input type="button" value="Cancel" onclick="{lwt_form_check.resetDirty(); location.href='index.php';}" /> 
             <span class="nowrap"></span>
-            <input type="button" value="Go Back" onclick="{resetDirty(); history.back();}" /> 
+            <input type="button" value="Go Back" onclick="{lwt_form_check.resetDirty(); history.back();}" /> 
             <span class="nowrap"></span>
             <input type="submit" name="op" value="Create <?php echo $textcount; ?> text<?php echo $plural; ?>" />
         </td>
@@ -251,7 +251,7 @@ function long_text_display($max_input_vars)
             $('#TxText').attr('lang', language_data[lid]);
         }
 
-        $(document).ready(ask_before_exiting);
+        $(document).ready(lwt_form_check.askBeforeExit);
         $(document).ready(change_textboxes_language);
      </script>
 
@@ -376,7 +376,7 @@ function long_text_display($max_input_vars)
         </tr>
         <tr>
             <td class="td1 right" colspan="2">
-                <input type="button" value="Cancel" onclick="{resetDirty(); location.href='index.php';}" />
+                <input type="button" value="Cancel" onclick="{lwt_form_check.resetDirty(); location.href='index.php';}" />
                 <input type="submit" name="op" value="NEXT STEP: Check the Texts" />
             </td>
         </tr>

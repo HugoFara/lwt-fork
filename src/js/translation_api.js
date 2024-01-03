@@ -12,7 +12,7 @@ function deleteTranslation (){
 		frame = window.opener;
 	if ($('[name="WoTranslation"]', frame.document).val().trim().length) {
 		$('[name="WoTranslation"]', frame.document).val('');
-		frame.makeDirty();
+		frame.lwt_form_check.makeDirty();
 	}
 }
 
@@ -32,11 +32,11 @@ function addTranslation (s) {
 	let oldValue = word_trans.value;
 	if (oldValue.trim() == '') {
 		word_trans.value = s;
-		frame.makeDirty();
+		frame.lwt_form_check.makeDirty();
 	} else {
 		if (oldValue.indexOf(s) == -1) {
 			word_trans.value = oldValue + ' / ' + s;
-			frame.makeDirty();
+			frame.lwt_form_check.makeDirty();
 		} else {
 			if (confirm(
 				'"' + s + '" seems already to exist as a translation.\n' + 
@@ -44,7 +44,7 @@ function addTranslation (s) {
 				)) 
 			{
 				word_trans.value = oldValue + ' / ' + s;
-				frame.makeDirty();
+				frame.lwt_form_check.makeDirty();
 			}
 		}
 	}

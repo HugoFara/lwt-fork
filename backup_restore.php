@@ -4,19 +4,19 @@
 /**
  * \file
  * \brief Backup/Restore/Empty LWT Database
- * 
+ *
  * Call: backup_restore.php?....
- *  ... restore=xxx ... do restore 
- *  ... backup=xxx ... do backup 
+ *  ... restore=xxx ... do restore
+ *  ... backup=xxx ... do backup
  * ... empty=xxx ... do truncate
- * 
+ *
  * PHP version 8.1
- * 
+ *
  * @category User_Interface
  * @package Lwt
  * @author  LWT Project <lwt-project@hotmail.com>
  * @license Unlicense <http://unlicense.org/>
- * @link    https://hugofara.github.io/lwt/docs/html/backup__restore_8php.html
+ * @link    https://hugofara.github.io/lwt/docs/php/files/backup-restore.html
  * @since   1.0.3
  */
 
@@ -24,10 +24,10 @@ require_once 'inc/session_utility.php';
 
 $message = '';
 
-if ($tbpref == '') { 
-    $pref = ""; 
+if ($tbpref == '') {
+    $pref = "";
 } else {
-    $pref = substr($tbpref, 0, -1) . "-"; 
+    $pref = substr($tbpref, 0, -1) . "-";
 }
 
 
@@ -35,14 +35,14 @@ $num_fields = null;
 $result = null;
 if (isset($_REQUEST['restore'])) {
     // RESTORE
-    if (isset($_FILES["thefile"]) && $_FILES["thefile"]["tmp_name"] != ""  
+    if (isset($_FILES["thefile"]) && $_FILES["thefile"]["tmp_name"] != ""
         && $_FILES["thefile"]["error"] == 0
     ) {
         $handle = gzopen($_FILES["thefile"]["tmp_name"], "r");
         if ($handle === false) {
             // $handle not OK
             $message = "Error: Restore file could not be opened";
-        } else { 
+        } else {
             // $handle OK
             $message = restore_file($handle, "Database");
         }
@@ -53,30 +53,32 @@ if (isset($_REQUEST['restore'])) {
 } elseif (isset($_REQUEST['backup'])) {
     // BACKUP
     $tables = array(
-        'archivedtexts', 'archtexttags', 'feedlinks', 'languages', 'textitems2', 
-        'newsfeeds', 'sentences', 'settings', 'tags', 'tags2', 'texts', 'texttags', 
+        'archivedtexts', 'archtexttags', 'feedlinks', 'languages', 'textitems2',
+        'newsfeeds', 'sentences', 'settings', 'tags', 'tags2', 'texts', 'texttags',
         'words', 'wordtags'
     );
     $fname = "lwt-backup-exp_version-" . $pref . date('Y-m-d-H-i-s') . ".sql.gz";
     $out = "-- " . $fname . "\n";
-    foreach ($tables as $table) { 
+    foreach ($tables as $table) {
         // foreach table
         $result = do_mysqli_query('SELECT * FROM ' . $tbpref . $table);
         $num_fields = mysqli_num_fields($result);
         $out .= "\nDROP TABLE IF EXISTS " . $table . ";\n";
         $row2 = mysqli_fetch_row(do_mysqli_query("SHOW CREATE TABLE $tbpref$table"));
         $out .= str_replace(
-            $tbpref . $table, $table, str_replace("\n", " ", $row2[1])
+            $tbpref . $table,
+            $table,
+            str_replace("\n", " ", $row2[1])
         ) . ";\n";
         if ($table !== 'sentences' && $table !== 'textitems2') {
-            while ($row = mysqli_fetch_row($result)) { 
+            while ($row = mysqli_fetch_row($result)) {
                 // foreach record
                 $return = 'INSERT INTO ' . $table . ' VALUES(';
-                for ($j=0; $j < $num_fields; $j++) { 
+                for ($j = 0; $j < $num_fields; $j++) {
                     // foreach field
                     $return .= convert_string_to_sqlsyntax_nonull($row[$j]);
-                    if ($j < ($num_fields-1)) { 
-                        $return .= ','; 
+                    if ($j < ($num_fields - 1)) {
+                        $return .= ',';
                     }
                 } // foreach field
                 $out .= $return . ");\n";
@@ -89,7 +91,7 @@ if (isset($_REQUEST['restore'])) {
     exit();
 } elseif (isset($_REQUEST['orig_backup'])) {
     $tables = array(
-        'archivedtexts', 'archtexttags', 'languages', 'sentences', 'settings', 
+        'archivedtexts', 'archtexttags', 'languages', 'sentences', 'settings',
         'tags', 'tags2', 'textitems', 'texts', 'texttags', 'words', 'wordtags'
     );
     $fname = "lwt-backup-" . $pref . date('Y-m-d-H-i-s') . ".sql.gz";
@@ -124,7 +126,7 @@ if (isset($_REQUEST['restore'])) {
                 FROM ' . $tbpref . 'languages where LgName<>""'
             );
             $num_fields = mysqli_num_fields($result);
-        } elseif ($table !== 'sentences' && $table !== 'textitems'  
+        } elseif ($table !== 'sentences' && $table !== 'textitems'
             && $table !== 'settings'
         ) {
             $result = do_mysqli_query('SELECT * FROM ' . $tbpref . $table);
@@ -132,9 +134,9 @@ if (isset($_REQUEST['restore'])) {
         }
         $out .= "\nDROP TABLE IF EXISTS " . $table . ";\n";
 
-        switch($table){
-        case 'archivedtexts':
-            $out .= "CREATE TABLE `archivedtexts` (
+        switch($table) {
+            case 'archivedtexts':
+                $out .= "CREATE TABLE `archivedtexts` (
                 `AtID` int(11) unsigned NOT NULL AUTO_INCREMENT, 
                 `AtLgID` int(11) unsigned NOT NULL, 
                 `AtTitle` varchar(200) NOT NULL, 
@@ -145,18 +147,18 @@ if (isset($_REQUEST['restore'])) {
                 PRIMARY KEY (`AtID`),   
                 KEY `AtLgID` (`AtLgID`) 
             ) ENGINE=MyISAM DEFAULT CHARSET=utf8;\n";
-            break;
-        case 'archtexttags':
-            $out .= "CREATE TABLE `archtexttags` (   
+                break;
+            case 'archtexttags':
+                $out .= "CREATE TABLE `archtexttags` (   
                 `AgAtID` int(11) unsigned NOT NULL,   
                 `AgT2ID` int(11) unsigned NOT NULL,   
                 PRIMARY KEY (`AgAtID`,`AgT2ID`),   
                 KEY `AgAtID` (`AgAtID`),   
                 KEY `AgT2ID` (`AgT2ID`) 
             ) ENGINE=MyISAM DEFAULT CHARSET=utf8;\n";
-            break;
-        case 'languages':
-            $out .= "CREATE TABLE `languages` (   
+                break;
+            case 'languages':
+                $out .= "CREATE TABLE `languages` (   
                 `LgID` int(11) unsigned NOT NULL AUTO_INCREMENT,   
                 `LgName` varchar(40) NOT NULL,   
                 `LgDict1URI` varchar(200) NOT NULL,   
@@ -174,9 +176,9 @@ if (isset($_REQUEST['restore'])) {
                 PRIMARY KEY (`LgID`),   
                 UNIQUE KEY `LgName` (`LgName`) 
             ) ENGINE=MyISAM DEFAULT CHARSET=utf8;\n";
-            break;
-        case 'sentences':
-            $out .= "CREATE TABLE `sentences` (   
+                break;
+            case 'sentences':
+                $out .= "CREATE TABLE `sentences` (   
                 `SeID` int(11) unsigned NOT NULL AUTO_INCREMENT,   
                 `SeLgID` int(11) unsigned NOT NULL,   
                 `SeTxID` int(11) unsigned NOT NULL,   
@@ -187,34 +189,34 @@ if (isset($_REQUEST['restore'])) {
                 KEY `SeTxID` (`SeTxID`),   
                 KEY `SeOrder` (`SeOrder`) 
             ) ENGINE=MyISAM DEFAULT CHARSET=utf8;\n";
-            break;
-        case 'settings':
-            $out .= "CREATE TABLE `settings` (   
+                break;
+            case 'settings':
+                $out .= "CREATE TABLE `settings` (   
                 `StKey` varchar(40) NOT NULL,   
                 `StValue` varchar(40) DEFAULT NULL,   
                 PRIMARY KEY (`StKey`) 
             ) ENGINE=MyISAM DEFAULT CHARSET=utf8;\n";
-            break;
-        case 'tags':
-            $out .= "CREATE TABLE `tags` (   
+                break;
+            case 'tags':
+                $out .= "CREATE TABLE `tags` (   
                 `TgID` int(11) unsigned NOT NULL AUTO_INCREMENT,   
                 `TgText` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,   
                 `TgComment` varchar(200) NOT NULL DEFAULT '',   
                 PRIMARY KEY (`TgID`),   
                 UNIQUE KEY `TgText` (`TgText`) 
             ) ENGINE=MyISAM DEFAULT CHARSET=utf8;\n";
-            break;
-        case 'tags2':
-            $out .= "CREATE TABLE `tags2` (   
+                break;
+            case 'tags2':
+                $out .= "CREATE TABLE `tags2` (   
                 `T2ID` int(11) unsigned NOT NULL AUTO_INCREMENT,   
                 `T2Text` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,   
                 `T2Comment` varchar(200) NOT NULL DEFAULT '',   
                 PRIMARY KEY (`T2ID`),   
                 UNIQUE KEY `T2Text` (`T2Text`) 
             ) ENGINE=MyISAM DEFAULT CHARSET=utf8;\n";
-            break;
-        case 'textitems':
-            $out .= "CREATE TABLE `textitems` (   
+                break;
+            case 'textitems':
+                $out .= "CREATE TABLE `textitems` (   
                 `TiID` int(11) unsigned NOT NULL AUTO_INCREMENT,   
                 `TiLgID` int(11) unsigned NOT NULL,   
                 `TiTxID` int(11) unsigned NOT NULL,   
@@ -232,9 +234,9 @@ if (isset($_REQUEST['restore'])) {
                 KEY `TiTextLC` (`TiTextLC`),   
                 KEY `TiIsNotWord` (`TiIsNotWord`) 
             ) ENGINE=MyISAM DEFAULT CHARSET=utf8;\n";
-            break;
-        case 'texts':
-            $out .= "CREATE TABLE `texts` (   
+                break;
+            case 'texts':
+                $out .= "CREATE TABLE `texts` (   
                 `TxID` int(11) unsigned NOT NULL AUTO_INCREMENT,   
                 `TxLgID` int(11) unsigned NOT NULL,   
                 `TxTitle` varchar(200) NOT NULL,   
@@ -245,18 +247,18 @@ if (isset($_REQUEST['restore'])) {
                 PRIMARY KEY (`TxID`),   
                 KEY `TxLgID` (`TxLgID`) 
             ) ENGINE=MyISAM DEFAULT CHARSET=utf8;\n";
-            break;
-        case 'texttags':
-            $out .= "CREATE TABLE `texttags` (   
+                break;
+            case 'texttags':
+                $out .= "CREATE TABLE `texttags` (   
                 `TtTxID` int(11) unsigned NOT NULL,   
                 `TtT2ID` int(11) unsigned NOT NULL,   
                 PRIMARY KEY (`TtTxID`,`TtT2ID`),   
                 KEY `TtTxID` (`TtTxID`),   
                 KEY `TtT2ID` (`TtT2ID`) 
             ) ENGINE=MyISAM DEFAULT CHARSET=utf8;\n";
-            break;
-        case 'words':
-            $out .= "CREATE TABLE `words` (   
+                break;
+            case 'words':
+                $out .= "CREATE TABLE `words` (   
                 `WoID` int(11) unsigned NOT NULL AUTO_INCREMENT,   
                 `WoLgID` int(11) unsigned NOT NULL,   
                 `WoText` varchar(250) NOT NULL,   
@@ -282,26 +284,26 @@ if (isset($_REQUEST['restore'])) {
                 KEY `WoTomorrowScore` (`WoTomorrowScore`),   
                 KEY `WoRandom` (`WoRandom`) 
             ) ENGINE=MyISAM DEFAULT CHARSET=utf8;\n";
-            break;
-        case 'wordtags':
-            $out .= "CREATE TABLE `wordtags` (   
+                break;
+            case 'wordtags':
+                $out .= "CREATE TABLE `wordtags` (   
                 `WtWoID` int(11) unsigned NOT NULL,   
                 `WtTgID` int(11) unsigned NOT NULL,   
                 PRIMARY KEY (`WtWoID`,`WtTgID`),   
                 KEY `WtTgID` (`WtTgID`),   
                 KEY `WtWoID` (`WtWoID`) 
             ) ENGINE=MyISAM DEFAULT CHARSET=utf8;\n";
-            break;
+                break;
         }
 
         if ($table !== 'sentences' && $table !== 'textitems' && $table !== 'settings'
         ) {
             while ($row = mysqli_fetch_row($result)) { // foreach record
                 $return = 'INSERT INTO ' . $table . ' VALUES(';
-                for ($j=0; $j < $num_fields; $j++) { // foreach field
+                for ($j = 0; $j < $num_fields; $j++) { // foreach field
                     $return .= convert_string_to_sqlsyntax_nonull($row[$j]);
-                    if ($j < ($num_fields-1)) { 
-                        $return .= ','; 
+                    if ($j < ($num_fields - 1)) {
+                        $return .= ',';
                     }
                 } // foreach field
                 $out .= $return . ");\n";
@@ -315,23 +317,7 @@ if (isset($_REQUEST['restore'])) {
     exit();
 } elseif (isset($_REQUEST['empty'])) {
     // EMPTY
-    runsql('TRUNCATE ' . $tbpref . 'archivedtexts', '');
-    runsql('TRUNCATE ' . $tbpref . 'archtexttags', '');
-    runsql('TRUNCATE ' . $tbpref . 'feedlinks', '');
-    runsql('TRUNCATE ' . $tbpref . 'languages', '');
-    runsql('TRUNCATE ' . $tbpref . 'textitems2', '');
-    runsql('TRUNCATE ' . $tbpref . 'newsfeeds', '');
-    runsql('TRUNCATE ' . $tbpref . 'sentences', '');
-    runsql('TRUNCATE ' . $tbpref . 'tags', '');
-    runsql('TRUNCATE ' . $tbpref . 'tags2', '');
-    runsql('TRUNCATE ' . $tbpref . 'texts', '');
-    runsql('TRUNCATE ' . $tbpref . 'texttags', '');
-    runsql('TRUNCATE ' . $tbpref . 'words', '');
-    runsql('TRUNCATE ' . $tbpref . 'wordtags', '');
-    runsql('DELETE FROM ' . $tbpref . 'settings where StKey = \'currenttext\'', '');
-    optimizedb();
-    get_tags($refresh = 1);
-    get_texttags($refresh = 1);
+    truncateUserDatabase();
     $message = "Database content has been deleted (but settings have been kept)";
 }
 
@@ -339,10 +325,10 @@ pagestart('Backup/Restore/Empty Database', true);
 
 echo error_message_with_hide($message, true);
 
-if ($tbpref == '') { 
-    $prefinfo = "(Default Table Set)"; 
+if ($tbpref == '') {
+    $prefinfo = "(Default Table Set)";
 } else {
-    $prefinfo = "(Table Set: <i>" . tohtml(substr($tbpref, 0, -1)) . "</i>)"; 
+    $prefinfo = "(Table Set: <i>" . tohtml(substr($tbpref, 0, -1)) . "</i>)";
 }
 
 ?>

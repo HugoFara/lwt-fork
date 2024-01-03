@@ -337,7 +337,7 @@ if (isset($_REQUEST['chg'])) {
         ?>
     
      <script type="text/javascript" charset="utf-8">
-         $(document).ready(ask_before_exiting);
+         $(document).ready(lwt_form_check.askBeforeExit);
      </script>
      <h2>Edit Archived Text</h2>
      <form class="validate" action="<?php echo $_SERVER['PHP_SELF']; ?>#rec<?php echo $_REQUEST['chg']; ?>" method="post">
@@ -389,7 +389,7 @@ if (isset($_REQUEST['chg'])) {
         </tr>
         <tr>
             <td class="td1 right" colspan="2">
-                <input type="button" value="Cancel" onclick="{resetDirty(); location.href='edit_archivedtexts.php#rec<?php echo $_REQUEST['chg']; ?>';}" /> 
+                <input type="button" value="Cancel" onclick="{lwt_form_check.resetDirty(); location.href='edit_archivedtexts.php#rec<?php echo $_REQUEST['chg']; ?>';}" /> 
                 <input type="submit" name="op" value="Change" />
             </td>
         </tr>

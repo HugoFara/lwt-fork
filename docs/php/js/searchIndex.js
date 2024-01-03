@@ -1006,25 +1006,25 @@ Search.appendIndex(
             "summary": "",
             "url": "namespaces/lwt-interface-edit-word.html#function_do_content"
         },                {
-            "fqsen": "\\Lwt\\Interface\\Feed_Wizard\\feed_wizard_edit_options\u0028\u0029",
-            "name": "feed_wizard_edit_options",
+            "fqsen": "\\Lwt\\Interface\\Feed_Wizard\\feed_wizard_insert_uri\u0028\u0029",
+            "name": "feed_wizard_insert_uri",
             "summary": "",
-            "url": "namespaces/lwt-interface-feed-wizard.html#function_feed_wizard_edit_options"
-        },                {
-            "fqsen": "\\Lwt\\Interface\\Feed_Wizard\\feed_wizard_filter_text\u0028\u0029",
-            "name": "feed_wizard_filter_text",
-            "summary": "",
-            "url": "namespaces/lwt-interface-feed-wizard.html#function_feed_wizard_filter_text"
+            "url": "namespaces/lwt-interface-feed-wizard.html#function_feed_wizard_insert_uri"
         },                {
             "fqsen": "\\Lwt\\Interface\\Feed_Wizard\\feed_wizard_select_text\u0028\u0029",
             "name": "feed_wizard_select_text",
             "summary": "",
             "url": "namespaces/lwt-interface-feed-wizard.html#function_feed_wizard_select_text"
         },                {
-            "fqsen": "\\Lwt\\Interface\\Feed_Wizard\\feed_wizard_insert_uri\u0028\u0029",
-            "name": "feed_wizard_insert_uri",
+            "fqsen": "\\Lwt\\Interface\\Feed_Wizard\\feed_wizard_filter_text\u0028\u0029",
+            "name": "feed_wizard_filter_text",
             "summary": "",
-            "url": "namespaces/lwt-interface-feed-wizard.html#function_feed_wizard_insert_uri"
+            "url": "namespaces/lwt-interface-feed-wizard.html#function_feed_wizard_filter_text"
+        },                {
+            "fqsen": "\\Lwt\\Interface\\Feed_Wizard\\feed_wizard_edit_options\u0028\u0029",
+            "name": "feed_wizard_edit_options",
+            "summary": "",
+            "url": "namespaces/lwt-interface-feed-wizard.html#function_feed_wizard_edit_options"
         },                {
             "fqsen": "\\Lwt\\Interface\\translate_sentence\u0028\u0029",
             "name": "translate_sentence",

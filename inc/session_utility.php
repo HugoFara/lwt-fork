@@ -12,1413 +12,13 @@
  * @package Lwt
  * @author  HugoFara <hugo.farajallah@protonmail.com>
  * @license Unlicense <http://unlicense.org/>
- * @link    https://hugofara.github.io/lwt/docs/html/session__utility_8php.html
+ * @link    https://hugofara.github.io/lwt/docs/php/files/inc-session-utility.html
  * @since   2.0.3-fork
  */
 
 require_once __DIR__ . '/database_connect.php';
-
-
-/**
- * Return the list of all tags.
- * 
- * @param int $refresh If true, refresh all tags for session
- * 
- * @global string $tbpref Table name prefix
- * 
- * @return array<string> All tags
- */
-function get_tags($refresh = 0) 
-{
-    global $tbpref;
-    if (isset($_SESSION['TAGS']) 
-        && is_array($_SESSION['TAGS']) 
-        && isset($_SESSION['TBPREF_TAGS']) 
-        && $_SESSION['TBPREF_TAGS'] == $tbpref . url_base() 
-        && $refresh == 0
-    ) {
-            return $_SESSION['TAGS'];
-    }
-    $tags = array();
-    $sql = 'SELECT TgText FROM ' . $tbpref . 'tags ORDER BY TgText';
-    $res = do_mysqli_query($sql);
-    while ($record = mysqli_fetch_assoc($res)) {
-        $tags[] = (string)$record["TgText"];
-    }
-    mysqli_free_result($res);
-    $_SESSION['TAGS'] = $tags;
-    $_SESSION['TBPREF_TAGS'] = $tbpref . url_base();
-    return $_SESSION['TAGS'];
-}
-
-/**
- * Return the list of all text tags.
- * 
- * @param int $refresh If true, refresh all text tags for session
- * 
- * @global string $tbpref Table name prefix
- * 
- * @return array<string> All text tags
- */
-function get_texttags($refresh = 0) 
-{
-    global $tbpref;
-    if (isset($_SESSION['TEXTTAGS']) 
-        && is_array($_SESSION['TEXTTAGS']) 
-        && isset($_SESSION['TBPREF_TEXTTAGS']) 
-        && $refresh == 0
-        && $_SESSION['TBPREF_TEXTTAGS'] == $tbpref . url_base()
-    ) {
-            return $_SESSION['TEXTTAGS']; 
-    }
-    $tags = array();
-    $sql = 'SELECT T2Text FROM ' . $tbpref . 'tags2 ORDER BY T2Text';
-    $res = do_mysqli_query($sql);
-    while ($record = mysqli_fetch_assoc($res)) {
-        $tags[] = (string)$record["T2Text"];
-    }
-    mysqli_free_result($res);
-    $_SESSION['TEXTTAGS'] = $tags;
-    $_SESSION['TBPREF_TEXTTAGS'] = $tbpref . url_base();
-    return $_SESSION['TEXTTAGS'];
-}
-
-// -------------------------------------------------------------
-
-function getTextTitle($textid): string 
-{
-    global $tbpref;
-    $text = get_first_value(
-        "SELECT TxTitle AS value 
-        FROM " . $tbpref . "texts 
-        WHERE TxID=" . $textid
-    );
-    if (!isset($text)) { 
-        $text = "?"; 
-    }
-    return (string)$text;
-}
-
-// -------------------------------------------------------------
-
-function get_tag_selectoptions($v,$l): string 
-{
-    global $tbpref;
-    if (!isset($v)) { 
-        $v = ''; 
-    }
-    $r = "<option value=\"\"" . get_selected($v, '');
-    $r .= ">[Filter off]</option>";
-    if ($l == '') {
-        $sql = "select TgID, TgText 
-        from " . $tbpref . "words, " . $tbpref . "tags, " . $tbpref . "wordtags 
-        where TgID = WtTgID and WtWoID = WoID 
-        group by TgID 
-        order by UPPER(TgText)"; 
-    } else {
-        $sql = "select TgID, TgText 
-        from " . $tbpref . "words, " . $tbpref . "tags, " . $tbpref . "wordtags 
-        where TgID = WtTgID and WtWoID = WoID and WoLgID = " . $l . " 
-        group by TgID 
-        order by UPPER(TgText)"; 
-    }
-    $res = do_mysqli_query($sql);
-    $cnt = 0;
-    while ($record = mysqli_fetch_assoc($res)) {
-        $d = $record["TgText"];
-        $cnt++;
-        $r .= "<option value=\"" . $record["TgID"] . "\"" .
-         get_selected($v, $record["TgID"]) . ">" . tohtml($d) . "</option>";
-    }
-    mysqli_free_result($res);
-    if ($cnt > 0) {
-        $r .= "<option disabled=\"disabled\">--------</option>";
-        $r .= "<option value=\"-1\"" . get_selected($v, -1) . ">UNTAGGED</option>";
-    }
-    return $r;
-}
-
-// -------------------------------------------------------------
-
-function get_texttag_selectoptions($v,$l): string 
-{
-    global $tbpref;
-    if (!isset($v) ) {
-        $v = ''; 
-    }
-    $r = "<option value=\"\"" . get_selected($v, '');
-    $r .= ">[Filter off]</option>";
-    if ($l == '') {
-        $sql = "select T2ID, T2Text 
-        from " . $tbpref . "texts, " . $tbpref . "tags2, " . $tbpref . "texttags 
-        where T2ID = TtT2ID and TtTxID = TxID 
-        group by T2ID 
-        order by UPPER(T2Text)"; 
-    } else {
-        $sql = "select T2ID, T2Text 
-        from " . $tbpref . "texts, " . $tbpref . "tags2, " . $tbpref . "texttags 
-        where T2ID = TtT2ID and TtTxID = TxID and TxLgID = " . $l . " 
-        group by T2ID 
-        order by UPPER(T2Text)"; 
-    }
-    $res = do_mysqli_query($sql);
-    $cnt = 0;
-    while ($record = mysqli_fetch_assoc($res)) {
-        $d = $record["T2Text"];
-        $cnt++;
-        $r .= "<option value=\"" . $record["T2ID"] . "\"" . 
-        get_selected($v, $record["T2ID"]) . ">" . tohtml($d) . "</option>";
-    }
-    mysqli_free_result($res);
-    if ($cnt > 0) {
-        $r .= "<option disabled=\"disabled\">--------</option>";
-        $r .= "<option value=\"-1\"" . get_selected($v, -1) . ">UNTAGGED</option>";
-    }
-    return $r;
-}
-
-// -------------------------------------------------------------
-
-function get_txtag_selectoptions($l,$v): string
-{
-    global $tbpref;
-    if (!isset($v)) {
-        $v = ''; 
-    }
-    $u ='';
-    $r = "<option value=\"&amp;texttag\"" . get_selected($v, '');
-    $r .= ">[Filter off]</option>";
-    $sql = 'SELECT IFNULL(T2Text, 1) AS TagName, TtT2ID AS TagID, GROUP_CONCAT(TxID 
-    ORDER BY TxID) AS TextID 
-    FROM ' . $tbpref . 'texts 
-    LEFT JOIN ' . $tbpref . 'texttags ON TxID = TtTxID
-    LEFT JOIN ' . $tbpref . 'tags2 ON TtT2ID = T2ID';
-    if ($l) {
-        $sql .= ' WHERE TxLgID=' . $l; 
-    }
-    $sql .= ' GROUP BY UPPER(TagName)';
-    $res = do_mysqli_query($sql);
-    while ($record = mysqli_fetch_assoc($res)) {
-        if ($record['TagName']==1) {
-            $u ="<option disabled=\"disabled\">--------</option><option value=\"" . 
-            $record['TextID'] . "&amp;texttag=-1\"" . get_selected($v, "-1") . 
-            ">UNTAGGED</option>";
-        } else {
-            $r .= "<option value=\"" .$record['TextID']."&amp;texttag=". 
-            $record['TagID'] . "\"" . get_selected($v, $record['TagID']) . ">" . 
-            $record['TagName'] . "</option>";
-        }
-    }
-    mysqli_free_result($res);
-    return $r.$u;
-}
-
-// -------------------------------------------------------------
-
-function get_archivedtexttag_selectoptions($v,$l): string 
-{
-    global $tbpref;
-    if (!isset($v)) { 
-        $v = ''; 
-    }
-    $r = "<option value=\"\"" . get_selected($v, '');
-    $r .= ">[Filter off]</option>";
-    if ($l == '') {
-        $sql = "select T2ID, T2Text 
-        from " . $tbpref . "archivedtexts, " . 
-        $tbpref . "tags2, " . $tbpref . "archtexttags 
-        where T2ID = AgT2ID and AgAtID = AtID 
-        group by T2ID 
-        order by UPPER(T2Text)"; 
-    } else {
-        $sql = "select T2ID, T2Text 
-        from " . $tbpref . "archivedtexts, " . $tbpref . "tags2, " . 
-        $tbpref . "archtexttags 
-        where T2ID = AgT2ID and AgAtID = AtID and AtLgID = " . $l . " 
-        group by T2ID 
-        order by UPPER(T2Text)"; 
-    }
-    $res = do_mysqli_query($sql);
-    $cnt = 0;
-    while ($record = mysqli_fetch_assoc($res)) {
-        $d = $record["T2Text"];
-        $cnt++;
-        $r .= "<option value=\"" . $record["T2ID"] . "\"" . 
-        get_selected($v, $record["T2ID"]) . ">" . tohtml($d) . "</option>";
-    }
-    mysqli_free_result($res);
-    if ($cnt > 0) {
-        $r .= "<option disabled=\"disabled\">--------</option>";
-        $r .= "<option value=\"-1\"" . get_selected($v, -1) . ">UNTAGGED</option>";
-    }
-    return $r;
-}
-
-
-/**
- * Save the tags for words.
- * 
- * @return void
- */
-function saveWordTags($wid) 
-{
-    global $tbpref;
-    runsql("DELETE from " . $tbpref . "wordtags WHERE WtWoID =" . $wid, '');
-    if (!isset($_REQUEST['TermTags'])  
-        || !is_array($_REQUEST['TermTags'])  
-        || !isset($_REQUEST['TermTags']['TagList'])  
-        || !is_array($_REQUEST['TermTags']['TagList'])
-    ) {
-         return;
-    }
-    $cnt = count($_REQUEST['TermTags']['TagList']);
-    getWordTags(1);
-
-    for ($i = 0; $i < $cnt; $i++) {
-        $tag = $_REQUEST['TermTags']['TagList'][$i];
-        if(!in_array($tag, $_SESSION['TAGS'])) {
-            runsql(
-                "INSERT INTO {$tbpref}tags (TgText) 
-                VALUES(" . convert_string_to_sqlsyntax($tag) . ")", 
-                ""
-            );
-        }
-        runsql(
-            "INSERT INTO {$tbpref}wordtags (WtWoID, WtTgID) 
-            SELECT $wid, TgID 
-            FROM {$tbpref}tags 
-            WHERE TgText = " . convert_string_to_sqlsyntax($tag), 
-            ""
-        );
-    }
-    // refresh tags cache
-    get_tags(1);
-}
-
-/**
- * Save the tags for texts.
- * 
- * @return void
- * 
- * @global string $tbpref Database table prefix.
- */
-function saveTextTags($tid): void 
-{
-    global $tbpref;
-    runsql(
-        "DELETE FROM " . $tbpref . "texttags WHERE TtTxID =" . $tid, 
-        ''
-    );
-    if (!isset($_REQUEST['TextTags']) 
-        || !is_array($_REQUEST['TextTags']) 
-        || !isset($_REQUEST['TextTags']['TagList']) 
-        || !is_array($_REQUEST['TextTags']['TagList'])
-    ) {
-        return;
-    }
-    $cnt = count($_REQUEST['TextTags']['TagList']);
-    get_texttags(1);
-
-    for ($i = 0; $i < $cnt; $i++) {
-        $tag = $_REQUEST['TextTags']['TagList'][$i];
-        if (!in_array($tag, $_SESSION['TEXTTAGS'])) {
-            runsql(
-                "INSERT INTO {$tbpref}tags2 (T2Text) 
-                VALUES(" . convert_string_to_sqlsyntax($tag) . ")", 
-                ""
-            );
-        }
-        runsql(
-            "INSERT INTO {$tbpref}texttags (TtTxID, TtT2ID) 
-            SELECT $tid, T2ID 
-            FROM {$tbpref}tags2 
-            WHERE T2Text = " . convert_string_to_sqlsyntax($tag), 
-            ""
-        );
-    }
-    // refresh tags cache
-    get_texttags(1);
-}
-
-
-/**
- * Save the tags for archived texts.
- * 
- * @return void
- * 
- * @global string $tbpref Databse table prefix. 
- */
-function saveArchivedTextTags($tid): void 
-{
-    global $tbpref;
-    runsql("DELETE from " . $tbpref . "archtexttags WHERE AgAtID =" . $tid, '');
-    if (!isset($_REQUEST['TextTags']) 
-        || !is_array($_REQUEST['TextTags']) 
-        || !isset($_REQUEST['TextTags']['TagList']) 
-        || !is_array($_REQUEST['TextTags']['TagList'])
-    ) {
-        return;
-    }
-    $cnt = count($_REQUEST['TextTags']['TagList']);
-    get_texttags(1);
-    for ($i = 0; $i < $cnt; $i++) {
-        $tag = $_REQUEST['TextTags']['TagList'][$i];
-        if (!in_array($tag, $_SESSION['TEXTTAGS'])) {
-            runsql(
-                'INSERT INTO {$tbpref}tags2 (T2Text) 
-                VALUES(' . convert_string_to_sqlsyntax($tag) . ')', 
-                ""
-            );
-        }
-        runsql(
-            "INSERT INTO {$tbpref}archtexttags (AgAtID, AgT2ID) 
-            SELECT $tid, T2ID 
-            FROM {$tbpref}tags2 
-            WHERE T2Text = " . convert_string_to_sqlsyntax($tag), 
-            ""
-        );
-        // refresh tags cache
-        get_texttags(1);
-    }
-}
-
-// -------------------------------------------------------------
-
-function getWordTags($wid): string 
-{
-    global $tbpref;
-    $r = '<ul id="termtags">';
-    if ($wid > 0) {
-        $sql = 'select TgText 
-        from ' . $tbpref . 'wordtags, ' . $tbpref . 'tags 
-        where TgID = WtTgID and WtWoID = ' . $wid . ' 
-        order by TgText';
-        $res = do_mysqli_query($sql);
-        while ($record = mysqli_fetch_assoc($res)) {
-            $r .= '<li>' . tohtml($record["TgText"]) . '</li>';
-        }
-        mysqli_free_result($res);
-    }
-    $r .= '</ul>';
-    return $r;
-}
-
-/**
- * Return a HTML-formatted list of the text tags.
- *
- * @param int $tid Text ID. Can be below 1 to create an empty list.
- *
- * @return string UL list of text tags
- *
- * @global string $tbpref Database table prefix 
- */
-function getTextTags($tid): string 
-{
-    global $tbpref;
-    $r = '<ul id="texttags" class="respinput">';
-    if ($tid > 0) {
-        $sql = "SELECT T2Text 
-        FROM {$tbpref}texttags, {$tbpref}tags2 
-        WHERE T2ID = TtT2ID AND TtTxID = $tid 
-        ORDER BY T2Text";
-        $res = do_mysqli_query($sql);
-        while ($record = mysqli_fetch_assoc($res)) {
-            $r .= '<li>' . tohtml($record["T2Text"]) . '</li>';
-        }
-        mysqli_free_result($res);
-    }
-    $r .= '</ul>';
-    return $r;
-}
-
-
-/**
- * Return a HTML-formatted list of the text tags for an archived text.
- *
- * @param int $tid Text ID. Can be below 1 to create an empty list.
- *
- * @return string UL list of text tags
- *
- * @global string $tbpref Database table prefix 
- */
-function getArchivedTextTags($tid): string 
-{
-    global $tbpref;
-    $r = '<ul id="texttags">';
-    if ($tid > 0) {
-        $sql = 'SELECT T2Text 
-        FROM ' . $tbpref . 'archtexttags, ' . $tbpref . 'tags2 
-        WHERE T2ID = AgT2ID AND AgAtID = ' . $tid . ' 
-        ORDER BY T2Text';
-        $res = do_mysqli_query($sql);
-        while ($record = mysqli_fetch_assoc($res)) {
-            $r .= '<li>' . tohtml($record["T2Text"]) . '</li>';
-        }
-        mysqli_free_result($res);
-    }
-    $r .= '</ul>';
-    return $r;
-}
-
-// -------------------------------------------------------------
-
-function addtaglist($item, $list): string 
-{
-    global $tbpref;
-    $tagid = get_first_value(
-        'select TgID as value 
-        from ' . $tbpref . 'tags 
-        where TgText = ' . convert_string_to_sqlsyntax($item)
-    );
-    if (!isset($tagid)) {
-        runsql(
-            'insert into ' . $tbpref . 'tags (TgText) 
-            values(' . convert_string_to_sqlsyntax($item) . ')', 
-            ""
-        );
-        $tagid = get_first_value(
-            'select TgID as value 
-            from ' . $tbpref . 'tags 
-            where TgText = ' . convert_string_to_sqlsyntax($item)
-        );
-    }
-    $sql = 'select WoID 
-    from ' . $tbpref . 'words 
-    LEFT JOIN ' . $tbpref . 'wordtags 
-    ON WoID = WtWoID AND WtTgID = ' . $tagid . ' 
-    WHERE WtTgID IS NULL AND WoID in ' . $list;
-    $res = do_mysqli_query($sql);
-    $cnt = 0;
-    while ($record = mysqli_fetch_assoc($res)) {
-        $cnt += (int) runsql(
-            'insert ignore into ' . $tbpref . 'wordtags (WtWoID, WtTgID) 
-            values(' . $record['WoID'] . ', ' . $tagid . ')', 
-            ""
-        );
-    }
-    mysqli_free_result($res);
-    get_tags($refresh = 1);
-    return "Tag added in $cnt Terms";
-}
-
-// -------------------------------------------------------------
-
-function addarchtexttaglist($item, $list): string 
-{
-    global $tbpref;
-    $tagid = get_first_value(
-        'select T2ID as value from ' . $tbpref . 'tags2 
-        where T2Text = ' . convert_string_to_sqlsyntax($item)
-    );
-    if (!isset($tagid)) {
-        runsql(
-            'insert into ' . $tbpref . 'tags2 (T2Text) 
-            values(' . convert_string_to_sqlsyntax($item) . ')', 
-            ""
-        );
-        $tagid = get_first_value(
-            'select T2ID as value 
-            from ' . $tbpref . 'tags2 
-            where T2Text = ' . convert_string_to_sqlsyntax($item)
-        );
-    }
-    $sql = 'select AtID from ' . $tbpref . 'archivedtexts 
-    LEFT JOIN ' . $tbpref . 'archtexttags 
-    ON AtID = AgAtID AND AgT2ID = ' . $tagid . ' 
-    WHERE AgT2ID IS NULL AND AtID in ' . $list;
-    $res = do_mysqli_query($sql);
-    $cnt = 0;
-    while ($record = mysqli_fetch_assoc($res)) {
-        $cnt += (int) runsql(
-            'insert ignore into ' . $tbpref . 'archtexttags (AgAtID, AgT2ID) 
-            values(' . $record['AtID'] . ', ' . $tagid . ')', 
-            ""
-        );
-    }
-    mysqli_free_result($res);
-    get_texttags($refresh = 1);
-    return "Tag added in $cnt Texts";
-}
-
-// -------------------------------------------------------------
-
-function addtexttaglist($item, $list): string 
-{
-    global $tbpref;
-    $tagid = get_first_value(
-        'select T2ID as value 
-        from ' . $tbpref . 'tags2 
-        where T2Text = ' . convert_string_to_sqlsyntax($item)
-    );
-    if (!isset($tagid)) {
-        runsql(
-            'insert into ' . $tbpref . 'tags2 (T2Text) 
-            values(' . convert_string_to_sqlsyntax($item) . ')', 
-            ""
-        );
-        $tagid = get_first_value(
-            'select T2ID as value 
-            from ' . $tbpref . 'tags2 
-            where T2Text = ' . convert_string_to_sqlsyntax($item)
-        );
-    }
-    $sql = 'select TxID from ' . $tbpref . 'texts
-     LEFT JOIN ' . $tbpref . 'texttags 
-     ON TxID = TtTxID AND TtT2ID = ' . $tagid . ' 
-     WHERE TtT2ID IS NULL AND TxID in ' . $list;
-    $res = do_mysqli_query($sql);
-    $cnt = 0;
-    while ($record = mysqli_fetch_assoc($res)) {
-        $cnt += (int) runsql(
-            'insert ignore into ' . $tbpref . 'texttags (TtTxID, TtT2ID) 
-            values(' . $record['TxID'] . ', ' . $tagid . ')', 
-            ""
-        );
-    }
-    mysqli_free_result($res);
-    get_texttags($refresh = 1);
-    return "Tag added in $cnt Texts";
-}
-
-// -------------------------------------------------------------
-
-function removetaglist($item, $list): string 
-{
-    global $tbpref;
-    $tagid = get_first_value(
-        'SELECT TgID AS value
-        FROM ' . $tbpref . 'tags
-        WHERE TgText = ' . convert_string_to_sqlsyntax($item)
-    );
-    if (! isset($tagid)) { 
-        return "Tag " . $item . " not found"; 
-    }
-    $sql = 'select WoID from ' . $tbpref . 'words where WoID in ' . $list;
-    $res = do_mysqli_query($sql);
-    $cnt = 0;
-    while ($record = mysqli_fetch_assoc($res)) {
-        $cnt++;
-        runsql(
-            'DELETE FROM ' . $tbpref . 'wordtags
-            WHERE WtWoID = ' . $record['WoID'] . ' AND WtTgID = ' . $tagid, 
-            ""
-        );
-    }
-    mysqli_free_result($res);
-    return "Tag removed in $cnt Terms";
-}
-
-// -------------------------------------------------------------
-
-function removearchtexttaglist($item, $list): string 
-{
-    global $tbpref;
-    $tagid = get_first_value(
-        'select T2ID as value 
-        from ' . $tbpref . 'tags2 
-        where T2Text = ' . convert_string_to_sqlsyntax($item)
-    );
-    if (!isset($tagid)) { 
-        return "Tag " . $item . " not found"; 
-    }
-    $sql = 'select AtID from ' . $tbpref . 'archivedtexts where AtID in ' . $list;
-    $res = do_mysqli_query($sql);
-    $cnt = 0;
-    while ($record = mysqli_fetch_assoc($res)) {
-        $cnt++;
-        runsql(
-            'delete from ' . $tbpref . 'archtexttags 
-            where AgAtID = ' . $record['AtID'] . ' and AgT2ID = ' . $tagid, 
-            ""
-        );
-    }
-    mysqli_free_result($res);
-    return "Tag removed in $cnt Texts";
-}
-
-// -------------------------------------------------------------
-
-function removetexttaglist($item, $list): string 
-{
-    global $tbpref;
-    $tagid = get_first_value(
-        'select T2ID as value from ' . $tbpref . 'tags2 
-        where T2Text = ' . convert_string_to_sqlsyntax($item)
-    );
-    if (!isset($tagid)) { 
-        return "Tag " . $item . " not found"; 
-    }
-    $sql = 'select TxID from ' . $tbpref . 'texts where TxID in ' . $list;
-    $res = do_mysqli_query($sql);
-    $cnt = 0;
-    while ($record = mysqli_fetch_assoc($res)) {
-        $cnt++;
-        runsql(
-            'delete from ' . $tbpref . 'texttags 
-            where TtTxID = ' . $record['TxID'] . ' and TtT2ID = ' . $tagid, 
-            ""
-        );
-    }
-    mysqli_free_result($res);
-    return "Tag removed in $cnt Texts";
-}
-
-// -------------------------------------------------------------
-
-function load_feeds($currentfeed): void
-{
-    global $tbpref;
-    $cnt=0;
-    $ajax=$feeds=array();
-    echo '<script type="text/javascript">';
-    if (isset($_REQUEST['check_autoupdate'])) {
-        $result = do_mysqli_query(
-            "SELECT * FROM " . $tbpref . "newsfeeds 
-            where `NfOptions` like '%autoupdate=%'"
-        );
-        while($row = mysqli_fetch_assoc($result)){
-            if ($autoupdate = get_nf_option($row['NfOptions'], 'autoupdate')) {
-                if(strpos($autoupdate, 'h')!==false) {
-                    $autoupdate = str_replace('h', '', $autoupdate);
-                    $autoupdate = 60 * 60 * (int)$autoupdate;
-                } elseif(strpos($autoupdate, 'd')!==false) {
-                    $autoupdate=str_replace('d', '', $autoupdate);
-                    $autoupdate=60 * 60 * 24 * (int)$autoupdate;
-                } elseif(strpos($autoupdate, 'w')!==false) {
-                    $autoupdate=str_replace('w', '', $autoupdate);
-                    $autoupdate=60 * 60 * 24 * 7 * (int)$autoupdate;
-                } else { 
-                    continue; 
-                }
-                if(time()>($autoupdate + (int) $row['NfUpdate'])) {
-                    $ajax[$cnt]=  "$.ajax({type: 'POST',beforeSend: function(){ $('#feed_" . 
-                        $row['NfID'] . "').replaceWith( '<div id=\"feed_" . $row['NfID'] . "\" class=\"msgblue\"><p>". 
-                        addslashes((string) $row['NfName']).": loading</p></div>' );},url:'inc/ajax_load_feed.php', data: { NfID: '".
-                            $row['NfID']."', NfSourceURI: '". $row['NfSourceURI']."', NfName: '". addslashes((string) $row['NfName']).
-                            "', NfOptions: '". $row['NfOptions']."', cnt: '". $cnt.
-                            "' },success:function (data) {feedcnt+=1;$('#feedcount').text(feedcnt);$('#feed_" . 
-                                $row['NfID'] . "').replaceWith( data );}})";
-                    $cnt+=1;
-                    $feeds[$row['NfID']]=$row['NfName'];
-                }
-            }
-        }
-        mysqli_free_result($result);
-    } else {
-        $sql="SELECT * FROM " . $tbpref . "newsfeeds WHERE NfID in ($currentfeed)";
-        $result = do_mysqli_query($sql);
-        while($row = mysqli_fetch_assoc($result)){
-            $ajax[$cnt]=  "$.ajax({type: 'POST',beforeSend: function(){ $('#feed_" . 
-                $row['NfID'] . "').replaceWith( '<div id=\"feed_" . $row['NfID'] . "\" class=\"msgblue\"><p>". 
-                addslashes((string) $row['NfName']).": loading</p></div>' );},url:'inc/ajax_load_feed.php', data: { NfID: '".
-                    $row['NfID']."', NfSourceURI: '". $row['NfSourceURI']."', NfName: '". 
-                    addslashes((string) $row['NfName'])."', NfOptions: '". $row['NfOptions']."', cnt: '". 
-                    $cnt."' },success:function (data) {feedcnt+=1;$('#feedcount').text(feedcnt);$('#feed_" . 
-                        $row['NfID'] . "').replaceWith( data );}})";
-            $cnt+=1;
-            $feeds[$row['NfID']]=$row['NfName'];
-        }
-        mysqli_free_result($result);
-    }
-    if(!empty($ajax)) {
-        $z=array();
-        for($i=1;$i<=$cnt;$i++){
-            $z[]='a'.$i;
-        }
-        echo "feedcnt=0;\n";
-        echo '$(document).ready(function(){ $.when(',implode(',', $ajax),").then(function(",implode(',', $z),"){window.location.replace(\"",$_SERVER['PHP_SELF'],"\");});});";
-    } else { 
-        echo "window.location.replace(\"",$_SERVER['PHP_SELF'],"\");"; 
-    }
-    echo "\n</script>\n";
-    if($cnt!=1) { 
-        echo "<div class=\"msgblue\"><p>UPDATING <span id=\"feedcount\">0</span>/",$cnt," FEEDS</p></div>"; 
-    }
-    foreach($feeds as $k=>$v){
-        echo "<div id='feed_$k' class=\"msgblue\"><p>". $v.": waiting</p></div>";
-    }
-    echo "<div class=\"center\"><button onclick='window.location.replace(\"",$_SERVER['PHP_SELF'],"\");'>Continue</button></div>";
-}
-
-// -------------------------------------------------------------
-
-
-function write_rss_to_db($texts): string
-{
-    global $tbpref;
-    $texts=array_reverse($texts);
-    $message1=$message2=$message3=$message4=0;
-    $Nf_ID = null;
-    foreach($texts as $text){
-        $Nf_ID[]=$text['Nf_ID'];
-    }
-    $Nf_ID=array_unique($Nf_ID);
-    $Nf_tag='';
-    $text_item = null;
-    $nf_max_texts = null;
-    foreach($Nf_ID as $feed_ID){
-        foreach($texts as $text){
-            if($feed_ID==$text['Nf_ID']) {
-                if($Nf_tag!='"'.implode('","', $text['TagList']).'"') {
-                    $Nf_tag= '"'.implode('","', $text['TagList']).'"';
-                    foreach($text['TagList'] as $tag){
-                        if(! in_array($tag, $_SESSION['TEXTTAGS'])) {
-                            do_mysqli_query(
-                                'insert into ' . $tbpref . 'tags2 (T2Text) 
-                                values (' . convert_string_to_sqlsyntax($tag) . ')'
-                            );
-                        }
-                    }
-                    $nf_max_texts = $text['Nf_Max_Texts'];
-                }
-                echo '<div class="msgblue"><p class="hide_message">+++ "' . 
-                $text['TxTitle']. '" added! +++</p></div>';
-                do_mysqli_query(
-                    'INSERT INTO ' . $tbpref . 'texts (
-                        TxLgID,TxTitle,TxText,TxAudioURI,TxSourceURI
-                    ) VALUES (
-                        '.$text['TxLgID'].',' . 
-                        convert_string_to_sqlsyntax($text['TxTitle']) .','. 
-                        convert_string_to_sqlsyntax($text['TxText']) .','. 
-                        convert_string_to_sqlsyntax($text['TxAudioURI']) .','.
-                        convert_string_to_sqlsyntax($text['TxSourceURI']) .')'
-                );
-                $id = get_last_key();
-                splitCheckText(
-                    get_first_value(
-                        'select TxText as value from ' . $tbpref . 'texts 
-                        where TxID = ' . $id
-                    ), 
-                    get_first_value(
-                        'select TxLgID as value from ' . $tbpref . 'texts 
-                        where TxID = ' . $id
-                    ), 
-                    $id 
-                );
-                do_mysqli_query(
-                    'insert into ' . $tbpref . 'texttags (TtTxID, TtT2ID) 
-                    select ' . $id . ', T2ID from ' . $tbpref . 'tags2 
-                    where T2Text in (' . $Nf_tag .')'
-                );        
-            }
-        }
-        get_texttags(1);
-        $result=do_mysqli_query(
-            "SELECT TtTxID FROM " . $tbpref . "texttags 
-            join " . $tbpref . "tags2 on TtT2ID=T2ID 
-            WHERE T2Text in (". $Nf_tag .")"
-        );
-        $text_count=0;
-        while($row = mysqli_fetch_assoc($result)){
-            $text_item[$text_count++]=$row['TtTxID'];
-        }
-        mysqli_free_result($result);
-        if($text_count>$nf_max_texts) {
-            sort($text_item, SORT_NUMERIC);
-            $text_item=array_slice($text_item, 0, $text_count-$nf_max_texts);
-            foreach ($text_item as $text_ID){
-                $message3 += (int) runsql(
-                    'delete from ' . $tbpref . 'textitems2 
-                    where Ti2TxID = ' . $text_ID, 
-                    ""
-                );
-                $message2 += (int) runsql(
-                    'delete from ' . $tbpref . 'sentences 
-                    where SeTxID = ' . $text_ID, 
-                    ""
-                );
-                $message4 += (int) runsql(
-                    'insert into ' . $tbpref . 'archivedtexts (
-                        AtLgID, AtTitle, AtText, AtAnnotatedText, 
-                        AtAudioURI, AtSourceURI
-                    ) select TxLgID, TxTitle, TxText, TxAnnotatedText, 
-                    TxAudioURI, TxSourceURI 
-                    from ' . $tbpref . 'texts 
-                    where TxID = ' . $text_ID, 
-                    ""
-                );
-                $id = get_last_key();
-                runsql(
-                    'insert into ' . $tbpref . 'archtexttags (AgAtID, AgT2ID) 
-                    select ' . $id . ', TtT2ID from ' . $tbpref . 'texttags 
-                    where TtTxID = ' . $text_ID, 
-                    ""
-                );    
-                $message1 += (int) runsql(
-                    'delete from ' . $tbpref . 'texts 
-                    where TxID = ' . $text_ID, 
-                    ""
-                );
-                // $message .= $message4 . " / " . $message1 . " / " . $message2 . " / " . $message3;
-                adjust_autoincr('texts', 'TxID');
-                adjust_autoincr('sentences', 'SeID');
-                runsql(
-                    "DELETE " . $tbpref . "texttags 
-                    FROM (" 
-                        . $tbpref . "texttags 
-                        LEFT JOIN " . $tbpref . "texts on TtTxID = TxID
-                    ) 
-                    WHERE TxID IS NULL", 
-                    ''
-                );        
-            }
-        }
-    }
-    if ($message4>0 || $message1>0) { 
-        return "Texts archived: " . $message1 . 
-        " / Sentences deleted: " . $message2 . " / Text items deleted: " . $message3; 
-    }
-    else { 
-        return ''; 
-    }
-}
-
-// -------------------------------------------------------------
-
-function print_last_feed_update($diff): void
-{
-    $periods = array(
-    array(60 * 60 * 24 * 365 , 'year'),
-    array(60 * 60 * 24 * 30 , 'month'),
-    array(60 * 60 * 24 * 7, 'week'),
-    array(60 * 60 * 24 , 'day'),
-    array(60 * 60 , 'hour'),
-    array(60 , 'minute'),
-    array(1 , 'second'),
-    );
-    if($diff>=1) {
-        for($key=0;$key<7;$key++){
-            $x=intval($diff/$periods[$key][0]);
-            if($x>=1) {
-                echo " last update: $x ";
-                print_r($periods[$key][1]);
-                if($x>1) { echo 's'; 
-                }echo ' ago';break;
-            }
-        }
-    }
-    else { 
-        echo ' up to date'; 
-    }
-}
-
-/**
- * @return null|string|string[]
- *
- * @psalm-return array<string, string>|null|string
- */
-function get_nf_option($str,$option)
-{
-    $arr=explode(',', $str);
-    $all = null;
-    if($option=='all') { 
-        $all = array();
-    }
-    foreach($arr as $value){
-        $res=explode('=', $value);
-        if(trim($res[0])==$option) { 
-            return $res[1]; 
-        }
-        if($option=='all') { 
-            $all[$res[0]]=$res[1]; 
-        }
-    }
-    if($option=='all') { 
-        return $all; 
-    }
-    return null;
-}
-
-
-/**
- * @return ((false|null|string)[]|null|string)[]|false
- *
- * @psalm-return array{feed_title: null|string,...}|false
- */
-function get_links_from_new_feed($NfSourceURI): array|false
-{
-    $rss = new DOMDocument('1.0', 'utf-8');
-    if (!$rss->load($NfSourceURI, LIBXML_NOCDATA | ENT_NOQUOTES)) { 
-        return false; 
-    }
-    $rss_data = array();
-    $desc_count=0;
-    $desc_nocount=0;
-    $enc_count=0;
-    $enc_nocount=0;
-    if ($rss->getElementsByTagName('rss')->length !== 0) {
-        $feed_tags = array(
-            'item' => 'item',
-            'title' => 'title',
-            'description' => 'description',
-            'link' => 'link'
-        );
-    } elseif ($rss->getElementsByTagName('feed')->length !== 0) {
-        $feed_tags = array(
-            'item' => 'entry',
-            'title' => 'title',
-            'description' => 'summary',
-            'link' => 'link'
-        );
-    } else { 
-        return false; 
-    }
-    foreach ($rss->getElementsByTagName($feed_tags['item']) as $node) {
-        $item = array ( 
-            'title' => preg_replace(
-                array('/\s\s+/','/\ \&\ /','/\"/'), 
-                array(' ',' &amp; ','\"'), 
-                trim($node->getElementsByTagName($feed_tags['title'])->item(0)->nodeValue)
-            ),
-            'desc' => preg_replace(
-                array('/\s\s+/','/\ \&\ /','/\<[^\>]*\>/','/\"/'), 
-                array(' ',' &amp; ','','\"'), 
-                trim($node->getElementsByTagName($feed_tags['description'])->item(0)->nodeValue)
-            ),
-            'link' => trim(
-                ($feed_tags['item']=='entry') ? 
-                ($node->getElementsByTagName($feed_tags['link'])->item(0)->getAttribute('href')) : 
-                ($node->getElementsByTagName($feed_tags['link'])->item(0)->nodeValue)
-            ),
-        );
-        if ($feed_tags['item']=='item') {
-            foreach($node->getElementsByTagName('encoded') as $txt_node) {
-                if($txt_node->parentNode===$node) {
-                    $item['encoded'] = $txt_node->ownerDocument->saveHTML($txt_node);
-                    $item['encoded'] = mb_convert_encoding(
-                        html_entity_decode($item['encoded'], ENT_NOQUOTES, "UTF-8"), 
-                        "HTML-ENTITIES", 
-                        "UTF-8"
-                    );
-                }
-            }
-            foreach($node->getElementsByTagName('description') as $txt_node) {
-                if($txt_node->parentNode===$node) {
-                    $item['description'] = $txt_node->ownerDocument->saveHTML($txt_node);
-                    $item['description'] = mb_convert_encoding(
-                        html_entity_decode($item['description'], ENT_NOQUOTES, "UTF-8"), 
-                        "HTML-ENTITIES", 
-                        "UTF-8"
-                    );
-                }
-            }
-            if (isset($item['desc'])) {
-                if(mb_strlen($item['desc'], "UTF-8")>900) { 
-                    $desc_count++; 
-                } else { 
-                    $desc_nocount++; 
-                }
-            }
-            if (isset($item['encoded'])) {
-                if(mb_strlen($item['encoded'], "UTF-8")>900) { 
-                    $enc_count++; 
-                } else { 
-                    $enc_nocount++; 
-                }
-            }
-        }
-        if ($feed_tags['item']=='entry') {
-            foreach($node->getElementsByTagName('content') as $txt_node) {
-                if($txt_node->parentNode===$node) {
-                    $item['content'] = $txt_node->ownerDocument->saveHTML($txt_node);
-                    $item['content'] = mb_convert_encoding(
-                        html_entity_decode($item['content'], ENT_NOQUOTES, "UTF-8"),
-                        "HTML-ENTITIES", 
-                        "UTF-8"
-                    );
-                }
-            }
-            if (isset($item['content'])) {
-                if (mb_strlen($item['content'], "UTF-8")>900) { 
-                    $desc_count++; 
-                } else { 
-                    $desc_nocount++; 
-                }
-            }
-        }
-        if ($item['title'] != "" && $item['link'] != "") { 
-            array_push($rss_data, $item); 
-        }
-    }
-    if ($desc_count > $desc_nocount) {
-        $source = ($feed_tags['item']=='entry') ? 'content' : 'description';
-        $rss_data['feed_text'] = $source;
-        foreach ($rss_data as $i=>$val){
-            if (is_array($val)) {
-                $rss_data[$i]['text'] = $val[$source];
-            }
-        }
-    } else if ($enc_count > $enc_nocount) {
-        $rss_data['feed_text'] = 'encoded';
-        foreach ($rss_data as $i=>$val){
-            if (is_array($val)) {
-                $rss_data[$i]['text'] = $val['encoded'];
-            }
-        }
-    }
-    $rss_data['feed_title'] = $rss->getElementsByTagName('title')->item(0)->nodeValue;
-    return $rss_data;
-}
-
-// -------------------------------------------------------------
-
-/**
- * @return (false|null|string)[][]|false
- *
- * @psalm-return false|list<array{title: null|string, desc: null|string, link: string, date: string, text?: false|string, audio: string}>
- */
-function get_links_from_rss($NfSourceURI,$NfArticleSection): array|false
-{
-    $rss = new DOMDocument('1.0', 'utf-8');
-    if(!$rss->load($NfSourceURI, LIBXML_NOCDATA | ENT_NOQUOTES)) { 
-        return false; 
-    }
-    $rss_data = array();
-    if($rss->getElementsByTagName('rss')->length !== 0) {
-        $feed_tags=array(
-            'item' => 'item','title' => 'title','description' => 'description',
-            'link' => 'link','pubDate' => 'pubDate','enclosure' => 'enclosure',
-            'url' => 'url'
-        );
-    }
-    elseif($rss->getElementsByTagName('feed')->length !== 0) {
-        $feed_tags=array(
-            'item' => 'entry','title' => 'title','description' => 'summary',
-            'link' => 'link','pubDate' => 'published','enclosure' => 'link',
-            'url' => 'href'
-        );
-    }
-    else { 
-        return false; 
-    }
-    foreach ($rss->getElementsByTagName($feed_tags['item']) as $node) {
-        $item = array (
-        'title' => preg_replace(
-            array('/\s\s+/','/\ \&\ /'), array(' ',' &amp; '), 
-            trim($node->getElementsByTagName($feed_tags['title'])->item(0)->nodeValue)
-        ),
-        'desc' => isset($node->getElementsByTagName($feed_tags['description'])->item(0)->nodeValue) ? 
-        preg_replace(
-            array('/\ \&\ /','/<br(\s+)?\/?>/i','/<br [^>]*?>/i','/\<[^\>]*\>/','/(\n)[\s^\n]*\n[\s]*/'), 
-            array(' &amp; ',"\n","\n",'','$1$1'), 
-            trim($node->getElementsByTagName($feed_tags['description'])->item(0)->nodeValue)
-        ) : '',
-        'link' => trim(
-            ($feed_tags['item']=='entry')?(
-            $node->getElementsByTagName($feed_tags['link'])->item(0)->getAttribute('href')
-            ):(
-                $node->getElementsByTagName($feed_tags['link'])->item(0)->nodeValue)
-        ),
-        'date' => isset($node->getElementsByTagName($feed_tags['pubDate'])->item(0)->nodeValue)?
-        trim($node->getElementsByTagName($feed_tags['pubDate'])->item(0)->nodeValue)
-        : null,
-        );
-        $pubDate = date_parse_from_format('D, d M Y H:i:s T', $item['date']);
-        if($pubDate['error_count']>0) {
-            $item['date'] = date("Y-m-d H:i:s", time()-count($rss_data));
-        }
-        else{
-            $item['date'] = date(
-                "Y-m-d H:i:s", mktime(
-                    $pubDate['hour'], 
-                    $pubDate['minute'], $pubDate['second'], $pubDate['month'], 
-                    $pubDate['day'], $pubDate['year']
-                )
-            );
-        }
-        if(strlen($item['desc'])>1000) { $item['desc']=mb_substr($item['desc'], 0, 995, "utf-8") . '...'; 
-        }
-        if ($NfArticleSection) {
-            foreach ($node->getElementsByTagName($NfArticleSection) as $txt_node) {
-                if($txt_node->parentNode===$node) {
-                    $item['text'] = $txt_node->ownerDocument->saveHTML($txt_node);
-                    $item['text']=mb_convert_encoding(html_entity_decode($item['text'], ENT_NOQUOTES, "UTF-8"), "HTML-ENTITIES", "UTF-8");
-                    //$item['text']=str_replace ('"','\"',$item['text']);///////////////
-                }
-            }
-        }
-        $item['audio'] = "";
-        foreach($node->getElementsByTagName($feed_tags['enclosure']) as $enc){
-            $type=$enc->getAttribute('type');
-            if($type=="audio/mpeg") { $item['audio']=$enc->getAttribute($feed_tags['url']); 
-            }
-        }
-        if($item['title']!="" && ($item['link']!="" || ($NfArticleSection!="" && !empty($item['text'])))) { array_push($rss_data, $item); 
-        }
-    }
-    return $rss_data;
-}
-
-
-/**
- * @return (array|mixed|null|string)[][]|null|string
- *
- * @psalm-return array<array{TxTitle: mixed, TxAudioURI: mixed|null, TxText: string, TxSourceURI: mixed|string, message?: string, link?: list{mixed,...}}>|null|string
- */
-function get_text_from_rsslink($feed_data, $NfArticleSection, $NfFilterTags, $NfCharset=null): array|string|null
-{
-    global $tbpref;
-    $data = null;
-    foreach ($feed_data as $key =>$val) {
-        if (strncmp($NfArticleSection, 'redirect:', 9)==0) {    
-            $dom = new DOMDocument;
-            $HTMLString = file_get_contents(trim($feed_data[$key]['link']));
-            $dom->loadHTML($HTMLString);
-            $xPath = new DOMXPath($dom);
-            $redirect = explode(" | ", $NfArticleSection, 2);
-            $NfArticleSection = $redirect[1];
-            $redirect = substr($redirect[0], 9);
-            $feed_host = parse_url(trim($feed_data[$key]['link']));
-            foreach ($xPath->query($redirect) as $node) {
-                if (empty(trim($node->localName)) 
-                    || $node->nodeType == XML_TEXT_NODE
-                    || !$node->hasAttributes()
-                ) {
-                    continue;
-                }
-                /*
-                May be better but yet untested*/
-                /**
-                 * @psalm-suppress NullIterator
-                 */  
-                foreach ($node->attributes as $attr) {
-                    if ($attr->name=='href') {
-                        $feed_data[$key]['link'] = $attr->value;
-                        if (strncmp($feed_data[$key]['link'], '..', 2)==0) {
-                            $feed_data[$key]['link'] = 'http://'.$feed_host['host'] . 
-                            substr($feed_data[$key]['link'], 2);
-                        }
-                    }
-                }
-                /*
-                $len = $node->attributes->length;
-                for ($i=0; $i<$len; $i++){
-                    if ($node->attributes->item($i)->name=='href') {
-                        $feed_data[$key]['link'] = $node->attributes->item($i)->value;
-                        if (strncmp($feed_data[$key]['link'], '..', 2)==0) {
-                            $feed_data[$key]['link'] = 'http://'.$feed_host['host'] . substr($feed_data[$key]['link'], 2);
-                        }
-                    }
-                } */   
-            }
-            unset($dom);
-            unset($HTMLString);
-            unset($xPath);
-        }
-        $data[$key]['TxTitle'] = $feed_data[$key]['title'];
-        $data[$key]['TxAudioURI'] = isset($feed_data[$key]['audio'])? $feed_data[$key]['audio'] : null;
-        $data[$key]['TxText'] = "";
-        if(isset($feed_data[$key]['text'])) {
-            if($feed_data[$key]['text']=="") {
-                unset($feed_data[$key]['text']);
-            }
-        }
-        if(isset($feed_data[$key]['text'])) {
-            $link = trim($feed_data[$key]['link']);
-            if(substr($link, 0, 1)=='#') {
-                runsql(
-                    'UPDATE ' . $tbpref . 'feedlinks 
-                    SET FlLink=' . convert_string_to_sqlsyntax($link) . ' 
-                    where FlID = ' .substr($link, 1), 
-                    ""
-                );
-            }
-            $data[$key]['TxSourceURI'] = $link;
-            $HTMLString=str_replace(
-                array('>','<'), 
-                array('> ',' <'), 
-                $feed_data[$key]['text']
-            );//$HTMLString=str_replace (array('>','<'),array('> ',' <'),$HTMLString);
-        } else {
-            $data[$key]['TxSourceURI'] = $feed_data[$key]['link'];
-            $context = stream_context_create(array('http' => array('follow_location' => true )));
-            $HTMLString = file_get_contents(trim($data[$key]['TxSourceURI']), false, $context);
-            if (!empty($HTMLString)) {
-                $encod  = '';
-                if (empty($NfCharset)) {
-                    $header = get_headers(trim($data[$key]['TxSourceURI']), true);
-                    foreach ($header as $k=>$v){
-                        if (strtolower($k) == 'content-type') {
-                            if (is_array($v)) {
-                                $encod = $v[count($v)-1];
-                            } else {
-                                $encod = $v;
-                            }
-                            $pos = strpos($encod, 'charset=');
-                            if (($pos!==false) && (strpos($encod, 'text/html;')!==false)) {
-                                $encod=substr($encod, $pos+8);    
-                                break;
-                            } else { 
-                                $encod=''; 
-                            }
-                        }
-                        
-                    }
-                } else {
-                    if ($NfCharset!='meta') { 
-                        $encod  = $NfCharset; 
-                    }
-                }
-                
-                if (empty($encod)) {
-                    $doc = new DOMDocument;
-                    $previous_value = libxml_use_internal_errors(true);
-                    $doc->loadHTML($HTMLString);
-                    /*
-                    if (!$doc->loadHTML($HTMLString)) {
-                    foreach (libxml_get_errors() as $error) {
-                    // handle errors here
-                    }*/
-                    libxml_clear_errors();
-                    libxml_use_internal_errors($previous_value);
-                    $nodes=$doc->getElementsByTagName('meta');
-                    foreach($nodes as $node){
-                        $len=$node->attributes->length;
-                        for($i=0;$i<$len;$i++){
-                            if($node->attributes->item($i)->name=='content') {
-                                $pos = strpos($node->attributes->item($i)->value, 'charset=');
-                                if($pos) {
-                                    $encod=substr($node->attributes->item($i)->value, $pos+8);
-                                    unset($doc);
-                                    unset($nodes);
-                                    break 2;    
-                                }
-                            }
-                        }    
-                    }
-                    if(empty($encod)) {
-                        foreach($nodes as $node){
-                            $len=$node->attributes->length;
-                            if($len=='1') {
-                                if($node->attributes->item(0)->name=='charset') {
-
-                                    $encod=$node->attributes->item(0)->value;
-                                    break;    
-                                }
-                            }
-                        }    
-                    }
-                }
-                unset($doc);
-                unset($nodes);
-                if(empty($encod)) {
-                    mb_detect_order("ASCII,UTF-8,ISO-8859-1,windows-1252,iso-8859-15");
-                    $encod  = mb_detect_encoding($HTMLString);
-                }
-                $chset=$encod;
-                switch($encod){
-                case 'windows-1253':
-                    $chset='el_GR.utf8';
-                    break;
-                case 'windows-1254':
-                    $chset='tr_TR.utf8';
-                    break;
-                case 'windows-1255':
-                    $chset='he.utf8';
-                    break;
-                case 'windows-1256':
-                    $chset='ar_AE.utf8';
-                    break;
-                case 'windows-1258':
-                    $chset='vi_VI.utf8';
-                    break;
-                case 'windows-874':
-                    $chset='th_TH.utf8';
-                    break;
-                }
-                $HTMLString = '<meta http-equiv="Content-Type" content="text/html; charset='. $chset .'">' .$HTMLString;
-                if($encod!=$chset) { $HTMLString = iconv($encod, 'utf-8', $HTMLString); 
-                }
-                else { $HTMLString=mb_convert_encoding($HTMLString, 'HTML-ENTITIES', $encod); 
-                }
-            }
-        }
-        $HTMLString=str_replace(array('<br />','<br>','</br>','</h','</p'), array("\n","\n","","\n</h","\n</p"), $HTMLString);
-        $dom = new DOMDocument();
-        $previous_value = libxml_use_internal_errors(true);
-
-        $dom->loadHTML('<?xml encoding="UTF-8">' . $HTMLString);
-        foreach ($dom->childNodes as $item){/////////////////////////////////
-            if ($item->nodeType == XML_PI_NODE) {
-                $dom->removeChild($item); // remove hack
-            }
-        }
-        $dom->encoding = 'UTF-8'; // insert proper    //////////////////////////////
-
-        /*
-        if (!$dom->loadHTML($HTMLString)) {
-        foreach (libxml_get_errors() as $error) {
-        // handle errors here
-        }*/
-        libxml_clear_errors();
-        libxml_use_internal_errors($previous_value);
-        $filter_tags = explode("!?!", rtrim("//img | //script | //meta | //noscript | //link | //iframe!?!".$NfFilterTags, "!?!"));
-        foreach (explode("!?!", $NfArticleSection) as $article_tag) {
-            if($article_tag=='new') {
-                foreach ($filter_tags as $filter_tag){
-                    $nodes=$dom->getElementsByTagName($filter_tag);
-                    $domElemsToRemove = array();
-                    foreach ( $nodes as $domElement ) {
-                        $domElemsToRemove[] = $domElement;
-                    }
-                    foreach ($domElemsToRemove as $node) {
-                        $node->parentNode->removeChild($node);
-                    }
-                }
-                $nodes=$dom->getElementsByTagName('*');
-                foreach ( $nodes as $node ) {
-                    $node->removeAttribute('onclick');
-                }
-                $str=$dom->saveHTML($dom);
-                //$str=mb_convert_encoding(html_entity_decode($str, ENT_NOQUOTES, "UTF-8"),"HTML-ENTITIES","UTF-8");
-                return preg_replace(
-                    array('/\<html[^\>]*\>/','/\<body\>/'), array('',''), $str
-                );
-            }
-        }
-        $selector = new DOMXPath($dom);
-        foreach ($filter_tags as $filter_tag){
-            foreach ($selector->query($filter_tag) as $node) {
-                $node->parentNode->removeChild($node);
-            }
-        }
-        if(isset($feed_data[$key]['text'])) {
-            foreach ($selector->query($NfArticleSection) as $text_temp) {
-                if($text_temp->nodeValue != '') {
-                    $data[$key]['TxText'] .= mb_convert_encoding(
-                        $text_temp->nodeValue, "HTML-ENTITIES", "UTF-8"
-                    );
-                }
-            }
-            $data[$key]['TxText'] = html_entity_decode($data[$key]['TxText'], ENT_NOQUOTES, "UTF-8");
-        }        
-        else{
-            $article_tags = explode("!?!", $NfArticleSection);if(strncmp($NfArticleSection, 'redirect:', 9)==0) { unset($article_tags[0]); 
-            }
-            foreach ($article_tags as $article_tag) {
-                foreach ($selector->query($article_tag) as $text_temp) {
-                    if($text_temp->nodeValue != '') {
-                        $data[$key]['TxText'].= $text_temp->nodeValue;
-                    }
-                }
-            }
-        }        
-                
-        if($data[$key]['TxText']=="") {
-            unset($data[$key]);
-            if(!isset($data['error']['message'])) { $data['error']['message']=''; 
-            }
-            $data['error']['message'].= '"<a href=' . $feed_data[$key]['link'] .' onclick="window.open(this.href, \'child\'); return false">'  . $feed_data[$key]['title'] . '</a>" has no text section!<br />';
-            $data['error']['link'][]=$feed_data[$key]['link'];
-        }
-        else{
-            $data[$key]['TxText']=trim(preg_replace(array('/[\r\t]+/','/(\n)[\s^\n]*\n[\s]*/','/\ \ +/'), array(' ','$1$1',' '), $data[$key]['TxText']));
-            //$data[$key]['TxText']=trim(preg_replace(array('/[\s^\n]+/','/(\n)[\s^\n]*\n[\s]*/','/\ +/','/[ ]*(\n)/'), array(' ','$1$1',' ','$1'), $data[$key]['TxText']));
-        }
-    }
-    return $data;
-}
-
+require_once __DIR__ . '/feeds.php';
+require_once __DIR__ . '/tags.php';
 
 /**
  * Return navigation arrows to previous and next texts.
@@ -2405,6 +1005,27 @@ function get_annotation_position_selectoptions($v): string
     $r .= ">Below</option>";
     $r .= "<option value=\"4\"" . get_selected($v, 4);
     $r .= ">Above</option>";
+    return $r;
+}
+// -------------------------------------------------------------
+
+function get_hts_selectoptions($current_setting): string
+{
+    if (!isset($current_setting)) { 
+        $current_setting = 1; 
+    }
+    $options = array(
+        1 => "Never",
+        2 => "On Click",
+        3 => "On Hover"
+    );
+    $r = "";
+    foreach ($options as $key => $value) {
+        $r .= sprintf(
+            '<option value="%d"%s>%s</option>', 
+            $key, get_selected($current_setting, $key), $value
+        );
+    }
     return $r;
 }
 
@@ -4113,22 +2734,19 @@ function getScriptDirectionTag($lid): string
 }
 
 /**
- * Insert an expression to the database using MeCab.
+ * Find all occurences of an expression using MeCab.
  *
  * @param string     $text Text to insert
  * @param string|int $lid  Language ID
- * @param string|int $wid  Word ID
  * @param int        $len  Number of words in the expression
  *
- * @return string[][] Append text and values to insert to the database
- *
- * @since 2.5.0-fork Function added.
+ * @return (string|int)[] Each found multi-word details
  *
  * @global string $tbpref Table name prefix
  *
  * @psalm-return list{array<int, string>, list{0?: string,...}}
  */
-function insert_expression_from_mecab($text, $lid, $wid, $len): array
+function findMecabExpression($text, $lid): array
 {
     global $tbpref;
 
@@ -4157,9 +2775,7 @@ function insert_expression_from_mecab($text, $lid, $wid, $len): array
         }
     }
 
-
-    $appendtext = array();
-    $sqlarray = array();
+    $occurences = array();
     // For each sentence in database containing $text
     while ($record = mysqli_fetch_assoc($res)) {
         $sent = trim((string) $record['SeText']);
@@ -4189,13 +2805,12 @@ function insert_expression_from_mecab($text, $lid, $wid, $len): array
             $pos = preg_match_all('/ /', mb_substr($parsed_sentence, 0, $seek)) * 2 + 
             (int) $record['SeFirstPos'];
             // Ti2WoID,Ti2LgID,Ti2TxID,Ti2SeID,Ti2Order,Ti2WordCount,Ti2Text
-            $sqlarray[] = "($wid, $lid, {$record['SeTxID']}, {$record['SeID']}, 
-            $pos, $len, " . convert_string_to_sqlsyntax_notrim_nonull($text) . ")";
-            if (getSettingZeroOrOne('showallwords', 1)) {
-                $appendtext[$pos] = "&nbsp;$len&nbsp";
-            } else { 
-                $appendtext[$pos] = $text;
-            }
+            $occurences[] = [
+                "SeID" => (int) $record['SeID'],
+                "TxID" => (int) $record['SeTxID'], 
+                "position" => $pos,
+                "term" => $text
+            ];
             $seek = mb_strpos($parsed_sentence, $parsed_text, $seek + 1);
         }
         pclose($handle);
@@ -4203,7 +2818,55 @@ function insert_expression_from_mecab($text, $lid, $wid, $len): array
     mysqli_free_result($res);
     unlink($db_to_mecab);
 
-    return array($appendtext, $sqlarray);
+    return $occurences;
+}
+
+/**
+ * Insert an expression to the database using MeCab.
+ *
+ * @param string     $text Text to insert
+ * @param string|int $lid  Language ID
+ * @param string|int $wid  Word ID
+ * @param int        $len  Number of words in the expression
+ *
+ * @return string[][] Append text and values to insert to the database
+ *
+ * @since 2.5.0-fork Function added.
+ * 
+ * @deprecated Since 2.10.0 Use insertMecabExpression
+ *
+ * @global string $tbpref Table name prefix
+ *
+ * @psalm-return list{array<int, string>, list{0?: string,...}}
+ */
+function insert_expression_from_mecab($text, $lid, $wid, $len): array
+{
+    $occurences = findMecabExpression($text, $lid);
+
+    $mwords = array();
+    foreach ($occurences as $occ) {
+        $mwords[$occ['SeTxID']] = array();
+        if (getSettingZeroOrOne('showallwords', 1)) {
+            $mwords[$occ['SeTxID']][$occ['position']] = "&nbsp;$len&nbsp";
+        } else {
+            $mwords[$occ['SeTxID']][$occ['position']] = $occ['term'];
+        }
+    }
+    $flat_mwords = array_reduce($mwords, function ($carry, $item) {
+        return $carry + $item;
+    }, []);
+
+    $sqlarr = array();
+    foreach ($occurences as $occ) {
+        $sqlarr[] = "(" . implode(",", 
+        [
+            $wid, $lid, $occ["SeTxID"], $occ["SeID"], 
+            $occ["position"], $len, 
+            convert_string_to_sqlsyntax_notrim_nonull($occ["term"])
+        ]) . ")";
+    }
+
+    return array($flat_mwords, array(), $sqlarr);
 }
 
 /**
@@ -4221,7 +2884,7 @@ function insert_expression_from_mecab($text, $lid, $wid, $len): array
  *                   $mode is unnused, data are always returned.
  *                   The second return argument is always empty array.
  *
- * @deprecated Use insert_expression_from_mecab instead.
+ * @deprecated Use insertMecabExpression instead.
  *
  * @global string $tbpref Table name prefix
  *
@@ -4232,29 +2895,21 @@ function insertExpressionFromMeCab($textlc, $lid, $wid, $len, $mode): array
     return insert_expression_from_mecab($textlc, $lid, $wid, $len);
 }
 
+
 /**
- * Insert an expression without using a tool like MeCab.
+ * Find all occurences of an expression, do not use parsers like MeCab.
  *
  * @param string     $textlc Text to insert in lower case
  * @param string|int $lid    Language ID
- * @param string|int $wid    Word ID
- * @param int        $len    Number of words in the expression
- * @param mixed      $mode   Unnused
  *
- * @return (null|string)[][] Append text, empty and sentence id
- *
- * @since 2.5.0-fork Mode is unnused and data are always added to the output.
- * @since 2.5.2-fork Fixed multi-words insertion for languages using no space
+ * @return (string|int)[] Each inserted mutli-word details
  *
  * @global string $tbpref Table name prefix
- *
- * @psalm-return list{array<int, null|string>, array<never, never>, list{0?: string,...}}
  */
-function insert_standard_expression($textlc, $lid, $wid, $len, $mode): array
+function findStandardExpression($textlc, $lid): array
 {
     global $tbpref;
-    $appendtext = array();
-    $sqlarr = array();
+    $occurences = array();
     $res = do_mysqli_query("SELECT * FROM {$tbpref}languages WHERE LgID=$lid");
     $record = mysqli_fetch_assoc($res);
     $removeSpaces = $record["LgRemoveSpaces"] == 1;
@@ -4264,7 +2919,7 @@ function insert_standard_expression($textlc, $lid, $wid, $len, $mode): array
     if ($removeSpaces && !$splitEachChar) {
         $sql = "SELECT 
         GROUP_CONCAT(Ti2Text ORDER BY Ti2Order SEPARATOR ' ') AS SeText, SeID, 
-        SeTxID, SeFirstPos 
+        SeTxID, SeFirstPos, SeTxID
         FROM {$tbpref}textitems2
         JOIN {$tbpref}sentences 
         ON SeID=Ti2SeID AND SeLgID = Ti2LgID
@@ -4304,7 +2959,8 @@ function insert_standard_expression($textlc, $lid, $wid, $len, $mode): array
         $last_pos = mb_strripos($string, $textlc, 0, 'UTF-8');
         // For each occurence of query in sentence
         while ($last_pos !== false) {
-            if ($splitEachChar || $removeSpaces  
+            if (
+                $splitEachChar || $removeSpaces  
                 || preg_match($notermchar, " $string ", $matches, 0, $last_pos - 1)
             ) {
                 // Number of terms before group
@@ -4318,16 +2974,18 @@ function insert_standard_expression($textlc, $lid, $wid, $len, $mode): array
                 if ($matches[1] != $textlc) {
                     $txt = $splitEachChar ? $wis : $matches[1]; 
                 }
-                $sqlarr[] = "($wid, $lid, {$record['SeTxID']},
-                {$record['SeID']}, $pos, $len, " . 
-                convert_string_to_sqlsyntax_notrim_nonull($txt) . ')';
-                if (getSettingZeroOrOne('showallwords', 1)) {
-                    $appendtext[$pos] = "&nbsp;$len&nbsp";
-                } else if ($splitEachChar || $removeSpaces) {
-                    $appendtext[$pos] = $wis;
+                if ($splitEachChar || $removeSpaces) {
+                    $display = $wis;
                 } else {
-                    $appendtext[$pos] = $matches[1];
+                    $display = $matches[1];
                 }
+                $occurences[] = [
+                    "SeID" => (int) $record['SeID'],
+                    "SeTxID" => (int) $record['SeTxID'], 
+                    "position" => $pos,
+                    "term" => $txt,
+                    "term_display" => $display
+                ];
             }
             // Cut the sentence to before the right-most term starts
             $string = mb_substr($string, 0, $last_pos, 'UTF-8');
@@ -4335,7 +2993,55 @@ function insert_standard_expression($textlc, $lid, $wid, $len, $mode): array
         }
     }
     mysqli_free_result($res);
-    return array($appendtext, array(), $sqlarr);
+    return $occurences;
+}
+
+/**
+ * Insert an expression without using a tool like MeCab.
+ *
+ * @param string     $textlc Text to insert in lower case
+ * @param string|int $lid    Language ID
+ * @param string|int $wid    Word ID
+ * @param int        $len    Number of words in the expression
+ * @param mixed      $mode   Unnused
+ *
+ * @return (null|string)[][] Append text, empty and sentence id
+ *
+ * @since 2.5.0-fork Mode is unnused and data are always added to the output.
+ * @since 2.5.2-fork Fixed multi-words insertion for languages using no space.
+ * 
+ * @deprecated Since 2.10.0-fork, use insertStandardExpression
+ *
+ * @psalm-return list{array<int, null|string>, array<never, never>, list{0?: string,...}}
+ */
+function insert_standard_expression($textlc, $lid, $wid, $len, $mode): array
+{
+    $occurences = findStandardExpression($textlc, $lid);
+
+    $mwords = array();
+    foreach ($occurences as $occ) {
+        $mwords[$occ['SeTxID']] = array();
+        if (getSettingZeroOrOne('showallwords', 1)) {
+            $mwords[$occ['SeTxID']][$occ['position']] = "&nbsp;$len&nbsp";
+        } else {
+            $mwords[$occ['SeTxID']][$occ['position']] = $occ['term_display'];
+        }
+    }
+    $flat_mwords = array_reduce($mwords, function ($carry, $item) {
+        return $carry + $item;
+    }, []);
+
+    $sqlarr = array();
+    foreach ($occurences as $occ) {
+        $sqlarr[] = "(" . implode(",", 
+        [
+            $wid, $lid, $occ["SeTxID"], $occ["SeID"], 
+            $occ["position"], $len, 
+            convert_string_to_sqlsyntax_notrim_nonull($occ["term"])
+        ]) . ")";
+    }
+
+    return array($flat_mwords, array(), $sqlarr);
 }
 
 
@@ -4343,27 +3049,28 @@ function insert_standard_expression($textlc, $lid, $wid, $len, $mode): array
  * Prepare a JavaScript dialog to insert a new expression. Use elements in
  * global JavaScript scope.
  * 
- * @deprecated Use new_expression_interactable2 instead. The new function does not
+ * @deprecated Use newMultiWordInteractable instead. The new function does not
  * use global JS variables.
  * 
  * @return void 
  */
 function new_expression_interactable($hex, $appendtext, $sid, $len): void 
 {
-    $showAll = getSettingZeroOrOne('showallwords', 1) ? "m" : "";
+    $showAll = (bool) getSettingZeroOrOne('showallwords', 1);
+    $showType = $showAll ? "m" : '';
 
     ?>
 <script type="text/javascript">
     newExpressionInteractable(
         <?php echo json_encode($appendtext); ?>, 
-        ' class="click mword <?php echo $showAll; ?>wsty TERM<?php echo $hex; ?> word' + 
+        ' class="click mword <?php echo $showType; ?>wsty TERM<?php echo $hex; ?> word' + 
     woid + ' status' + status + '" data_trans="' + trans + '" data_rom="' + 
     roman + '" data_code="<?php echo $len; ?>" data_status="' + 
     status + '" data_wid="' + woid + 
     '" title="' + title + '"' ,
         <?php echo json_encode($len); ?>, 
         <?php echo json_encode($hex); ?>,
-        <?php echo json_encode(!$showAll); ?>
+        <?php echo json_encode($showAll); ?>
     );
  </script>
     <?php
@@ -4382,11 +3089,14 @@ function new_expression_interactable($hex, $appendtext, $sid, $len): void
  * @return void
  * 
  * @global string $tbpref Database table prefix.
+ * 
+ * @since 2.10.0-fork Fixes a bug inserting wrong title in tooltip
  */
 function new_expression_interactable2($hex, $appendtext, $wid, $len): void 
 {
     global $tbpref;
-    $showAll = (bool)getSettingZeroOrOne('showallwords', 1) ? "m" : "";
+    $showAll = (bool)getSettingZeroOrOne('showallwords', 1);
+    $showType = $showAll ? "m" : "";
     
     $sql = "SELECT * FROM {$tbpref}words WHERE WoID=$wid";
     $res = do_mysqli_query($sql);
@@ -4394,7 +3104,75 @@ function new_expression_interactable2($hex, $appendtext, $wid, $len): void
     $record = mysqli_fetch_assoc($res);
 
     $attrs = array(
-        "class" => "click mword {$showAll}wsty TERM$hex word$wid status" . 
+        "class" => "click mword {$showType}wsty TERM$hex word$wid status" . 
+        $record["WoStatus"],
+        "data_trans" => $record["WoTranslation"],
+        "data_rom" => $record["WoRomanization"],
+        "data_code" => $len,
+        "data_status" => $record["WoStatus"],
+        "data_wid" => $wid
+    ); 
+    mysqli_free_result($res);
+
+    $term = array_values($appendtext)[0];
+
+    ?>
+<script type="text/javascript">
+    let term = <?php echo json_encode($attrs); ?>;
+
+    let title = '';
+    if (window.parent.LWT_DATA.settings.jQuery_tooltip) {
+        title = make_tooltip(
+            <?php echo json_encode($term); ?>, term.data_trans, term.data_rom, 
+            parseInt(term.data_status, 10)
+        );
+    }
+    term['title'] = title;
+    let attrs = ""; 
+    Object.entries(term).forEach(([k, v]) => attrs += " " + k + '="' + v + '"');
+    // keys(term).map((k) => k + '="' + term[k] + '"').join(" ");
+    
+    newExpressionInteractable(
+        <?php echo json_encode($appendtext); ?>, 
+        attrs,
+        <?php echo json_encode($len); ?>, 
+        <?php echo json_encode($hex); ?>,
+        <?php echo json_encode($showAll); ?>
+    );
+ </script>
+    <?php
+    flush();
+}
+
+
+
+/**
+ * Prepare a JavaScript dialog to insert a new expression.
+ * 
+ * @param string     $hex        Lowercase text, formatted version of the text.
+ * @param string[][] $multiwords Multi-words to happen, format [textid][position][text]
+ * @param int        $wid        Term ID
+ * @param int        $len        Words count.
+ * 
+ * @return void
+ * 
+ * @global string $tbpref Database table prefix.
+ * 
+ * @since 2.10.0-fork Fixes a bug inserting wrong title in tooltip
+ */
+function newMultiWordInteractable($hex, $multiwords, $wid, $len): void 
+{
+    global $tbpref;
+    $showAll = (bool)getSettingZeroOrOne('showallwords', 1);
+    $showType = $showAll ? "m" : "";
+    
+    $sql = "SELECT * FROM {$tbpref}words WHERE WoID=$wid";
+    $res = do_mysqli_query($sql);
+
+    $record = mysqli_fetch_assoc($res);
+
+    $attrs = array(
+        "class" => "click mword {$showType}wsty TERM$hex word$wid status" . 
         $record["WoStatus"],
         "data_trans" => $record["WoTranslation"],
         "data_rom" => $record["WoRomanization"],
@@ -4406,26 +3184,31 @@ function new_expression_interactable2($hex, $appendtext, $wid, $len): void
 
     ?>
 <script type="text/javascript">
-    let term = <?php echo json_encode($attrs); ?>;
+    (function () {
+        let term = <?php echo json_encode($attrs); ?>;
 
-    let title = '';
-    if (window.parent.JQ_TOOLTIP) 
-        title = make_tooltip(
-            <?php echo json_encode($appendtext); ?>, term.data_trans, term.data_rom, 
-            parseInt(term.data_status, 10)
+        const multiWords = <?php echo json_encode($multiwords); ?>;
+
+        let title = '';
+        if (window.parent.LWT_DATA.settings.jQuery_tooltip) {
+            title = make_tooltip(
+                multiWords[window.parent.LWT_DATA.text.id][0], term.data_trans, 
+                term.data_rom, parseInt(term.data_status, 10)
+            );
+        }
+        term['title'] = title;
+        let attrs = ""; 
+        Object.entries(term).forEach(([k, v]) => attrs += " " + k + '="' + v + '"');
+        // keys(term).map((k) => k + '="' + term[k] + '"').join(" ");
+        
+        newExpressionInteractable(
+            multiWords[window.parent.LWT_DATA.text.id],
+            attrs,
+            term.data_code,
+            <?php echo json_encode($hex); ?>,
+            <?php echo json_encode($showAll); ?>
         );
-    term['title'] = title;
-    let attrs = ""; 
-    Object.entries(term).forEach(([k, v]) => attrs += " " + k + '="' + v + '"');
-    // keys(term).map((k) => k + '="' + term[k] + '"').join(" ");
-    
-    newExpressionInteractable(
-        <?php echo json_encode($appendtext); ?>, 
-        attrs,
-        <?php echo json_encode($len); ?>, 
-        <?php echo json_encode($hex); ?>,
-        <?php echo json_encode(!$showAll); ?>
-    );
+    })()
  </script>
     <?php
     flush();
@@ -4450,26 +3233,45 @@ function insertExpressions($textlc, $lid, $wid, $len, $mode): null|string
 {
     global $tbpref;
     $regexp = (string)get_first_value(
-        "SELECT LgRegexpWordCharacters FROM {$tbpref}languages WHERE LgID=$lid"
+        "SELECT LgRegexpWordCharacters AS value 
+        FROM {$tbpref}languages WHERE LgID=$lid"
     );
 
-    /*
-    * TODO:
-    * $appendtext: text to append to the current text
-    * $sqlarr: Expression to append to the database (text independent)
-    * Should separate the two
-    */ 
     if ('MECAB' == strtoupper(trim($regexp))) {
-        list($appendtext, $sqlarr) = insert_expression_from_mecab(
-            $textlc, $lid, $wid, $len
-        );
+        $occurences = findMecabExpression($textlc, $lid);
     } else {
-        list($appendtext, $_, $sqlarr) = insert_standard_expression(
-            $textlc, $lid, $wid, $len, null
-        );
+        $occurences = findStandardExpression($textlc, $lid);
+    }
+
+    // Update the term visually through JS
+    if ($mode == 0) {
+        $appendtext = array();
+        foreach ($occurences as $occ) {
+            $appendtext[$occ['SeTxID']] = array();
+            if (getSettingZeroOrOne('showallwords', 1)) {
+                $appendtext[$occ['SeTxID']][$occ['position']] = "&nbsp;$len&nbsp";
+            } else {
+                if ('MECAB' == strtoupper(trim($regexp))) {
+                    $appendtext[$occ['SeTxID']][$occ['position']] = $occ['term'];
+                } else {
+                    $appendtext[$occ['SeTxID']][$occ['position']] = $occ['term_display'];
+                }
+            }
+        }
+        $hex = strToClassName(prepare_textdata($textlc));
+        newMultiWordInteractable($hex, $appendtext, $wid, $len);
     }
     $sqltext = null;
-    if (!empty($sqlarr)) {
+    if (!empty($occurences)) {
+        $sqlarr = array();
+        foreach ($occurences as $occ) {
+            $sqlarr[] = "(" . implode(",", 
+            [
+                $wid, $lid, $occ["SeTxID"], $occ["SeID"], 
+                $occ["position"], $len, 
+                convert_string_to_sqlsyntax_notrim_nonull($occ["term"])
+            ]) . ")";
+        }
         $sqltext = '';
         if ($mode != 2) {
             $sqltext .= 
@@ -4481,10 +3283,6 @@ function insertExpressions($textlc, $lid, $wid, $len, $mode): null|string
         unset($sqlarr);
     }
 
-    if ($mode == 0) {
-        $hex = strToClassName(prepare_textdata($textlc));
-        new_expression_interactable2($hex, $appendtext, $wid, $len);
-    }
     if ($mode == 2) { 
         return $sqltext; 
     }
@@ -4572,7 +3370,7 @@ function restore_file($handle, $title): string
             if ($sql_line != "") {
                 if (!str_starts_with($query, '-- ')) {
                     $res = mysqli_query(
-                        $GLOBALS['DBCONNECTION'], insert_prefix_in_sql($query)
+                        $GLOBALS['DBCONNECTION'], prefixSQLQuery($query, $tbpref)
                     );
                     $install_status["queries"]++;
                     if ($res == false) {
@@ -4731,28 +3529,6 @@ function create_ann($textid): string
     return $ann;
 }
 
-
-// -------------------------------------------------------------
-
-function insert_prefix_in_sql($sql_line) 
-{
-    global $tbpref;
-    //                                 123456789012345678901
-    if (substr($sql_line, 0, 12) == "INSERT INTO ") {
-        return substr($sql_line, 0, 12) . $tbpref . substr($sql_line, 12); 
-    }
-    if (substr($sql_line, 0, 21) == "DROP TABLE IF EXISTS ") {
-        return substr($sql_line, 0, 21) . $tbpref . substr($sql_line, 21);
-    } 
-    if (substr($sql_line, 0, 14) == "CREATE TABLE `") {
-        return substr($sql_line, 0, 14) . $tbpref . substr($sql_line, 14);
-    } 
-    if (substr($sql_line, 0, 13) == "CREATE TABLE ") {
-        return substr($sql_line, 0, 13) . $tbpref . substr($sql_line, 13);
-    } 
-    return $sql_line; 
-}
-
 // -------------------------------------------------------------
 
 function create_save_ann($textid): string 
@@ -4769,6 +3545,35 @@ function create_save_ann($textid): string
         from " . $tbpref . "texts 
         where TxID = " . $textid
     );
+}
+
+/**
+ * Truncate the database, remove all data belonging by the current user.
+ * 
+ * Keep settings.
+ * 
+ * @global $tbpref
+ */
+function truncateUserDatabase()
+{
+    global $tbpref;
+    runsql('TRUNCATE ' . $tbpref . 'archivedtexts', '');
+    runsql('TRUNCATE ' . $tbpref . 'archtexttags', '');
+    runsql('TRUNCATE ' . $tbpref . 'feedlinks', '');
+    runsql('TRUNCATE ' . $tbpref . 'languages', '');
+    runsql('TRUNCATE ' . $tbpref . 'textitems2', '');
+    runsql('TRUNCATE ' . $tbpref . 'newsfeeds', '');
+    runsql('TRUNCATE ' . $tbpref . 'sentences', '');
+    runsql('TRUNCATE ' . $tbpref . 'tags', '');
+    runsql('TRUNCATE ' . $tbpref . 'tags2', '');
+    runsql('TRUNCATE ' . $tbpref . 'texts', '');
+    runsql('TRUNCATE ' . $tbpref . 'texttags', '');
+    runsql('TRUNCATE ' . $tbpref . 'words', '');
+    runsql('TRUNCATE ' . $tbpref . 'wordtags', '');
+    runsql('DELETE FROM ' . $tbpref . 'settings where StKey = \'currenttext\'', '');
+    optimizedb();
+    get_tags(1);
+    get_texttags(1);
 }
 
 // -------------------------------------------------------------

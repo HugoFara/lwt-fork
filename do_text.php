@@ -3,30 +3,30 @@
 /**
  * \file
  * \brief Start Reading a text (frameset)
- * 
+ *
  * Call: do_text.php?text=[textid]
  *      Create the main window when reading texts.
- * 
+ *
  * PHP version 8.1
- * 
+ *
  * @category User_Interface
  * @package Lwt
  * @author  LWT Project <lwt-project@hotmail.com>
  * @license Unlicense <http://unlicense.org/>
- * @link    https://hugofara.github.io/lwt/docs/html/do__text_8php.html
+ * @link    https://hugofara.github.io/lwt/docs/php/files/do-text.html
  * @since   1.0.3
  */
 
-require_once 'inc/session_utility.php'; 
+require_once 'inc/session_utility.php';
 require_once 'inc/mobile_interactions.php';
 require_once 'do_text_header.php';
 require_once 'do_text_text.php';
 
 /**
  * Get text ID (if possible).
- * 
+ *
  * Text ID if first looked at int the 'text' parameter. If not found, then look at 'start'.
- * 
+ *
  * @return int|null Text ID or null
  */
 function get_text_id()
@@ -42,16 +42,16 @@ function get_text_id()
 
 /**
  * Echo the page content for the mobile version of do_text.
- * 
+ *
  * @param int   $textid Text ID
  * @param mixed $audio  Audio URI, unnused, null by default
- * 
+ *
  * @return void
- * 
+ *
  * @since 2.2.1 It also calls do_frameset_mobile_css and do_frameset_mobile_js
  * @since 2.6.0-fork Rewrote to match the desktop version (between 2.2.1 and 2.6.0)
  */
-function do_text_mobile_content($textid, $audio=null)
+function do_text_mobile_content($textid, $audio = null)
 {
     ?>
 <div style="width: 95%; height: 100%;">
@@ -84,13 +84,13 @@ onclick="hideRightFrames();">
 
 /**
  * Echo the page content for the desktop version of do_text.
- * 
+ *
  * @param int   $textid Text ID
  * @param mixed $audio  Audio URI, unnused, null by default
- * 
+ *
  * @return void
  */
-function do_text_desktop_content($textid, $audio=null)
+function do_text_desktop_content($textid, $audio = null)
 {
     $frame_l_width = (int)getSettingWithDefault('set-text-l-framewidth-percent');
     ?>
@@ -122,25 +122,25 @@ width: <?php echo 97 - $frame_l_width; ?>%;">
 
 /**
  * Echo the text page.
- * 
+ *
  * @param int  $textit Text ID
  * @param bool $mobile Set to true if you want the mobile version of the page.
- * 
+ *
  * @since 2.2.1 The $mobile parameter is no longer required.
  * @since 2.7.0 Adds a CSS rule to auto-enlarge the body.
- * 
+ *
  * @return void
  */
 function do_text_page($textid)
 {
     pagestart_nobody(
-        'Read', 
+        'Read',
         "body {
             margin: 20px;
             max-width: 100%;
         }"
     );
-    
+
     if (is_mobile()) {
         do_text_mobile_content($textid);
     } else {

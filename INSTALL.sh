@@ -4,7 +4,7 @@
 apt_get_cmd=$(which apt-get)
 yum_cmd=$(which yum)
 
-packages="apache2 libapache2-mod-php php php-mbstring php-mysql mysql-server"
+packages="apache2 libapache2-mod-php php php-xml php-mbstring php-mysql mysql-server"
 
 echo "Installing dependencies"
 if [ ! -z $apt_get_cmd ]; then

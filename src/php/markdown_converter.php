@@ -9,7 +9,7 @@
  * @package Lwt_Documentation
  * @author  HugoFara <hugo.farajallah@protonmail.com>
  * @license Unlicense <http://unlicense.org/>
- * @link    https://hugofara.github.io/lwt/docs/html/markdown__converter_8php.html
+ * @link    https://hugofara.github.io/lwt/docs/php/files/src-php-markdown-converter.html
  * @since   2.0.3-fork
  */
 require __DIR__ . '/../../vendor/autoload.php';
