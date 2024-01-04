@@ -184,13 +184,15 @@ function mword_click_event_do_text_text () {
 
 const mwordDragNDrop = {
 
-  event: undefined,
+  annotation: undefined,
 
   pos: undefined,
 
   timeout: undefined,
 
   sentence: undefined,
+
+  touchmode: undefined,
 
   /**
    * Multi-word selection is finished
@@ -239,12 +241,12 @@ const mwordDragNDrop = {
   /**
    * Function to trigger above a term word
    */
-  twordMouseOver: function (evt) {
+  wordSelect: function (evt) {
     console.log("mouse over")
     console.log(evt.target)
     const context = mwordDragNDrop.sentence;
     // Clean all multi-word on mouseup
-    $('html').one('mouseup touchend', function () {
+    $('html').one('mouseup', function () {
       $('.wsty', context).each(function () {
         $(evt.target).addClass('status' + $(evt.target).attr('data_status'));
       });
@@ -265,9 +267,6 @@ const mwordDragNDrop = {
     $(context).on('mouseleave touchcancel', function () {
       $('.lword', context).removeClass('lword');
     });
-    $(context)
-      .one('mouseup', '.nword,.tword', mwordDragNDrop.finish)
-      .one('touchend', mwordDragNDrop.finish);
   },
 
   /**
@@ -310,10 +309,10 @@ const mwordDragNDrop = {
     $('.wsty', context).css('background-color', 'inherit')
       .css('border-bottom-color', 'rgba(0,0,0,0)').not('.hide,.word')
       .each(function () {
-        let f = parseInt($(this).attr('data_code')) * 2 +
+        const data_code = parseInt($(this).attr('data_code')) * 2 +
         parseInt($(this).attr('data_order')) - 1;
         let childr_html = '';
-        $(this).nextUntil($('[id^="ID-' + f + '-"]', context), '[id$="-1"]')
+        $(this).nextUntil($('[id^="ID-' + data_code + '-"]', context), '[id$="-1"]')
           .each(function () {
             let w_order = $(this).attr('data_order');
             if (w_order !== undefined) {
@@ -349,7 +348,7 @@ const mwordDragNDrop = {
     });
 
     // Edit "tword" elements by filling their attributes
-    if (mwordDragNDrop.event.data.annotation == 1) {
+    if (mwordDragNDrop.annotation == 1) {
       $('.wsty', context)
         .not('.hide')
         .each(function () {
@@ -361,7 +360,7 @@ const mwordDragNDrop = {
             'status1 status2 status3 status4 status5 status98 status99'
           );
         });
-    } else if (mwordDragNDrop.event.data.annotation == 3) {
+    } else if (mwordDragNDrop.annotation == 3) {
       $('.wsty', context)
         .not('.hide')
         .each(function () {
@@ -375,23 +374,35 @@ const mwordDragNDrop = {
         });
     }
 
-    // Prepare interaction on ".tword" to mouseover
-    $(context)
-      .one('mouseover', '.tword', mwordDragNDrop.twordMouseOver)
-      .one('touchmove', mwordDragNDrop.twordMouseOver);
+    // Prepare the click/touch interactions
+    if (mwordDragNDrop.touchmode) {
+      // Delete default behavior
+      mwordDragNDrop.sentence.off('touchend touchcancel');
+      // Remove word click
+      $('.word', context).off('click');
 
-    // Prepare a hover intent interaction
-    $(context).hoverIntent({
-      over: mwordDragNDrop.updateSelection,
-      out: function () {},
-      sensitivity: 18,
-      selector: '.tword'
-    });
-    $(context).on('touchmove', function (evt) {
-      // Prevents page scrolling
-      evt.preventDefault(); 
-      mwordDragNDrop.updateSelection();
-    });
+      // Change index on word click
+      $(context).one('touchstart', '.tword', mwordDragNDrop.wordSelect);
+      // Update words
+      $(context).one('touchstart', mwordDragNDrop.updateSelection);
+      // Save
+      $(context).one('touchstart', '.nword,.tword', mwordDragNDrop.finish);
+      // Terminates selection
+      $(context).one('touchstart', mwordDragNDrop.stopInteraction);
+    } else {
+      // Change index when hovering new word
+      $(context).one('mouseover', '.tword', mwordDragNDrop.wordSelect);
+
+      // Update selection on mouse movement stop
+      $(context).hoverIntent({
+        over: mwordDragNDrop.updateSelection,
+        out: function () {},
+        sensitivity: 18,
+        selector: '.tword'
+      });
+
+      $(context).one('mouseup', '.nword,.tword', mwordDragNDrop.finish);
+    }
   },
 
   /**
@@ -407,22 +418,41 @@ const mwordDragNDrop = {
     .css('background-color', '')
     .css('border-bottom-color', '');
     $('#pe').remove();
+    mwordDragNDrop.sentence = undefined;
   }
 }
 
-function mword_drag_n_drop_select (event) {
-  console.log("initializer")
+function mword_drag_n_drop_select (evt) {
   if (LWT_DATA.settings.jQuery_tooltip) $('.ui-tooltip').remove();
-  mwordDragNDrop.event = event;
-  mwordDragNDrop.sentence = $(this).parent();
-  mwordDragNDrop.sentence.one(
-    'mouseup mouseout touchend touchcancel', 
-    $(this), 
-    mwordDragNDrop.stopInteraction
-  );
+  mwordDragNDrop.annotation = evt.data.annotation;
+  if (evt.type == "mousedown") {
+    mwordDragNDrop.sentence = $(this).parent();
+    mwordDragNDrop.touchmode = false;
+    mwordDragNDrop.sentence.one(
+      'mouseup mouseout', 
+      $(this), 
+      mwordDragNDrop.stopInteraction
+    );
+  
+    mwordDragNDrop.timeout = setTimeout(mwordDragNDrop.startInteraction, 300);
+  } else {
+    mwordDragNDrop.touchmode = true;
+    // Create new interaction if new sentence
+    if (mwordDragNDrop.sentence != $(this).parent()) {
+      // Prepare new interaction
+      mwordDragNDrop.sentence = $(this).parent();
+      mwordDragNDrop.sentence.one(
+        'touchend touchcancel', 
+        $(this), 
+        mwordDragNDrop.stopInteraction
+      );
+    
+      mwordDragNDrop.timeout = setTimeout(mwordDragNDrop.startInteraction, 300);
 
-  mwordDragNDrop.timeout = setTimeout(mwordDragNDrop.startInteraction, 300);
+    }
+  }
 }
+
 
 function word_hover_over () {
   if (!$('.tword')[0]) {
@@ -712,9 +742,9 @@ function prepareTextInteractions () {
   $('#thetext')
     .on('selectstart', 'span', false)
     .on(
-    'mousedown touchstart', '.wsty',
-    { annotation: LWT_DATA.settings.annotations_mode },
-    mword_drag_n_drop_select
+      'mousedown touchstart', '.wsty',
+      { annotation: LWT_DATA.settings.annotations_mode },
+      mword_drag_n_drop_select
     );
   $('#thetext').on('click', '.mword', mword_click_event_do_text_text);
   $('.word').on('dblclick', word_dblclick_event_do_text_text);
