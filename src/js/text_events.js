@@ -239,15 +239,16 @@ const mwordDragNDrop = {
   /**
    * Function to trigger above a term word
    */
-  twordMouseOver: function () {
+  twordMouseOver: function (evt) {
     console.log("mouse over")
+    console.log(evt.target)
     const context = mwordDragNDrop.sentence;
     // Clean all multi-word on mouseup
     $('html').one('mouseup touchend', function () {
       $('.wsty', context).each(function () {
-        $(this).addClass('status' + $(this).attr('data_status'));
+        $(evt.target).addClass('status' + $(evt.target).attr('data_status'));
       });
-      if (!$(this).hasClass('tword')) {
+      if (!$(evt.target).hasClass('tword')) {
         $('span', context).removeClass('nword tword lword');
         $('.wsty', context).css('background-color', '')
           .css('border-bottom-color', '');
@@ -256,11 +257,11 @@ const mwordDragNDrop = {
     });
 
     // Set the position selected
-    mwordDragNDrop.pos = parseInt($(this).attr('data_order'));
+    mwordDragNDrop.pos = parseInt($(evt.target).attr('data_order'));
 
     // Add ".lword" class on this element
     $('.lword', context).removeClass('lword');
-    $(this).addClass('lword');
+    $(evt.target).addClass('lword');
     $(context).on('mouseleave touchcancel', function () {
       $('.lword', context).removeClass('lword');
     });
@@ -270,23 +271,25 @@ const mwordDragNDrop = {
   },
 
   /**
-   * When having the cursor over the sentence.
+   * When having the cursor over the sentence. Updates selection length.
    */
-  sentenceHover: function () {
+  updateSelection: function () {
     console.log("sentence hover")
     const context = mwordDragNDrop.sentence;
     $('.lword', context).removeClass('lword');
-    const lpos = parseInt($(this).attr('data_order'));
+    const first_pos = parseInt($(this).attr('data_order'));
+    const last_pos = mwordDragNDrop.pos
     $(this).addClass('lword');
-    if (lpos > mwordDragNDrop.pos) {
-      for (var i = mwordDragNDrop.pos; i < lpos; i++) {
+    // Adds words to the selection
+    if (first_pos > last_pos) {
+      for (let i = last_pos; i < first_pos; i++) {
         $(
           '.tword[data_order="' + i + '"],.nword[data_order="' + i + '"]',
           context
         ).addClass('lword');
       }
     } else {
-      for (var i = mwordDragNDrop.pos; i > lpos; i--) {
+      for (let i = last_pos; i > first_pos; i--) {
         $(
           '.tword[data_order="' + i + '"],.nword[data_order="' + i + '"]',
           context
@@ -379,12 +382,16 @@ const mwordDragNDrop = {
 
     // Prepare a hover intent interaction
     $(context).hoverIntent({
-      over: mwordDragNDrop.sentenceHover,
+      over: mwordDragNDrop.updateSelection,
       out: function () {},
       sensitivity: 18,
       selector: '.tword'
     });
-    $(context).on('touchmove', function (evt) {evt.preventDefault(); mwordDragNDrop.sentenceHover();});
+    $(context).on('touchmove', function (evt) {
+      // Prevents page scrolling
+      evt.preventDefault(); 
+      mwordDragNDrop.updateSelection();
+    });
   },
 
   /**
