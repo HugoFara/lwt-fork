@@ -190,7 +190,7 @@ const mwordDragNDrop = {
 
   timeout: undefined,
 
-  context: undefined,
+  sentence: undefined,
 
   /**
    * Multi-word selection is finished
@@ -198,7 +198,8 @@ const mwordDragNDrop = {
    * @param {*} ev 
    */
   finish: function (ev) {
-    const context = mwordDragNDrop.context;
+    console.log("finish")
+    const context = mwordDragNDrop.sentence;
     if (ev.handled !== true) {
       const len = $('.lword.tword', context).length;
       if (len > 0) {
@@ -206,6 +207,7 @@ const mwordDragNDrop = {
         if (len > 1) {
           const text = $('.lword', context)
             .map(function () { return $(this).text(); }).get().join('');
+          console.log("Final text:" + text)
           if (text.length > 250) {
             alert('Selected text is too long!!!');
           } else {
@@ -238,8 +240,10 @@ const mwordDragNDrop = {
    * Function to trigger above a term word
    */
   twordMouseOver: function () {
-    const context = mwordDragNDrop.context;
-    $('html').one('mouseup', function () {
+    console.log("mouse over")
+    const context = mwordDragNDrop.sentence;
+    // Clean all multi-word on mouseup
+    $('html').one('mouseup touchend', function () {
       $('.wsty', context).each(function () {
         $(this).addClass('status' + $(this).attr('data_status'));
       });
@@ -250,22 +254,27 @@ const mwordDragNDrop = {
         $('#pe').remove();
       }
     });
+
+    // Set the position selected
     mwordDragNDrop.pos = parseInt($(this).attr('data_order'));
 
     // Add ".lword" class on this element
     $('.lword', context).removeClass('lword');
     $(this).addClass('lword');
-    $(context).on('mouseleave', function () {
+    $(context).on('mouseleave touchcancel', function () {
       $('.lword', context).removeClass('lword');
     });
-    $(context).one('mouseup', '.nword,.tword', mwordDragNDrop.finish);
+    $(context)
+      .one('mouseup', '.nword,.tword', mwordDragNDrop.finish)
+      .one('touchend', mwordDragNDrop.finish);
   },
 
   /**
    * When having the cursor over the sentence.
    */
-  sentenceOver: function () {
-    const context = mwordDragNDrop.context;
+  sentenceHover: function () {
+    console.log("sentence hover")
+    const context = mwordDragNDrop.sentence;
     $('.lword', context).removeClass('lword');
     const lpos = parseInt($(this).attr('data_order'));
     $(this).addClass('lword');
@@ -290,8 +299,10 @@ const mwordDragNDrop = {
    * Start creating a multi-word.
    */
   startInteraction: function () {
-    const context = mwordDragNDrop.context;
-    context.off('mouseout');
+    console.log("start")
+    const context = mwordDragNDrop.sentence;
+    // Keeps the sentence selected
+    context.off('mouseout touchcancel');
     // Add .tword (term word) and .nword (not word) subelements 
     $('.wsty', context).css('background-color', 'inherit')
       .css('border-bottom-color', 'rgba(0,0,0,0)').not('.hide,.word')
@@ -362,26 +373,30 @@ const mwordDragNDrop = {
     }
 
     // Prepare interaction on ".tword" to mouseover
-    $(context).one('mouseover', '.tword', mwordDragNDrop.twordMouseOver);
+    $(context)
+      .one('mouseover', '.tword', mwordDragNDrop.twordMouseOver)
+      .one('touchmove', mwordDragNDrop.twordMouseOver);
 
     // Prepare a hover intent interaction
     $(context).hoverIntent({
-      over: mwordDragNDrop.sentenceOver,
+      over: mwordDragNDrop.sentenceHover,
       out: function () {},
       sensitivity: 18,
       selector: '.tword'
     });
+    $(context).on('touchmove', function (evt) {evt.preventDefault(); mwordDragNDrop.sentenceHover();});
   },
 
   /**
    * Stop the multi-word creation interaction
    */
   stopInteraction: function () {
+    console.log("stoped!")
     clearTimeout(mwordDragNDrop.timeout);
     $('.nword').removeClass('nword');
     $('.tword').removeClass('tword');
     $('.lword').removeClass('lword');
-    $('.wsty', mwordDragNDrop.context)
+    $('.wsty', mwordDragNDrop.sentence)
     .css('background-color', '')
     .css('border-bottom-color', '');
     $('#pe').remove();
@@ -389,11 +404,15 @@ const mwordDragNDrop = {
 }
 
 function mword_drag_n_drop_select (event) {
+  console.log("initializer")
   if (LWT_DATA.settings.jQuery_tooltip) $('.ui-tooltip').remove();
-  const sentence = $(this).parent();
-  mwordDragNDrop.context = sentence;
   mwordDragNDrop.event = event;
-  sentence.one('mouseup mouseout', $(this), mwordDragNDrop.stopInteraction);
+  mwordDragNDrop.sentence = $(this).parent();
+  mwordDragNDrop.sentence.one(
+    'mouseup mouseout touchend touchcancel', 
+    $(this), 
+    mwordDragNDrop.stopInteraction
+  );
 
   mwordDragNDrop.timeout = setTimeout(mwordDragNDrop.startInteraction, 300);
 }
@@ -683,10 +702,13 @@ function prepareTextInteractions () {
   $('.word').each(word_each_do_text_text);
   $('.mword').each(mword_each_do_text_text);
   $('.word').on('click', word_click_event_do_text_text);
-  $('#thetext').on('selectstart', 'span', false).on(
-    'mousedown', '.wsty',
+  $('#thetext')
+    .on('selectstart', 'span', false)
+    .on(
+    'mousedown touchstart', '.wsty',
     { annotation: LWT_DATA.settings.annotations_mode },
-    mword_drag_n_drop_select);
+    mword_drag_n_drop_select
+    );
   $('#thetext').on('click', '.mword', mword_click_event_do_text_text);
   $('.word').on('dblclick', word_dblclick_event_do_text_text);
   $('#thetext').on('dblclick', '.mword', word_dblclick_event_do_text_text);
