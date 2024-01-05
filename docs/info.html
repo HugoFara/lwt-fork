@@ -234,7 +234,7 @@
 			</h2>
 
 			<p>
-				The current version is 2.9.1-fork (December 29 2023).
+				The current version is 2.10.0-fork (December 29 2023).
 				<br>
 				<a href="#CHANGELOG">View the Changelog.</a>
 			</p>
@@ -423,11 +423,12 @@ The local webserver (MAMP) will be automatically stopped by quitting the MAMP ap
 <li>
 <p>Installation of LAMP:</p>
 <pre><code class="language-bash">sudo apt-get update
-sudo apt-get install apache2 libapache2-mod-php php php-mbstring php-mysql mysql-server
+sudo apt-get install apache2 libapache2-mod-php php php-mbstring php-mysql php-xml mysql-server
 </code></pre>
+<p>Note: if MySQL is unavailable for your Linux distribution, you can also use MariaDB.</p>
 </li>
 <li>
-<p>(Optional) Check if everything is okay:</p>
+<p>Check if everything is okay:</p>
 <ul>
 <li>
 <code>php -v</code> should show a PHP version equal or above to 8.0.0.</li>
@@ -498,15 +499,16 @@ sudo service mysql restart
 </ol>
 <p>If you want to use LWT again, just do step 7.</p>
 <h3>Run in a Docker container</h3>
-<p><a href="https://docs.docker.com/get-docker/">Docker</a> is the easiest way to install LWT, but it will use more or less 1 GB
-on your system.</p>
+<p><a href="https://docs.docker.com/get-docker/">Docker</a> is the easiest way to install LWT,
+but it will use more or less 1 GB on your system.</p>
 <h4>Using the installer</h4>
-<p>For an light-weight installation, you may use <a href="https://github.com/HugoFara/lwt-docker-installer">HugoFara/lwt-docker-installer</a>.</p>
+<p>For an light-weight installer, you may use
+<a href="https://github.com/HugoFara/lwt-docker-installer">HugoFara/lwt-docker-installer</a>.</p>
 <h4>Build image from source</h4>
 <p>Download the lwt, open a terminal inside it, then type</p>
 <pre><code class="language-bash">docker compose up
 </code></pre>
-<p>By default the server can be accessed on port 8010 (<a href="http://localhost:8010">http://localhost:8010</a>).</p>
+<p>By default the server can be accessed on port 8010 (<a href="http://localhost:8010/lwt">http://localhost:8010/lwt</a>).</p>
 <p>To remove the created containers run</p>
 <pre><code class="language-bash">docker compose down
 </code></pre>
@@ -535,6 +537,7 @@ The official repository is at <a href="https://packagist.org/packages/hugofara/l
 </ol>
 <h3>Something Went Wrong</h3>
 <p>Need more help? You can contact us through  <a href="https://github.com/HugoFara/lwt/issues">GitHub</a> and <a href="https://discord.gg/xrkRZR2jtt">Discord</a>!</p>
+<p>You can also consult the troubleshooting section of the documentation at <a href="https://hugofara.github.io/lwt/docs/info.html#faq">https://hugofara.github.io/lwt/docs/info.html#faq</a>.</p>
 <p>Please note that <em>PHP below version 8.0 is no longer supported</em>.</p>
 
 			<h2 id="postinstall" name="postinstall">▶ Optional Post-Installation Steps - <a href="#">[↑]</a></h2>
@@ -1776,6 +1779,17 @@ A track of all changes is kept in the <a href="./CHANGELOG.md">CHANGELOG.md</a>.
 <li>
 <strong>Arguments</strong>: None</li>
 </ul>
+<h4>Get Reading Configuration</h4>
+<p>Retrieves how word should be read for a specific language.</p>
+<ul>
+<li>
+<strong>Endpoint</strong>: <code>/languages/{lang-id}/reading-configuration</code>
+</li>
+<li>
+<strong>Method</strong>: GET</li>
+<li>
+<strong>Arguments</strong>: None</li>
+</ul>
 <h4>Get Phonetic Reading</h4>
 <p>Retrieves the phonetic reading for any specified term.</p>
 <ul>
@@ -1785,7 +1799,7 @@ A track of all changes is kept in the <a href="./CHANGELOG.md">CHANGELOG.md</a>.
 <li>
 <strong>Method</strong>: GET</li>
 <li>
-<strong>Arguments</strong>: <code>text</code> and <code>lang</code>.</li>
+<strong>Arguments</strong>: <code>text</code> and (<code>lang</code> or <code>lg_id</code>).</li>
 </ul>
 <h4>Get Next Word to Review</h4>
 <p>Retrieves the next word to be reviewed.</p>
@@ -2223,17 +2237,18 @@ ones are marked like "v1.0.0-fork".</p>
 <ul>
 <li>Support for Japanese with MeCab on Mac! This was added thanks to
 <a href="https://github.com/quopquai">quopquai</a> on <a href="https://github.com/HugoFara/lwt/issues/135">#135</a>.</li>
-<li>
-<code>unloadformcheck.js</code> now declares a new object <code>lwt_form_check</code> that contains all the functions needed.</li>
 <li>New globals (<a href="https://github.com/HugoFara/lwt/issues/163">#163</a>):
 <ul>
 <li>On <code>inc/kernel_utility.php</code>: <code>LWT_APP_VERSION</code> and <code>LWT_RELEASE_DATE</code>.</li>
 <li>On <code>api.php</code>: <code>LWT_API_VERSION</code> and <code>LWT_API_RELEASE_DATE</code>.</li>
 <li>
 <code>src/js/jq_pgm.js</code>: <code>LWT_DATA</code>.</li>
+<li>
+<code>unloadformcheck.js</code> now declares a new object <code>lwtFormCheck</code> that contains
+all the functions needed.</li>
 </ul>
 </li>
-<li>Imprtant additions to Text-To-Speech (TTS):
+<li>Important additions to Text-To-Speech (TTS):
 <ul>
 <li>Word can be read on hover or on click.
 Pull request <a href="https://github.com/HugoFara/lwt/pull/147">#147</a> by
@@ -2250,6 +2265,12 @@ application and <code>speechDispatcher</code> that can choose a text reader
 </li>
 <li>Starts a cleaner database management. Database schema is defined in
 <code>db/schema/baseline.sql</code> and no longer in PHP code.</li>
+<li>You can choose to add romanization for languages that don't need it in the language
+settings (<a href="https://github.com/HugoFara/lwt/issues/119">#119</a>).</li>
+<li>Docker images are now built for multiple platforms, see PR
+<a href="https://github.com/HugoFara/lwt/pull/169">#169</a>, closing discussion
+<a href="https://github.com/HugoFara/lwt/discussions/141">#141</a>.
+Many thanks to <a href="https://github.com/ProgramComputer">@ProgramComputer</a>!</li>
 </ul>
 <h4>Changed</h4>
 <ul>
@@ -2261,7 +2282,7 @@ It adds <code>README.md</code> and <code>UNLICENSE.md</code>.</li>
 <li>Adds <code>docs/info.html</code> and <code>docs/index.html</code> from <a href="https://github.com/HugoFara/lwt/pull/146">#146</a>.</li>
 </ul>
 </li>
-<li>Multi-word creation was reviewed to use a simpler code.</li>
+<li>Multi-word creation was reviewed to use a simpler JS code.</li>
 <li>On word review, status + 1 can be set only after word display. Before, you could
 press key up at any time to increase term status, but keydown was effective only
 after solution display (<a href="https://github.com/HugoFara/lwt/issues/159">#159</a>).</li>
@@ -2273,6 +2294,26 @@ It should not lead to any code or behaviour change.</li>
 <li>
 <code>src/js/overlib_interface.js</code>, stemmed from <code>src/js/pgm.js</code>. It contains all the
 overlib interactions.</li>
+<li>
+<code>src/js/src/js/text_events.js</code>, stemmed from <code>src/js/jq_pgm.js</code>.
+It defines interactions with a text on reading.</li>
+</ul>
+</li>
+<li>For audio URI, raises the characters length limit from 200 to 2048
+(<a href="https://github.com/HugoFara/lwt/issues/144">#144</a>).</li>
+<li>Database:
+<ul>
+<li>Database creation and migration is now handled directly in SQL, for a safer
+behavior.</li>
+<li>You do no longer need to give to LWT SYSTEM_VARIABLES_ADMIN for text reparsing. (new function <code>checkExpressions</code>) (<a href="https://github.com/HugoFara/lwt/issues/167">#167</a>). It is still necessary for words import.</li>
+</ul>
+</li>
+<li>Docker changes:
+<ul>
+<li>By default, the images now runs at localhot/lwt and no longer in the
+root folder (<a href="https://github.com/HugoFara/lwt-docker-installer/pull/4">installer #4</a>
+and <a href="https://github.com/HugoFara/lwt/pull/169">#169</a>).</li>
+<li>Image updated from <code>apache-buster</code> to <code>apache-bullseye</code>.</li>
 </ul>
 </li>
 </ul>
@@ -2285,8 +2326,6 @@ overlib interactions.</li>
 Solves <a href="https://github.com/HugoFara/lwt/issues/129">#129</a>, thanks to the help of PR
 <a href="https://github.com/HugoFara/lwt/pull/168">#168</a>.</li>
 <li>Text reading position was not working consistently when adding several known words.</li>
-<li>Japanese was always requiring MeCab for TTS, even if it was not used
-(<a href="https://github.com/HugoFara/lwt/pull/155">#155</a>).</li>
 <li>Multi-words:
 <ul>
 <li>Tooltip was not properly saved (<a href="https://github.com/HugoFara/lwt/pull/170">#170</a>).</li>
@@ -2304,6 +2343,8 @@ multi-word on multiple texts was displaying it at many positions on creation.</l
 <li>Parsing Japanese texts with MeCab was creating warnings when the text was not
 finishing by a punctation mark.</li>
 <li>Multi-words were not saved with MeCab parsing on Japanese.</li>
+<li>Japanese was always requiring MeCab for TTS, even if it was not used
+(<a href="https://github.com/HugoFara/lwt/pull/155">#155</a>) and <a href="https://github.com/HugoFara/lwt/pull/182">#182</a>.</li>
 </ul>
 </li>
 <li>On word review (test):
@@ -2319,7 +2360,7 @@ missing in <code>INSTALL.sh</code> (and <code>composer.json</code>), as stated i
 </ul>
 <h4>Deprecated</h4>
 <ul>
-<li>Using any function from <code>unloadformcheck.js</code> without using <code>lwt_form_check</code> is deprecated.</li>
+<li>Using any function from <code>unloadformcheck.js</code> without using <code>lwtFormCheck</code> is deprecated.</li>
 <li>
 <code>get_database_prefixes</code> is deprecated, superseded by <code>getDatabasePrefix</code> which is much cleaner.</li>
 <li>Globals defined in <code>jq_pgm.js</code> are going into a single global <code>LWT_DATA</code>.</li>

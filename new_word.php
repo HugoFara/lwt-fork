@@ -125,10 +125,15 @@ else {  // if (! isset($_REQUEST['op']))
     $lang = (int)getreq('lang');
     $text = (int)getreq('text');
     $scrdir = getScriptDirectionTag($lang);
+    $showRoman = (bool) get_first_value(
+        "SELECT LgShowRomanization AS value
+        FROM {$tbpref}languages 
+        WHERE LgID = $lang"
+    );
     pagestart_nobody('');
     ?>
     <script type="text/javascript">
-        $(document).ready(lwt_form_check.askBeforeExit);
+        $(document).ready(lwtFormCheck.askBeforeExit);
         $(window).on('beforeunload', function() {
             setTimeout(function() {window.parent.frames['ru'].location.href = 'empty.html';}, 0);
         });
@@ -159,7 +164,7 @@ else {  // if (! isset($_REQUEST['op']))
                 <?php echo getWordTags(0); ?>
             </td>
             </tr>
-            <tr>
+            <tr class="<?php echo ($showRoman ? '' : 'hide'); ?>">
                 <td class="td1 right">Romaniz.:</td>
                 <td class="td1">
                     <input type="text" class="checkoutsidebmp" data_info="Romanization" name="WoRomanization" value="" maxlength="100" size="35" />

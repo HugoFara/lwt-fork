@@ -1,6 +1,8 @@
 name: Docker image
 
 on:
+  release:
+    types: [ published ]
   push:
     branches: [ 'master' ]
     tags:
@@ -11,15 +13,78 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  build-and-push-image:
-    runs-on: ubuntu-latest
+  build-and-upload-image-to-release:
     permissions:
-      contents: read
+      contents: write
       packages: write
-
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # For platform support change, change here and below
+        platform:
+          - linux/amd64
+          - linux/386
+          - linux/arm/v5
+          - linux/arm/v7
+          - linux/arm64
+          - linux/mips64le
+          - linux/ppc64le
+          - linux/s390x
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+      - name: Build  Docker images
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          platforms: ${{ matrix.platform }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          outputs: type=oci,dest=/tmp/image.tar
+        if: ${{ github.event_name == 'release'}}
+      - name: Upload binaries to release
+        if: ${{ github.event_name == 'release'}}
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{secrets.GITHUB_TOKEN }}
+          file: /tmp/image.tar
+          asset_name: ${{ github.ref_name }}-${{ matrix.platform }}
+          tag: ${{ github.ref }}
+  build-and-push-image:
+    permissions:
+      packages: write
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: Log in to the Container registry
         uses: docker/login-action@v2
@@ -39,5 +104,6 @@ jobs:
         with:
           context: .
           push: true
+          platforms: linux/amd64,linux/386,linux/arm/v5,linux/arm/v7,linux/arm64,linux/mips64le,linux/ppc64le,linux/s390x
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

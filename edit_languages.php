@@ -176,7 +176,7 @@ function edit_languages_op_save(): string
                 LgExportTemplate, LgTextSize, LgCharacterSubstitutions, 
                 LgRegexpSplitSentences, LgExceptionsSplitSentences, 
                 LgRegexpWordCharacters, LgRemoveSpaces, LgSplitEachChar, 
-                LgRightToLeft, LgTTSVoiceAPI
+                LgRightToLeft, LgTTSVoiceAPI, LgShowRomanization
             ) VALUES(" . 
                 convert_string_to_sqlsyntax($_REQUEST["LgName"]) . ', ' .
                 convert_string_to_sqlsyntax($_REQUEST["LgDict1URI"]) . ', '. 
@@ -191,7 +191,8 @@ function edit_languages_op_save(): string
                 ((int)isset($_REQUEST["LgRemoveSpaces"])) . ', '.
                 ((int)isset($_REQUEST["LgSplitEachChar"])) . ', '.
                 ((int)isset($_REQUEST["LgRightToLeft"])) . ', ' .
-                convert_string_to_sqlsyntax($_REQUEST["LgTTSVoiceAPI"]) . 
+                convert_string_to_sqlsyntax($_REQUEST["LgTTSVoiceAPI"]) . ', ' .
+                ((int)isset($_REQUEST["LgShowRomanization"])) .
             ')', 
             'Saved'
         );
@@ -211,7 +212,8 @@ function edit_languages_op_save(): string
             'LgRemoveSpaces = ' . ((int)isset($_REQUEST["LgRemoveSpaces"])) . ', ' .
             'LgSplitEachChar = ' . ((int)isset($_REQUEST["LgSplitEachChar"])) . ', ' . 
             'LgRightToLeft = ' . ((int)isset($_REQUEST["LgRightToLeft"])) . ', ' .
-            "LgTTSVoiceAPI = " . convert_string_to_sqlsyntax($_REQUEST["LgTTSVoiceAPI"]) . 
+            "LgTTSVoiceAPI = " . convert_string_to_sqlsyntax($_REQUEST["LgTTSVoiceAPI"]) . ', ' . 
+            "LgShowRomanization = " . ((int)isset($_REQUEST["LgShowRomanization"])) .
             " WHERE LgID = $val", 
             'Saved'
         );
@@ -272,7 +274,8 @@ function edit_languages_op_change($lid): string
         'LgRemoveSpaces = ' . ((int)isset($_REQUEST["LgRemoveSpaces"])) . ', ' .
         'LgSplitEachChar = ' . ((int)isset($_REQUEST["LgSplitEachChar"])) . ', ' . 
         'LgRightToLeft = ' . ((int)isset($_REQUEST["LgRightToLeft"])) . ', ' .
-        'LgTTSVoiceAPI = ' . convert_string_to_sqlsyntax($_REQUEST["LgTTSVoiceAPI"]) . 
+        'LgTTSVoiceAPI = ' . convert_string_to_sqlsyntax($_REQUEST["LgTTSVoiceAPI"]) . ', ' .
+        'LgShowRomanization = ' . ((int)isset($_REQUEST["LgShowRomanization"])) .
         " WHERE LgID = $lid", 
         'Updated'
     );
@@ -340,6 +343,7 @@ function load_language($lgid)
         $language->spliteachchar = null;
         $language->rightoleft = null;
         $language->ttsvoiceapi = "";
+        $language->showromanization = true;
     } else {
         // Load data from database
         $sql = "SELECT * FROM {$tbpref}languages WHERE LgID = $lgid";
@@ -359,6 +363,7 @@ function load_language($lgid)
         $language->spliteachchar = (bool) $record["LgSplitEachChar"];
         $language->rightoleft = (bool) $record["LgRightToLeft"];
         $language->ttsvoiceapi =  $record["LgTTSVoiceAPI"];
+        $language->showromanization = (bool) $record["LgShowRomanization"];
         mysqli_free_result($res);
     }
     return $language;
@@ -687,12 +692,9 @@ function edit_language_form($language): void
 
         testVoiceAPI: function () {
             const api_value = document.forms.lg_form.LgTTSVoiceAPI.value;
-            const prevApi = LWT_DATA.language.ttsVoiceApi;
-            LWT_DATA.language.ttsVoiceApi = api_value;
-            const text = document.forms.lg_form.LgVoiceAPIDemo.value;
-            const lang = <?php echo json_encode($sourceLg); ?>;
-            speechDispatcher(text, lang);
-            LWT_DATA.language.ttsVoiceApi = prevApi;
+            const term = document.forms.lg_form.LgVoiceAPIDemo.value;
+            const lang = <?php echo json_encode($language->name); ?>;
+            readTextWithExternal(term, api_value, lang);
         },
 
         fullFormCheck: function () { 
@@ -1025,6 +1027,17 @@ function edit_language_form($language): void
         </td>
     </tr>
     <tr>
+        <td class="td1 right">Show Romanization:</td>
+        <td class="td1">
+            <input type="checkbox" name="LgShowRomanization" id="LgShowRomanization" 
+            value="1" <?php echo $language->showromanization ? "checked" : ""; ?> />
+            <label for="LgShowRomanization">
+                Show/Hide <a href="https://en.wikipedia.org/wiki/Romanization">romanization</a> field.
+                Recommended for difficult writing systems (e. g.: Chinese, Japanese...)
+            </label>
+        </td>
+    </tr>
+    <tr>
         <td class="td1 right">
             Export Template 
             <img class="click" src="icn/question-frame.png" title="Help" alt="Help" 
@@ -1064,7 +1077,7 @@ function edit_language_form($language): void
     <tr>
         <td class="td1 right" colspan="2">
             <input type="button" value="Cancel" 
-            onclick="{lwt_form_check.resetDirty(); location.href='edit_languages.php';}" /> 
+            onclick="{lwtFormCheck.resetDirty(); location.href='edit_languages.php';}" /> 
             <?php 
             if ($language->id == 0) {
                 echo '<input type="submit" name="op" value="Save" />';
@@ -1189,7 +1202,7 @@ function edit_languages_new()
             }
         };
 
-        $(document).ready(lwt_form_check.askBeforeExit);
+        $(document).ready(lwtFormCheck.askBeforeExit);
     </script>
     <div class="td1 center">
         <div class="center" style="border: 1px solid black;">
@@ -1265,7 +1278,7 @@ function edit_languages_change($lid)
     <script type="text/javascript" charset="utf-8">
         const LANGDEFS = <?php echo json_encode(LWT_LANGUAGES_ARRAY); ?>;
 
-        $(document).ready(lwt_form_check.askBeforeExit);
+        $(document).ready(lwtFormCheck.askBeforeExit);
     </script>
     <h2>Edit Language 
         <a target="_blank" href="docs/info.html#howtolang">

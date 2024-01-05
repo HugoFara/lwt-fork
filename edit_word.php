@@ -285,7 +285,7 @@ function edit_word_do_form($wid, $text_id, $ord, $fromAnn)
     pagestart_nobody($titletext);
     ?>
 <script type="text/javascript">
-    $(document).ready(lwt_form_check.askBeforeExit);
+    $(document).ready(lwtFormCheck.askBeforeExit);
     $(window).on('beforeunload',function() {
         setTimeout(function() {window.parent.frames['ru'].location.href = 'empty.html';}, 0);
     });
@@ -313,7 +313,12 @@ function edit_word_do_form($wid, $text_id, $ord, $fromAnn)
             WHERE LgID = $lang"
         );
         $lang_short = array_key_exists($lgname, LWT_LANGUAGES_ARRAY) ? 
-        LWT_LANGUAGES_ARRAY[$lgname][1] : ''
+        LWT_LANGUAGES_ARRAY[$lgname][1] : '';
+        $showRoman = (bool) get_first_value(
+            "SELECT LgShowRomanization AS value
+            FROM {$tbpref}languages 
+            WHERE LgID = $lang"
+        );
             
         ?>
     
@@ -351,7 +356,7 @@ function edit_word_do_form($wid, $text_id, $ord, $fromAnn)
             <?php echo getWordTags(0); ?>
         </td>
     </tr>
-    <tr>
+    <tr class="<?php echo ($showRoman ? '' : 'hide'); ?>">
         <td class="td1 right">Romaniz.:</td>
         <td class="td1">
             <input type="text" class="checkoutsidebmp" data_info="Romanization" 
@@ -413,16 +418,16 @@ function edit_word_do_form($wid, $text_id, $ord, $fromAnn)
         /**
          * Sets the romanization of a term.
          */
-        const autoRomanization = function () {
+        const autoRomanization = function (lgid) {
             const term = $('#wordfield').val();
-            getPhoneticTextAsync(term, LANG_SHORT)
+            getPhoneticTextAsync(term, lgid)
             .then(function (phonetic) {
                 newword.WoRomanization.value = phonetic["phonetic_reading"];
             });
         }
 
         autoTranslate();
-        autoRomanization();
+        autoRomanization(<?php echo json_encode($lang); ?>);
 
     </script>
         <?php
@@ -451,6 +456,12 @@ function edit_word_do_form($wid, $text_id, $ord, $fromAnn)
             if ($transl == '*') { 
                 $transl = ''; 
             }
+            $showRoman = (bool) get_first_value(
+                "SELECT LgShowRomanization AS value
+                FROM {$tbpref}languages JOIN {$tbpref}texts 
+                ON TxLgID = LgID
+                WHERE TxID = $text_id"
+            );
             ?>
         
      <form name="editword" class="validate" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
@@ -489,7 +500,7 @@ function edit_word_do_form($wid, $text_id, $ord, $fromAnn)
                 <?php echo getWordTags($wid); ?>
             </td>
         </tr>
-        <tr>
+        <tr class="<?php echo ($showRoman ? '' : 'hide'); ?>">
             <td class="td1 right">Romaniz.:</td>
             <td class="td1">
                 <input type="text" class="checkoutsidebmp" 

@@ -18,7 +18,7 @@
  * 
  * This structure is experimental and subject to change.
  * 
- * @since 2.10.0-fork Get a new ttsvoiceapi method
+ * @since 2.10.0-fork Get new ttsvoiceapi, showromanization properties
  */
 class Language
 {
@@ -89,6 +89,11 @@ class Language
     public $ttsvoiceapi;
 
     /**
+     * @var string $showromanization Setting to show or hide romanization
+     */
+    public $showromanization;
+
+    /**
      * Export word data as a JSON dictionnary.
      * 
      * @return string JSON disctionnary. 
@@ -110,7 +115,8 @@ class Language
                 "removespaces"       => $this->removespaces,
                 "spliteachchar"      => $this->spliteachchar,
                 "rightoleft"         => $this->rightoleft,
-                "ttsvoiceapi"        => $this->ttsvoiceapi
+                "ttsvoiceapi"        => $this->ttsvoiceapi,
+                "showromanization"   => $this->showromanization
             )
         );
     }

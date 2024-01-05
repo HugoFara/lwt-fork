@@ -187,8 +187,8 @@ function browser_tts($text, $languageName): void
         WHERE LgName = " . convert_string_to_sqlsyntax($languageName)
     );
     $languageCode = getLanguageCode($lg_id, LWT_LANGUAGES_ARRAY);
-    // Phonetic reading for this text
-    $phoneticText = phonetic_reading($text, $languageCode);
+    // Phonetic reading for this text. As it can be long do not use AJAX
+    $phoneticText = phoneticReading($text, $lg_id);
     $voiceApi = get_first_value(
         "SELECT LgTTSVoiceAPI AS value FROM {$tbpref}languages 
         WHERE LgID = $lg_id"

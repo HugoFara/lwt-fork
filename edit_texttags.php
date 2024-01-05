@@ -110,7 +110,7 @@ if (isset($_REQUEST['new'])) {
 
     <h2>New Tag</h2>
     <script type="text/javascript" charset="utf-8">
-        $(document).ready(lwt_form_check.askBeforeExit);
+        $(document).ready(lwtFormCheck.askBeforeExit);
     </script>
     <form name="newtag" class="validate" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
     <table class="tab1" cellspacing="0" cellpadding="5">
@@ -131,7 +131,7 @@ if (isset($_REQUEST['new'])) {
     </tr>
     <tr>
         <td class="td1 right" colspan="2">
-        <input type="button" value="Cancel" onclick="{lwt_form_check.resetDirty(); location.href='edit_texttags.php';}" /> 
+        <input type="button" value="Cancel" onclick="{lwtFormCheck.resetDirty(); location.href='edit_texttags.php';}" /> 
         <input type="submit" name="op" value="Save" /></td>
     </tr>
     </table>
@@ -148,7 +148,7 @@ if (isset($_REQUEST['new'])) {
         ?>
      <h2>Edit Tag</h2>
      <script type="text/javascript" charset="utf-8">
-         $(document).ready(lwt_form_check.askBeforeExit);
+         $(document).ready(lwtFormCheck.askBeforeExit);
      </script>
      <form name="edittag" class="validate" action="<?php echo $_SERVER['PHP_SELF']; ?>#rec<?php echo $_REQUEST['chg']; ?>" method="post">
         <input type="hidden" name="T2ID" value="<?php echo $record['T2ID']; ?>" />
@@ -169,7 +169,7 @@ if (isset($_REQUEST['new'])) {
         </tr>
         <tr>
         <td class="td1 right" colspan="2">
-        <input type="button" value="Cancel" onclick="{lwt_form_check.resetDirty(); location.href='edit_texttags.php#rec<?php echo $_REQUEST['chg']; ?>'};" /> 
+        <input type="button" value="Cancel" onclick="{lwtFormCheck.resetDirty(); location.href='edit_texttags.php#rec<?php echo $_REQUEST['chg']; ?>'};" /> 
         <input type="submit" name="op" value="Change" /></td>
         </tr>
         </table>

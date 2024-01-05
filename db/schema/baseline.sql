@@ -1,5 +1,18 @@
 -- Basefile to install LWT
 
+-- Migration files to update the database
+DROP TABLE IF EXISTS _migrations;
+CREATE TABLE _migrations (
+	filename VARCHAR(255) NOT NULL,
+	PRIMARY KEY (filename)
+);
+INSERT INTO _migrations VALUES('19700101_000001_lwt_original.sql');
+INSERT INTO _migrations VALUES('19700102_000001_lwt_fork.sql');
+INSERT INTO _migrations VALUES('20231224_131202_missing_auto_increment.sql');
+INSERT INTO _migrations VALUES('20240103_120316_2.10.0-fork.sql');
+
+-- Database definition
+
 CREATE TABLE IF NOT EXISTS archivedtexts ( 
     AtID smallint(5) unsigned NOT NULL AUTO_INCREMENT, 
     AtLgID tinyint(3) unsigned NOT NULL, 

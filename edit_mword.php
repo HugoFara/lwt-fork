@@ -329,11 +329,17 @@ function edit_mword_display_new($term, $tid, $ord, $len)
     $sent = getSentence(
         $seid, $term->textlc, (int) getSettingWithDefault('set-term-sentence-count')
     );
+    $showRoman = (bool) get_first_value(
+        "SELECT LgShowRomanization AS value
+        FROM {$tbpref}languages JOIN {$tbpref}texts 
+        ON TxLgID = LgID
+        WHERE TxID = $tid"
+    );
 
     ?>
 
     <script type="text/javascript">
-        $(document).ready(lwt_form_check.askBeforeExit);
+        $(document).ready(lwtFormCheck.askBeforeExit);
         $(window).on('beforeunload',function() {
             setTimeout(function() {
                 window.parent.frames['ru'].location.href = 'empty.html';
@@ -367,7 +373,7 @@ function edit_mword_display_new($term, $tid, $ord, $len)
                 <?php echo getWordTags(0); ?>
             </td>
         </tr>
-        <tr>
+        <tr class="<?php echo ($showRoman ? '' : 'hide'); ?>">
             <td class="td1 right">Romaniz.:</td>
             <td class="td1">
                 <input type="text" class="checkoutsidebmp" data_info="Romanization" name="WoRomanization" value="" maxlength="100" size="35" />
@@ -420,6 +426,13 @@ function edit_mword_display_change($term, $tid, $ord)
     $sql = 'SELECT WoTranslation, WoSentence, WoRomanization, WoStatus 
     FROM ' . $tbpref . 'words WHERE WoID = ' . $term->id;
     $res = do_mysqli_query($sql);
+    $showRoman = (bool) get_first_value(
+        "SELECT LgShowRomanization AS value
+        FROM {$tbpref}languages JOIN {$tbpref}texts 
+        ON TxLgID = LgID
+        WHERE TxID = $tid"
+    );
+
     if ($record = mysqli_fetch_assoc($res)) {
         $status = $record['WoStatus'];
         if ($status >= 98) { 
@@ -445,7 +458,7 @@ function edit_mword_display_change($term, $tid, $ord)
         ?>
     
     <script type="text/javascript">
-        $(document).ready(lwt_form_check.askBeforeExit);
+        $(document).ready(lwtFormCheck.askBeforeExit);
         $(window).on('beforeunload',function() {
             setTimeout(function() {
                 window.parent.frames['ru'].location.href = 'empty.html';
@@ -485,7 +498,7 @@ function edit_mword_display_change($term, $tid, $ord)
                 <?php echo getWordTags($term->id); ?>
             </td>
         </tr>
-        <tr>
+        <tr class="<?php echo ($showRoman ? '' : 'hide'); ?>">
             <td class="td1 right">Romaniz.:</td>
             <td class="td1">
                 <input type="text" class="checkoutsidebmp" data_info="Romanization" 

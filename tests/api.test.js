@@ -41,6 +41,12 @@ describe('Calls on GET', function() {
   it('GET /phonetic-reading', function(done) {
     supertest(host)
       .get(api_path + '/phonetic-reading')
+      .query({text: 'test', lgid: '1'})
+      .expect('Content-Type', 'application/json')
+      .expect(200, done)
+
+    supertest(host)
+      .get(api_path + '/phonetic-reading')
       .query({text: 'test', lang: 'en'})
       .expect('Content-Type', 'application/json')
       .expect(function(res) {

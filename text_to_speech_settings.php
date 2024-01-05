@@ -259,7 +259,7 @@ function tts_js()
         },
 
         clickCancel: function() {
-            lwt_form_check.resetDirty(); 
+            lwtFormCheck.resetDirty(); 
             location.href = 'text_to_speech_settings.php';
         }
     };

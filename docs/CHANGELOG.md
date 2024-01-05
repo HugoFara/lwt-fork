@@ -11,12 +11,13 @@ ones are marked like "v1.0.0-fork".
 
 * Support for Japanese with MeCab on Mac! This was added thanks to 
 [quopquai](https://github.com/quopquai) on [#135](https://github.com/HugoFara/lwt/issues/135).
-* `unloadformcheck.js` now declares a new object `lwt_form_check` that contains all the functions needed.
 * New globals ([#163](https://github.com/HugoFara/lwt/issues/163)):
   * On `inc/kernel_utility.php`: `LWT_APP_VERSION` and `LWT_RELEASE_DATE`.
   * On `api.php`: `LWT_API_VERSION` and `LWT_API_RELEASE_DATE`.
   * `src/js/jq_pgm.js`: `LWT_DATA`.
-* Imprtant additions to Text-To-Speech (TTS):
+  * `unloadformcheck.js` now declares a new object `lwtFormCheck` that contains 
+  all the functions needed.
+* Important additions to Text-To-Speech (TTS):
   * Word can be read on hover or on click. 
   Pull request [#147](https://github.com/HugoFara/lwt/pull/147) by 
   [@ProgramComputer](https://github.com/ProgramComputer).
@@ -30,6 +31,12 @@ ones are marked like "v1.0.0-fork".
   (browser or third party). 
 * Starts a cleaner database management. Database schema is defined in 
 `db/schema/baseline.sql` and no longer in PHP code.
+* You can choose to add romanization for languages that don't need it in the language 
+settings ([#119](https://github.com/HugoFara/lwt/issues/119)).
+* Docker images are now built for multiple platforms, see PR 
+[#169](https://github.com/HugoFara/lwt/pull/169), closing discussion 
+[#141](https://github.com/HugoFara/lwt/discussions/141). 
+Many thanks to [@ProgramComputer](https://github.com/ProgramComputer)!
 
 ### Changed
 
@@ -38,7 +45,7 @@ ones are marked like "v1.0.0-fork".
   See [#160](https://github.com/HugoFara/lwt/issues/160). 
   It adds `README.md` and `UNLICENSE.md`.
   * Adds `docs/info.html` and `docs/index.html` from [#146](https://github.com/HugoFara/lwt/pull/146).
-* Multi-word creation was reviewed to use a simpler code.
+* Multi-word creation was reviewed to use a simpler JS code.
 * On word review, status + 1 can be set only after word display. Before, you could 
 press key up at any time to increase term status, but keydown was effective only 
 after solution display ([#159](https://github.com/HugoFara/lwt/issues/159)).
@@ -47,6 +54,19 @@ after solution display ([#159](https://github.com/HugoFara/lwt/issues/159)).
   It should not lead to any code or behaviour change.
   * `src/js/overlib_interface.js`, stemmed from `src/js/pgm.js`. It contains all the 
   overlib interactions.
+  * `src/js/src/js/text_events.js`, stemmed from `src/js/jq_pgm.js`. 
+  It defines interactions with a text on reading.
+* For audio URI, raises the characters length limit from 200 to 2048 
+([#144](https://github.com/HugoFara/lwt/issues/144)).
+* Database:
+  * Database creation and migration is now handled directly in SQL, for a safer 
+behavior.
+  * You do no longer need to give to LWT SYSTEM_VARIABLES_ADMIN for text reparsing. (new function `checkExpressions`) ([#167](https://github.com/HugoFara/lwt/issues/167)). It is still necessary for words import.
+* Docker changes:
+  * By default, the images now runs at localhot/lwt and no longer in the 
+  root folder ([installer #4](https://github.com/HugoFara/lwt-docker-installer/pull/4) 
+  and [#169](https://github.com/HugoFara/lwt/pull/169)).
+  * Image updated from `apache-buster` to `apache-bullseye`.
 
 ### Fixed
 
@@ -57,8 +77,6 @@ after solution display ([#159](https://github.com/HugoFara/lwt/issues/159)).
 Solves [#129](https://github.com/HugoFara/lwt/issues/129), thanks to the help of PR 
 [#168](https://github.com/HugoFara/lwt/pull/168).
 * Text reading position was not working consistently when adding several known words.
-* Japanese was always requiring MeCab for TTS, even if it was not used 
-([#155](https://github.com/HugoFara/lwt/pull/155)).
 * Multi-words:
   * Tooltip was not properly saved ([#170](https://github.com/HugoFara/lwt/pull/170)).
   * Translation may be escaped two times ([#170](https://github.com/HugoFara/lwt/pull/170)).
@@ -72,6 +90,8 @@ Solves [#129](https://github.com/HugoFara/lwt/issues/129), thanks to the help of
   * Parsing Japanese texts with MeCab was creating warnings when the text was not 
   finishing by a punctation mark.
   * Multi-words were not saved with MeCab parsing on Japanese.
+  * Japanese was always requiring MeCab for TTS, even if it was not used 
+  ([#155](https://github.com/HugoFara/lwt/pull/155)) and [#182](https://github.com/HugoFara/lwt/pull/182).
 * On word review (test): 
   * the space keyboard shortcut may have been inoperating.
   * On `api.php`, tests were always set to "multi-word" due to a missing variable 
@@ -82,7 +102,7 @@ missing in `INSTALL.sh` (and `composer.json`), as stated in
 
 ### Deprecated
 
-* Using any function from `unloadformcheck.js` without using `lwt_form_check` is deprecated.
+* Using any function from `unloadformcheck.js` without using `lwtFormCheck` is deprecated.
 * `get_database_prefixes` is deprecated, superseded by `getDatabasePrefix` which is much cleaner.
 * Globals defined in `jq_pgm.js` are going into a single global `LWT_DATA`.
 

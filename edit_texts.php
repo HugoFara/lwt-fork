@@ -637,7 +637,7 @@ function edit_texts_form($text, $annotated)
             $('#TxText').attr('lang', language_data[lid]);
         }
     
-        $(document).ready(lwt_form_check.askBeforeExit);
+        $(document).ready(lwtFormCheck.askBeforeExit);
         $(document).ready(change_textboxes_language);
     </script>
     <div class="flex-spaced">
@@ -754,7 +754,7 @@ function edit_texts_form($text, $annotated)
     <img style="float: right; display: none;" id="subtitlesLoadingImg" src="icn/waiting2.gif" />
    
                     <input type="text" class="checkoutsidebmp respinput" 
-                    data_info="Audio-URI" name="TxAudioURI" maxlength="200"
+                    data_info="Audio-URI" name="TxAudioURI" maxlength="2048"
                     value="<?php echo tohtml($text->media_uri); ?>"  /> 
                     <span class="click" id="genSub" onclick="do_ajax_update_subtitles();" style="display: none; margin-left: 16px;">
     <img src="icn/arrow-circle-135.png" title="Generate Subtitles" alt="Generate Subtitles" /> 
@@ -771,7 +771,7 @@ function edit_texts_form($text, $annotated)
             <tr>
                 <td class="td1 right" colspan="2">
                     <input type="button" value="Cancel" 
-                    onclick="{lwt_form_check.resetDirty(); location.href='edit_texts.php<?php echo ($new_text ? '' : '#rec' . $text->id); ?>';}" />
+                    onclick="{lwtFormCheck.resetDirty(); location.href='edit_texts.php<?php echo ($new_text ? '' : '#rec' . $text->id); ?>';}" />
                     <input type="submit" name="op" value="Check" />
                     <input type="submit" name="op" 
                     value="<?php echo ($new_text ? 'Save' : 'Change') ?>" />

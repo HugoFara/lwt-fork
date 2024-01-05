@@ -209,7 +209,7 @@ echo error_message_with_hide($message, true);
 
 ?>
 <script type="text/javascript" charset="utf-8">
-    $(document).ready(lwt_form_check.askBeforeExit);
+    $(document).ready(lwtFormCheck.askBeforeExit);
 </script>
 <form class="validate" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
 <table class="tab1" cellspacing="0" cellpadding="5">
@@ -749,10 +749,10 @@ echo error_message_with_hide($message, true);
     <tr>
         <td class="td1 right" colspan="4">
             <input type="button" value="&lt;&lt; Back" 
-            onclick="{lwt_form_check.resetDirty(); location.href='index.php';}" />
+            onclick="{lwtFormCheck.resetDirty(); location.href='index.php';}" />
             <span class="nowrap"></span>
             <input type="button" value="Reset all settings to default" 
-            onclick="{lwt_form_check.resetDirty(); location.href='settings.php?op=reset';}" />
+            onclick="{lwtFormCheck.resetDirty(); location.href='settings.php?op=reset';}" />
             <span class="nowrap"></span>
             <input type="submit" name="op" value="Save" />
         </td>

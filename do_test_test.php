@@ -776,22 +776,23 @@ function do_test_test_javascript_clickable($wo_record, $solution, $startSec, $en
 {
     global $tbpref;
     $wid = $wo_record['WoID'];
-   /* $lang = get_first_value(
-        'SELECT LgName AS value FROM ' . $tbpref . 'languages
-        WHERE LgID = ' . $wo_record['WoLgID'] . '
-        LIMIT 1'
-    );
-    $abbr = $langDefs[$lang][1];*/
-    $abbr = getLanguageCode($wo_record['WoLgID'], LWT_LANGUAGES_ARRAY);
-    $phoneticText = phonetic_reading($wo_record['WoText'], $abbr);
     $voiceApi = get_first_value(
         "SELECT LgTTSVoiceAPI AS value FROM {$tbpref}languages 
         WHERE LgID = " . $wo_record['WoLgID']
     );
     ?>
-    <script type="text/javascript">
-   
+<script type="text/javascript">
+    /** 
+     * Read the word aloud
+     */
+    function read_word() {
+        speechDispatcher(
+            <?php echo json_encode($wo_record['WoText']); ?>, 
+            <?php echo json_encode($wo_record['WoLgID']); ?>
+        );
+    }
 
+    LWT_DATA.language.id = <?php echo json_encode($wo_record['WoLgID']); ?>;
     LWT_DATA.test.solution = <?php echo prepare_textdata_js($solution); ?>;
     LWT_DATA.word.id = <?php echo $wid; ?>;
     LWT_DATA.language.ttsVoiceApi = <?php echo json_encode($voiceApi); ?>;
@@ -964,22 +965,12 @@ function do_test_test_javascript($count)
      * @param {number} start_sec  starting second
      * @param {number} end_sec  ending second
      * @param {string} word_text  word text
-     * @param {string} word_lg_abbr  Word ID
+     * @param {string} word_lg_id  Word ID
      * @param {string} solution Test answer
      * @param {string} group    
      */
-    function insert_new_word(word_id,tx_id,start_sec,end_sec,word_text,word_lg_abbr, solution, group) {
-        
-        const options_phonetic_reading = {
-                "text": word_text,
-                "lang": word_lg_abbr
+    function insert_new_word(word_id,tx_id,start_sec,end_sec,word_text,word_lg_id, solution, group) {
 
-            };
-            $.getJSON(
-                'api.php/v1/phonetic-reading?' + $.param(options_phonetic_reading)
-            ).done(function (data) {
-                if (data["phonetic_reading"]) {
-                    $('.word').on('click', read_word);
 
                     /** 
                     * Read the word aloud
@@ -987,13 +978,13 @@ function do_test_test_javascript($count)
                     function read_word() {
                         if (('speechSynthesis' in window) &&
                             document.getElementById('utterance-allowed').checked) {
-                            const text = data["phonetic_reading"];
-                            const lang = word_lg_abbr;
-                            readRawTextAloud(text, lang);
+                            const text = word_text;
+                            const lang_id = word_lg_id;
+                            speechDispatcher(text, lang_id);
                         }
                     }
-                }
-            });
+                
+        
             const options_media_paths = {
                 "id": tx_id
             };
@@ -1031,6 +1022,8 @@ playsentence.setAttribute('data-end-time',end_sec)
         $(document).on('keydown', keydown_event_do_test_test);
         $('.word')
         .on('click', word_click_event_do_test_test)
+        $('.word').on('click', read_word);
+
     }
 
     /**
@@ -1063,7 +1056,7 @@ playsentence.setAttribute('data-end-time',end_sec)
             );
         } else {
             insert_new_word(
-                current_test.word_id,current_test.txID,current_test.startSec,current_test.endSec,current_test.word_text,current_test.word_lg_abbr,current_test.solution, current_test.group
+                current_test.word_id,current_test.txID,current_test.startSec,current_test.endSec,current_test.word_text,current_test.word_lg_id,current_test.solution, current_test.group
             );
         }
     }

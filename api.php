@@ -12,6 +12,7 @@ require_once __DIR__ . '/inc/ajax_save_impr_text.php';
 require_once __DIR__ . '/inc/ajax_save_text_position.php';
 require_once __DIR__ . '/inc/ajax_show_imported_terms.php';
 require_once __DIR__ . '/inc/ajax_edit_impr_text.php';
+require_once __DIR__ . '/inc/langdefs.php';
 
 
 /**
@@ -52,6 +53,9 @@ function endpoint_exits($method, $requestUri)
 {
     // Set up API endpoints
     $endpoints = [
+        'languages' => [ 'GET' ],
+        //'languages/(?<lang-id>\d+)/reading-configuration' => [ 'GET' ],
+
         'media-files' => [ 'GET' ],
 
         'phonetic-reading' => [ 'GET' ],
@@ -154,6 +158,36 @@ function media_files($get_req)
     return get_media_paths($get_req["id"]);
 }
 
+
+/**
+ * The way text should be read
+ */
+function readingConfiguration($get_req): array 
+{
+    global $tbpref;
+    // language, voiceAPI, abbr
+    $req = do_mysqli_query(
+        "SELECT LgName, LgTTSVoiceAPI, LgRegexpWordCharacters FROM {$tbpref}languages 
+        WHERE LgID = " . $get_req["lang_id"]
+    );
+    $record = mysqli_fetch_assoc($req);
+    $abbr = getLanguageCode($get_req["lang_id"], LWT_LANGUAGES_ARRAY);
+    if ($record["LgTTSVoiceAPI"] != '') {
+        $readingMode = "external";
+    } elseif ($record["LgRegexpWordCharacters"] == "mecab") {
+        $readingMode = "internal";
+    } else {
+        $readingMode = "direct";
+    }
+    return array(
+        "name" => $record["LgName"],
+        "voiceapi" => $record["LgTTSVoiceAPI"],
+        "word_parsing" => $record["LgRegexpWordCharacters"],
+        "abbreviation" => $abbr,
+        "reading_mode" => $readingMode
+    );
+}
+
 /**
  * Get the phonetic reading of a word based on it's language.
  *
@@ -162,10 +196,16 @@ function media_files($get_req)
  * @return string[] JSON-encoded result
  *
  * @psalm-return array{phonetic_reading: string}
+ * 
+ * @since 2.10.0-fork Can also accept a language ID with "lgid" parameter
  */
 function get_phonetic_reading($get_req): array
 {
-    $data = phonetic_reading($get_req['text'], $get_req['lang']);
+    if (array_key_exists("lang_id", $get_req)) {
+        $data = phoneticReading($get_req['text'], $get_req['lang_id']);
+    } else {
+        $data = phonetic_reading($get_req['text'], $get_req['lang']);
+    }
     return array("phonetic_reading" => $data);
 }
 
@@ -204,7 +244,7 @@ function get_word_test_ajax($testsql, $word_mode, $lgid, $wordregex, $testtype):
     if (empty($word_record)) {
         $output = array(
             "word_id" => 0,
-            "word_lg_abbr" =>'',
+            "word_lg_id" => 0,
             "word_text" => '',
             "group" => '',
             "startSec" => 0,
@@ -235,11 +275,10 @@ function get_word_test_ajax($testsql, $word_mode, $lgid, $wordregex, $testtype):
         $wordregex
     );
     $solution = get_test_solution($testtype, $word_record, $word_mode, $save);
-    $abbr = getLanguageCode($word_record['WoLgID'], LWT_LANGUAGES_ARRAY);
 
     return array(
         "word_id" => $word_record['WoID'],
-        "word_lg_abbr" =>$abbr,
+        "word_lg_id" =>$word_record['WoLgID'],
         "solution" => $solution,
         "word_text" => $save,
         "group" => $html_sentence,        
@@ -660,6 +699,27 @@ function request_handler($method, $requestUri, $post_param)
             parse_str($uri_query, $req_param);
         }
         switch ($endpoint_fragments[0]) {
+            case 'languages':
+                if (ctype_digit($endpoint_fragments[1])) {
+                    if ($endpoint_fragments[2] == 'reading-configuration') {
+                        $req_param['lang_id'] = (int) $endpoint_fragments[1];
+                        $answer = readingConfiguration($req_param);
+                        send_response(200, $answer);
+                    } else {
+                        send_response(
+                            404,
+                            ['error' => 'Expected "reading-configuration", Got ' .
+                            $endpoint_fragments[2]]
+                        );
+                    }
+                } else {
+                    send_response(
+                        404,
+                        ['error' => 'Expected Language ID, found ' .
+                        $endpoint_fragments[1]]
+                    );
+                }
+                break;
             case 'media-files':
                 $answer = media_files($req_param);
                 send_response(200, $answer);

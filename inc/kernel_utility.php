@@ -17,10 +17,10 @@
 /**
  * @var string Version of this current LWT application.
  */
- define('LWT_APP_VERSION', '2.9.1-fork');
+ define('LWT_APP_VERSION', '2.10.0-fork');
 
  /**
-  * @var string Date of the last published release of LWT 
+  * @var string Date of the lastest published release of LWT 
   */
  define('LWT_RELEASE_DATE', "2023-12-29");
 
@@ -815,7 +815,7 @@ function targetLangFromDict($url)
  * 
  * @return array
  */
-function SQLParser($filename)
+function parseSQLFile($filename)
 {  
     $handle = fopen($filename, 'r');
     if ($handle === false) {

@@ -797,33 +797,34 @@ function do_text_text_content($textid, $only_body = true): void
         'LWT_DATA' => array(
 
             'language' => array(
-                'dict_link1' => $wb1,
-                'dict_link2' => $wb2,
+                'id'              => $langid,
+                'dict_link1'      => $wb1,
+                'dict_link2'      => $wb2,
                 'translator_link' => $wb3,
-                'delimiter' => tohtml(
+                'delimiter'       => tohtml(
                     str_replace(
                         array('\\',']','-','^'),
                         array('\\\\','\\]','\\-','\\^'),
                         getSettingWithDefault('set-term-translation-delimiters')
                     )
                 ),
-                'word_parsing' => $record['LgRegexpWordCharacters'],
-                'rtl' => $rtlScript
+                'word_parsing'    => $record['LgRegexpWordCharacters'],
+                'rtl'             => $rtlScript
             ),
 
             'text' => array(
-                'id' => $textid,
+                'id'               => $textid,
                 'reading_position' => $pos,
-                'annotations' => json_decode(annotation_to_json($ann))
+                'annotations'      => json_decode(annotation_to_json($ann))
             ),
 
             'settings' => array(
-                'jQuery_tooltip' => (
+                'jQuery_tooltip'     => (
                     getSettingWithDefault('set-tooltip-mode') == 2 ? 1 : 0
                 ),
-                'hts' => getSettingWithDefault('set-hts'),
+                'hts'                => getSettingWithDefault('set-hts'),
                 'word_status_filter' => makeStatusClassFilter((int)$visit_status),
-                'annotations_mode' => $mode_trans
+                'annotations_mode'   => $mode_trans
             ),
         )
     );

@@ -3661,6 +3661,56 @@ function trim_value(&$value): void
     $value = trim($value); 
 }
 
+
+/** 
+ * Parses text be read by an automatic audio player.
+ * 
+ * Some non-phonetic alphabet will need this, currently only Japanese
+ * is supported, using MeCab.
+ *
+ * @param  string $text Text to be converted
+ * @param  string $lgid Language ID
+ * @return string Parsed text in a phonetic format.
+ */
+function phoneticReading($text, $lgid) 
+{
+    global $tbpref;
+    $sentence_split = get_first_value(
+        "SELECT LgRegexpWordCharacters AS value FROM {$tbpref}languages
+        WHERE LgID = $lgid"
+    );
+
+    // For now we only support phonetic text with MeCab
+    if ($sentence_split != "mecab") {
+        return $text;
+    }
+
+    // Japanese is an exception
+    $mecab_file = sys_get_temp_dir() . "/" . $tbpref . "mecab_to_db.txt";
+    $mecab_args = ' -O yomi ';
+    if (file_exists($mecab_file)) { 
+        unlink($mecab_file); 
+    }
+    $fp = fopen($mecab_file, 'w');
+    fwrite($fp, $text . "\n");
+    fclose($fp);
+    $mecab = get_mecab_path($mecab_args);
+    $handle = popen($mecab . $mecab_file, "r");
+    /**
+     * @var string $mecab_str Output string 
+     */
+    $mecab_str = '';
+    while (($line = fgets($handle, 4096)) !== false) {
+        $mecab_str .= $line; 
+    }
+    if (!feof($handle)) {
+        echo "Error: unexpected fgets() fail\n";
+    }
+    pclose($handle);
+    unlink($mecab_file);
+    return $mecab_str;
+}
+
 /** 
  * Parses text be read by an automatic audio player.
  * 

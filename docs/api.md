@@ -32,13 +32,21 @@ Retrieves the files paths to the audio and video files in the media folder.
 - **Method**: GET
 - **Arguments**: None
 
+### Get Reading Configuration
+
+Retrieves how word should be read for a specific language.
+
+- **Endpoint**: `/languages/{lang-id}/reading-configuration`
+- **Method**: GET
+- **Arguments**: None
+
 ### Get Phonetic Reading
 
 Retrieves the phonetic reading for any specified term.
 
 - **Endpoint**: `/phonetic-reading`
 - **Method**: GET
-- **Arguments**: `text` and `lang`.
+- **Arguments**: `text` and (`lang` or `lg_id`).
 
 
 ### Get Next Word to Review

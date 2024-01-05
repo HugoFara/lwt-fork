@@ -78,7 +78,7 @@ function display_form()
             $('#TxText').attr('lang', language_data[lid]);
         }
 
-        $(document).ready(lwt_form_check.askBeforeExit);
+        $(document).ready(lwtFormCheck.askBeforeExit);
         $(document).ready(change_textboxes_language);
      </script>
 <form class="validate" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">

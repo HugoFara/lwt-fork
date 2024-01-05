@@ -1,6 +1,6 @@
 /**
  * Interaction between LWT and jQuery
- * 
+ *
  * @license unlicense
  * @author  andreask7 <andreasks7@users.noreply.github.com>
  * @since   1.6.16-fork
@@ -13,18 +13,19 @@ Global variables used in LWT jQuery functions
 LWT_DATA = {
   /** Language data */
   language: {
+    id: undefined,
     /** First dictionary URL */
     dict_link1: '',
     /** Second dictionary URL */
     dict_link2: '',
     /** Translator URL */
     translator_link: '',
-  
+
     delimiter: '',
 
     /** Word parsing strategy, usually regular expression or 'mecab' */
     word_parsing: '',
-  
+
     rtl: false,
     /** Third-party voice API */
     ttsVoiceApi: ''
@@ -67,29 +68,28 @@ LWT jQuery functions
 
 /**
  * Set translation and romanization in a form when possible.
- * 
+ *
  * Marj the form as edited if something was changed.
- * 
+ *
  * @param {string} tra Translation
  * @param {string} rom Romanization
  */
-function setTransRoman(tra, rom) {
+function setTransRoman (tra, rom) {
   let form_changed = false;
-  if ($('textarea[name="WoTranslation"]').length == 1) { 
+  if ($('textarea[name="WoTranslation"]').length == 1) {
     $('textarea[name="WoTranslation"]').val(tra);
     form_changed |= true;
   }
-  if ($('input[name="WoRomanization"]').length == 1) { 
+  if ($('input[name="WoRomanization"]').length == 1) {
     $('input[name="WoRomanization"]').val(rom);
     form_changed |= true;
   }
-  if (form_changed)
-    lwt_form_check.makeDirty();
+  if (form_changed) { lwtFormCheck.makeDirty(); }
 }
 
 /**
  * Return whether characters are outside the multilingual plane.
- * 
+ *
  * @param {string} s Input string
  * @returns {boolean} true is some characters are outside the plane
  */
@@ -99,7 +99,7 @@ function containsCharacterOutsideBasicMultilingualPlane (s) {
 
 /**
  * Alert if characters are outside the multilingual plane.
- * 
+ *
  * @param {string} s Input string
  * @returns {boolean} true is some characters are outside the plane
  */
@@ -109,12 +109,12 @@ function alertFirstCharacterOutsideBasicMultilingualPlane (s, info) {
   }
   const match = /[\uD800-\uDFFF]/.exec(s);
   alert(
-    'ERROR\n\nText "' + info + '" contains invalid character(s) ' + 
-    '(in the Unicode Supplementary Multilingual Planes, > U+FFFF) like emojis ' + 
-    'or very rare characters.\n\nFirst invalid character: "' + 
-    s.substring(match.index, match.index + 2) + '" at position ' + 
-    (match.index + 1) + '.\n\n' + 
-    'More info: https://en.wikipedia.org/wiki/Plane_(Unicode)\n\n' + 
+    'ERROR\n\nText "' + info + '" contains invalid character(s) ' +
+    '(in the Unicode Supplementary Multilingual Planes, > U+FFFF) like emojis ' +
+    'or very rare characters.\n\nFirst invalid character: "' +
+    s.substring(match.index, match.index + 2) + '" at position ' +
+    (match.index + 1) + '.\n\n' +
+    'More info: https://en.wikipedia.org/wiki/Plane_(Unicode)\n\n' +
     'Please remove this/these character(s) and try again.'
   );
   return 1;
@@ -122,7 +122,7 @@ function alertFirstCharacterOutsideBasicMultilingualPlane (s, info) {
 
 /**
  * Return the memory size of an UTF8 string.
- * 
+ *
  * @param {string} s String to evaluate
  * @returns {number} Size in bytes
  */
@@ -132,7 +132,7 @@ function getUTF8Length (s) {
 
 /**
  * Force the user scrolling to an anchor.
- * 
+ *
  * @param {string} aid Anchor ID
  */
 function scrollToAnchor (aid) {
@@ -141,13 +141,13 @@ function scrollToAnchor (aid) {
 
 /**
  * Set an existing translation as annotation for a term.
- * 
- * @param {int} textid Text ID 
- * @param {string} elem_name Name of the element of which to change annotation (e. g.: "rg1") 
- * @param {Object} form_data All the data from the form 
+ *
+ * @param {int} textid Text ID
+ * @param {string} elem_name Name of the element of which to change annotation (e. g.: "rg1")
+ * @param {Object} form_data All the data from the form
  * (e. g. {"rg0": "foo", "rg1": "bar"})
  */
-function do_ajax_save_impr_text(textid, elem_name, form_data) {
+function do_ajax_save_impr_text (textid, elem_name, form_data) {
   const idwait = '#wait' + elem_name.substring(2);
   $(idwait).html('<img src="icn/waiting2.gif" />');
   // elem: "rg2", form_data: {"rg2": "translation"}
@@ -159,13 +159,14 @@ function do_ajax_save_impr_text(textid, elem_name, form_data) {
     },
     function (data) {
       $(idwait).html('<img src="icn/empty.gif" />');
-      if ("error" in data)
+      if ('error' in data) {
         alert(
           'Saving your changes failed, please reload the page and try again! ' +
           'Error message: "' + data.error + '".'
         );
+      }
     },
-    "json"
+    'json'
   );
 }
 
@@ -190,25 +191,24 @@ function changeImprAnnRadio () {
   do_ajax_save_impr_text(textid, elem_name, form_data);
 }
 
-
 /**
  * Update a word translation.
- * 
+ *
  * @param {int}    wordid Word ID
  * @param {string} txid   Text HTML ID or unique HTML selector
  */
-function updateTermTranslation(wordid, txid) {
+function updateTermTranslation (wordid, txid) {
   const translation = $(txid).val().trim();
   const pagepos = $(document).scrollTop();
   if (translation == '' || translation == '*') {
     alert('Text Field is empty or = \'*\'!');
     return;
   }
-  let request = {
-    translation: translation,
+  const request = {
+    translation
   };
-  const failure = "Updating translation of term failed!" + 
-  "Please reload page and try again.";
+  const failure = 'Updating translation of term failed!' +
+  'Please reload page and try again.';
   $.post(
     'api.php/v1/terms/' + wordid + '/translations',
     request,
@@ -217,36 +217,36 @@ function updateTermTranslation(wordid, txid) {
         alert(failure);
         return;
       }
-      if ("error" in d) {
-        alert(failure + "\n" + d.error);
+      if ('error' in d) {
+        alert(failure + '\n' + d.error);
         return;
       }
       do_ajax_edit_impr_text(pagepos, d.update, wordid);
     },
-    "json"
+    'json'
   );
 }
 
 /**
  * Add (new word) a word translation.
- * 
+ *
  * @param {string} txid   Text HTML ID or unique HTML selector
  * @param {string} word   Word text
  * @param {int}    lang   Language ID
  */
-function addTermTranslation(txid, word, lang) {
+function addTermTranslation (txid, word, lang) {
   const translation = $(txid).val().trim();
   const pagepos = $(document).scrollTop();
   if (translation == '' || translation == '*') {
     alert('Text Field is empty or = \'*\'!');
     return;
   }
-  const failure = "Adding translation to term failed!" +
-  "Please reload page and try again."
+  const failure = 'Adding translation to term failed!' +
+  'Please reload page and try again.'
   $.post(
     'api.php/v1/terms/new',
     {
-      translation: translation,
+      translation,
       term_text: word,
       lg_id: lang
     },
@@ -255,19 +255,19 @@ function addTermTranslation(txid, word, lang) {
         alert(failure);
         return;
       }
-      if ("error" in d) {
-        alert(failure + "\n" + d.error);
+      if ('error' in d) {
+        alert(failure + '\n' + d.error);
         return;
       }
       do_ajax_edit_impr_text(pagepos, d.add, d.term_id);
     },
-    "json"
+    'json'
   );
 }
 
 /**
  * Set a new status for a word in the test table.
- * 
+ *
  * @param {string} wordid Word ID
  * @param {bool}   up     true if status sould be increased, false otherwise
  */
@@ -276,20 +276,20 @@ function changeTableTestStatus (wordid, up) {
   const wid = parseInt(wordid, 10);
   $.post(
     'api.php/v1/terms/' + wid + '/status/' + status_change,
-    {}, 
+    {},
     function (data) {
-      if (data == "" || "error" in data) {
+      if (data == '' || 'error' in data) {
         return;
       }
       $('#STAT' + wordid).html(data.increment);
     },
-    "json"
+    'json'
   );
 }
 
 /**
  * Check if there is no problem with the text.
- * 
+ *
  * @returns {boolean} true if all checks were successfull
  */
 function check () {
@@ -304,11 +304,11 @@ function check () {
   count = 0;
   $('input.checkurl').each(function (_n) {
     if ($(this).val().trim().length > 0) {
-      if (($(this).val().trim().indexOf('http://') != 0) && 
-      ($(this).val().trim().indexOf('https://') != 0) && 
+      if (($(this).val().trim().indexOf('http://') != 0) &&
+      ($(this).val().trim().indexOf('https://') != 0) &&
       ($(this).val().trim().indexOf('#') != 0)) {
         alert(
-          'ERROR\n\nField "' + $(this).attr('data_info') + 
+          'ERROR\n\nField "' + $(this).attr('data_info') +
           '" must start with "http://" or "https://" if not empty.'
         );
         count++;
@@ -323,9 +323,9 @@ function check () {
         type: 'POST',
         url: 'inc/ajax.php',
         data: {
-          action: "",
-          action_type: "check_regexp",
-          regex: regexp 
+          action: '',
+          action_type: 'check_regexp',
+          regex: regexp
         },
 			 async: false
       }
@@ -341,11 +341,11 @@ function check () {
   // change the following «input[class*="max_int_"]» into «input[class*="maxint_"]»
   $('input[class*="max_int_"]').each(function (_n) {
     const maxvalue = parseInt($(this).attr('class')
-    .replace(/.*maxint_([0-9]+).*/, '$1'));
+      .replace(/.*maxint_([0-9]+).*/, '$1'));
     if ($(this).val().trim().length > 0) {
       if ($(this).val() > maxvalue) {
         alert(
-          'ERROR\n\n Max Value of Field "' + $(this).attr('data_info') + 
+          'ERROR\n\n Max Value of Field "' + $(this).attr('data_info') +
           '" is ' + maxvalue
         );
         count++;
@@ -368,7 +368,7 @@ function check () {
       } catch (err) {
         if (err instanceof TypeError) {
           alert(
-            'ERROR\n\nField "' + $(this).attr('data_info') + 
+            'ERROR\n\nField "' + $(this).attr('data_info') +
             '" should be an URL if not empty.'
           );
           count++;
@@ -380,7 +380,7 @@ function check () {
     if ($(this).val().trim().length > 0) {
       if (!(isInt($(this).val().trim()) && (parseInt($(this).val().trim(), 10) > 0))) {
         alert(
-          'ERROR\n\nField "' + $(this).attr('data_info') + 
+          'ERROR\n\nField "' + $(this).attr('data_info') +
           '" must be an integer number > 0.'
         );
         count++;
@@ -391,7 +391,7 @@ function check () {
     if ($(this).val().trim().length > 0) {
       if (!(isInt($(this).val().trim()) && (parseInt($(this).val().trim(), 10) >= 0))) {
         alert(
-          'ERROR\n\nField "' + $(this).attr('data_info') + 
+          'ERROR\n\nField "' + $(this).attr('data_info') +
           '" must be an integer number >= 0.'
         );
         count++;
@@ -410,8 +410,8 @@ function check () {
   $('textarea.checklength').each(function (_n) {
     if ($(this).val().trim().length > (0 + $(this).attr('data_maxlength'))) {
       alert(
-        'ERROR\n\nText is too long in field "' + $(this).attr('data_info') + 
-        '", please make it shorter! (Maximum length: ' + 
+        'ERROR\n\nText is too long in field "' + $(this).attr('data_info') +
+        '", please make it shorter! (Maximum length: ' +
         $(this).attr('data_maxlength') + ' char.)'
       );
       count++;
@@ -427,8 +427,8 @@ function check () {
   $('textarea.checkbytes').each(function (_n) {
     if (getUTF8Length($(this).val().trim()) > (0 + $(this).attr('data_maxlength'))) {
       alert(
-        'ERROR\n\nText is too long in field "' + $(this).attr('data_info') + 
-        '", please make it shorter! (Maximum length: ' + 
+        'ERROR\n\nText is too long in field "' + $(this).attr('data_info') +
+        '", please make it shorter! (Maximum length: ' +
         $(this).attr('data_maxlength') + ' bytes.)'
       );
       count++;
@@ -437,7 +437,7 @@ function check () {
   $('input.noblanksnocomma').each(function (_n) {
     if ($(this).val().indexOf(' ') > 0 || $(this).val().indexOf(',') > 0) {
       alert(
-        'ERROR\n\nNo spaces or commas allowed in field "' + 
+        'ERROR\n\nNo spaces or commas allowed in field "' +
         $(this).attr('data_info') + '", please remove!'
       );
       count++;
@@ -468,7 +468,7 @@ function confirmDelete () {
 }
 
 /**
- * Enable/disable words hint. 
+ * Enable/disable words hint.
  * Function called when clicking on "Show All".
  */
 function showAllwordsClick () {
@@ -476,18 +476,18 @@ function showAllwordsClick () {
   const showLeaning = $('#showlearningtranslations').prop('checked') ? '1' : '0';
   const text = $('#thetextid').text();
   // Timeout necessary because the button is clicked on the left (would hide frames)
-	setTimeout(function () {
+  setTimeout(function () {
     showRightFrames(
-      'set_text_mode.php?mode=' + showAll + '&showLearning=' + showLeaning + 
+      'set_text_mode.php?mode=' + showAll + '&showLearning=' + showLeaning +
       '&text=' + text
-  );}, 500);
-  setTimeout(function () {window.location.reload();}, 4000);
+    );
+  }, 500);
+  setTimeout(function () { window.location.reload(); }, 4000);
 }
 
 function textareaKeydown (event) {
   if (event.keyCode && event.keyCode == '13') {
-    if (check()) 
-      $('input:submit').last().trigger('click');
+    if (check()) { $('input:submit').last().trigger('click'); }
     return false;
   } else {
     return true;
@@ -503,13 +503,13 @@ function noShowAfter3Secs () {
  */
 function setTheFocus () {
   $('.setfocus')
-  .trigger('focus')
-  .trigger('select');
+    .trigger('focus')
+    .trigger('select');
 }
 
 /**
  * Prepare a dialog when the user clicks a word during a test.
- * 
+ *
  * @returns {false}
  */
 function word_click_event_do_test_test () {
@@ -529,12 +529,12 @@ function word_click_event_do_test_test () {
 
 /**
  * Handle keyboard interaction when testing a word.
- * 
- * @param {object} e A keystroke object 
+ *
+ * @param {object} e A keystroke object
  * @returns {bool} true if nothing was done, false otherwise
  */
 function keydown_event_do_test_test (e) {
-  if ((e.key == 'Space' || e.which == 32) && !LWT_DATA.test.answer_opened) { 
+  if ((e.key == 'Space' || e.which == 32) && !LWT_DATA.test.answer_opened) {
     // space : show solution
     $('.word').trigger('click');
     cleanupRightFrames();
@@ -542,46 +542,45 @@ function keydown_event_do_test_test (e) {
     LWT_DATA.test.answer_opened = true;
     return false;
   }
-  if (e.key == "Escape" || e.which == 27) { 
+  if (e.key == 'Escape' || e.which == 27) {
     // esc : skip term, don't change status
-		showRightFrames(
-      'set_test_status.php?wid=' + LWT_DATA.word.id + 
+    showRightFrames(
+      'set_test_status.php?wid=' + LWT_DATA.word.id +
       '&status=' + $('.word').attr('data_status')
     );
     return false;
   }
-  if (e.key == "I" || e.which == 73) { 
+  if (e.key == 'I' || e.which == 73) {
     // I : ignore, status=98
-		showRightFrames('set_test_status.php?wid=' + LWT_DATA.word.id + '&status=98');
+    showRightFrames('set_test_status.php?wid=' + LWT_DATA.word.id + '&status=98');
     return false;
   }
-  if (e.key == "W" || e.which == 87) { 
+  if (e.key == 'W' || e.which == 87) {
     // W : well known, status=99
-		showRightFrames('set_test_status.php?wid=' + LWT_DATA.word.id + '&status=99');
+    showRightFrames('set_test_status.php?wid=' + LWT_DATA.word.id + '&status=99');
     return false;
   }
-  if (e.key == "E" || e.which == 69) { 
+  if (e.key == 'E' || e.which == 69) {
     // E : edit
-		showRightFrames('edit_tword.php?wid=' + LWT_DATA.word.id);
+    showRightFrames('edit_tword.php?wid=' + LWT_DATA.word.id);
     return false;
   }
   // The next interactions should only be available with displayed solution
-  if (!LWT_DATA.test.answer_opened) 
-    return true;
-  if (e.key == "ArrowUp" || e.which == 38) { 
+  if (!LWT_DATA.test.answer_opened) { return true; }
+  if (e.key == 'ArrowUp' || e.which == 38) {
     // up : status+1
-		showRightFrames('set_test_status.php?wid=' + LWT_DATA.word.id + '&stchange=1');
+    showRightFrames('set_test_status.php?wid=' + LWT_DATA.word.id + '&stchange=1');
     return false;
   }
-  if (e.key == "ArrowDown" || e.which == 40) { 
+  if (e.key == 'ArrowDown' || e.which == 40) {
     // down : status-1
-		showRightFrames('set_test_status.php?wid=' + LWT_DATA.word.id + '&stchange=-1');
+    showRightFrames('set_test_status.php?wid=' + LWT_DATA.word.id + '&stchange=-1');
     return false;
   }
   for (let i = 0; i < 5; i++) {
-    if (e.which == (49 + i) || e.which == (97 + i)) { 
+    if (e.which == (49 + i) || e.which == (97 + i)) {
       // 1,.. : status=i
-			showRightFrames(
+      showRightFrames(
         'set_test_status.php?wid=' + LWT_DATA.word.id + '&status=' + (i + 1)
       );
       return false;
@@ -590,355 +589,12 @@ function keydown_event_do_test_test (e) {
   return true;
 }
 
-/**
- * Add annotations to a word.
- * 
- * @param {*} _ Unused, usually word number 
- */
-function word_each_do_text_text(_) {
-  const wid = $(this).attr('data_wid');
-  if (wid != '') {
-    const order = $(this).attr('data_order');
-    if (order in LWT_DATA.text.annotations) {
-      if (wid == LWT_DATA.text.annotations[order][1]) {
-        const ann = LWT_DATA.text.annotations[order][2];
-        const re = new RegExp(
-          '([' + LWT_DATA.language.delimiter + '][ ]{0,1}|^)(' + 
-          ann.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + ')($|[ ]{0,1}[' + 
-          LWT_DATA.language.delimiter + '])', 
-          ''
-        );
-        if (!re.test($(this).attr('data_trans').replace(/ \[.*$/, ''))) {
-          const trans = ann + ' / ' + $(this).attr('data_trans');
-          $(this).attr('data_trans', trans.replace(' / *', ''));
-        }
-        $(this).attr('data_ann', ann);
-      }
-    }
-  }
-  if (!LWT_DATA.settings.jQuery_tooltip) {
-    this.title = make_tooltip(
-      $(this).text(), 
-      $(this).attr('data_trans'), 
-      $(this).attr('data_rom'), 
-      $(this).attr('data_status')
-    );
-  }
-}
-
-function mword_each_do_text_text(_) {
-  if ($(this).attr('data_status') != '') {
-    const wid = $(this).attr('data_wid');
-    if (wid != '') {
-      const order = parseInt($(this).attr('data_order'));
-      for (let j = 2; j <= 16; j = j + 2) {
-        const index = (order + j).toString();
-        if (index in LWT_DATA.text.annotations) {
-          if (wid == LWT_DATA.text.annotations[index][1]) {
-            const ann = LWT_DATA.text.annotations[index][2];
-            const re = new RegExp(
-              '([' + LWT_DATA.language.delimiter + '][ ]{0,1}|^)(' + 
-              ann.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + ')($|[ ]{0,1}[' + 
-              LWT_DATA.language.delimiter + '])', 
-              ''
-            );
-            if (!re.test($(this).attr('data_trans').replace(/ \[.*$/, ''))) {
-              const trans = ann + ' / ' + $(this).attr('data_trans');
-              $(this).attr('data_trans', trans.replace(' / *', ''));
-            }
-            $(this).attr('data_ann', ann);
-            break;
-          }
-        }
-      }
-    }
-    if (!LWT_DATA.settings.jQuery_tooltip) {
-      this.title = make_tooltip(
-        $(this).attr('data_text'),
-        $(this).attr('data_trans'), $(this).attr('data_rom'),
-        $(this).attr('data_status')
-      );
-    }
-  }
-}
-
-function word_dblclick_event_do_text_text () {
-  const t = parseInt($('#totalcharcount').text(), 10);
-  if (t == 0) 
-    return;
-  let p = 100 * ($(this).attr('data_pos') - 5) / t;
-  if (p < 0) 
-    p = 0;
-  if (typeof (window.parent.frames.h.lwt_audio_controller.newPosition) === 'function') { 
-    window.parent.frames.h.lwt_audio_controller.newPosition(p); 
-  }
-}
-
-/**
- * Do a word edition window. Usually called when the user clicks on a word.
- * 
- * @since 2.9.10-fork Read word aloud if LWT_DATA.settings.hts equals 2.
- * 
- * @returns {bool} false
- */
-function word_click_event_do_text_text () {
-  const status = $(this).attr('data_status');
-  let ann = '';
-  if ($(this).attr('data_ann') !== undefined) { 
-    ann = $(this).attr('data_ann'); 
-  }
-
-  let hints;
-  if (LWT_DATA.settings.jQuery_tooltip) { 
-    hints = make_tooltip(
-      $(this).text(), $(this).attr('data_trans'), $(this).attr('data_rom'), status
-    ); 
-  } else { 
-    hints = $(this).attr('title'); 
-  }
-
-  // Get multi-words containing word
-  const multi_words = Array(7);
-  for (let i = 0; i < 7; i++) {
-    // Start from 2 as multi-words have at least two elements
-    multi_words[i] = $(this).attr('data_mw' + (i + 2)); 
-  }
-  if (status < 1) {
-    run_overlib_status_unknown(
-      LWT_DATA.language.dict_link1, LWT_DATA.language.dict_link2, LWT_DATA.language.translator_link, hints,
-      LWT_DATA.text.id, $(this).attr('data_order'), $(this).text(), multi_words, LWT_DATA.language.rtl
-    );
-    showRightFrames(
-      'edit_word.php?tid=' + LWT_DATA.text.id + '&ord=' + $(this).attr('data_order') + '&wid='
-    );
-  } else if (status == 99) {
-    run_overlib_status_99(
-      LWT_DATA.language.dict_link1, LWT_DATA.language.dict_link2, LWT_DATA.language.translator_link, hints,
-      LWT_DATA.text.id, $(this).attr('data_order'), 
-      $(this).text(), $(this).attr('data_wid'), multi_words, LWT_DATA.language.rtl, ann
-    );
-  } else if (status == 98) {
-    run_overlib_status_98(
-      LWT_DATA.language.dict_link1, LWT_DATA.language.dict_link2, LWT_DATA.language.translator_link, hints,
-      LWT_DATA.text.id, $(this).attr('data_order'), 
-      $(this).text(), $(this).attr('data_wid'), multi_words, LWT_DATA.language.rtl, ann
-    );
-  } else {
-    run_overlib_status_1_to_5(
-      LWT_DATA.language.dict_link1, LWT_DATA.language.dict_link2, LWT_DATA.language.translator_link, hints,
-      LWT_DATA.text.id, $(this).attr('data_order'), 
-      $(this).text(), $(this).attr('data_wid'), status, multi_words, LWT_DATA.language.rtl, ann
-    );
-  }
-  if (LWT_DATA.settings.hts == 2) {
-    const lg = getLangFromDict(LWT_DATA.language.translator_link);
-    speechDispatcher($(this).text(), lg);
-  }
-  return false;
-}
-
-function mword_click_event_do_text_text () {
-  const status = $(this).attr('data_status');
-  if (status != '') {
-    let ann = '';
-    if ((typeof $(this).attr('data_ann')) !== 'undefined') { 
-      ann = $(this).attr('data_ann'); 
-    }
-    run_overlib_multiword(
-      LWT_DATA.language.dict_link1, LWT_DATA.language.dict_link2, LWT_DATA.language.translator_link, 
-      LWT_DATA.settings.jQuery_tooltip ? make_tooltip(
-        $(this).text(), 
-        $(this).attr('data_trans'), 
-        $(this).attr('data_rom'), 
-        status
-      ) : $(this).attr('title'),
-      LWT_DATA.text.id, $(this).attr('data_order'), $(this).attr('data_text'),
-      $(this).attr('data_wid'), status, $(this).attr('data_code'), ann
-    );
-  }
-  if (LWT_DATA.settings.hts == 2) {
-    const lg = getLangFromDict(LWT_DATA.language.translator_link);
-    speechDispatcher($(this).text(), lg);
-  }
-  return false;
-}
-
-function mword_drag_n_drop_select (event) {
-  if (LWT_DATA.settings.jQuery_tooltip)$('.ui-tooltip').remove();
-  const context = $(this).parent();
-  context.one('mouseup mouseout', $(this), function () {
-    clearTimeout(to);
-    $('.nword').removeClass('nword');
-    $('.tword').removeClass('tword');
-    $('.lword').removeClass('lword');
-    $('.wsty', context).css('background-color', '').css('border-bottom-color', '');
-    $('#pe').remove();
-  });
-
-  to = setTimeout(function () {
-    let pos;
-    context.off('mouseout');
-    $('.wsty', context).css('background-color', 'inherit')
-    .css('border-bottom-color', 'rgba(0,0,0,0)').not('.hide,.word')
-    .each(function () {
-      f = parseInt($(this).attr('data_code')) * 2 + 
-      parseInt($(this).attr('data_order')) - 1;
-      h = '';
-      $(this).nextUntil($('[id^="ID-' + f + '-"]', context), '[id$="-1"]')
-      .each(function () {
-        l = $(this).attr('data_order');
-        if (typeof l !== 'undefined') {
-          h += '<span class="tword" data_order="' + l + '">' + $(this).text() + 
-          '</span>';
-        } else {
-          h += '<span class="nword" data_order="' + 
-          $(this).attr('id').split('-')[1] + '">' + $(this).text() + '</span>';
-        }
-      });
-      $(this).html(h);
-    });
-    $('#pe').remove();
-    $('body')
-    .append(
-      '<style id="pe">#' + context.attr('id') + ' .wsty:after,#' + 
-      context.attr('id') + ' .wsty:before{opacity:0}</style>'
-    );
-
-    $('[id$="-1"]', context).not('.hide,.wsty').addClass('nword').each(function () {
-      $(this).attr('data_order', $(this).attr('id').split('-')[1]);
-    });
-    $('.word', context).not('.hide').each(function () {
-      $(this).html(
-        '<span class="tword" data_order="' + $(this).attr('data_order') + '">' + 
-        $(this).text() + '</span>'
-      );
-    });
-    if (event.data.annotation == 1) {
-      $('.wsty', context)
-      .not('.hide')
-      .each(function () { 
-        $(this).children('.tword').last()
-        .attr('data_ann', $(this).attr('data_ann'))
-        .attr('data_trans', $(this).attr('data_trans'))
-        .addClass(
-          'content' + $(this)
-          .removeClass('status1 status2 status3 status4 status5 status98 status99')
-          .attr('data_status')
-        ); 
-      });
-    } else if (event.data.annotation == 3) {
-      $('.wsty', context)
-      .not('.hide')
-      .each(function () { 
-        $(this).children('.tword').first()
-        .attr('data_ann', $(this).attr('data_ann'))
-        .attr('data_trans', $(this).attr('data_trans'))
-        .addClass(
-          'content' + $(this)
-          .removeClass('status1 status2 status3 status4 status5 status98 status99')
-          .attr('data_status')
-        ); 
-      });
-    }
-      $(context).one('mouseover', '.tword', function () {
-      $('html').one('mouseup', function () {
-        $('.wsty', context).each(function () { 
-          $(this).addClass('status' + $(this).attr('data_status')); 
-        });
-        if (!$(this).hasClass('tword')) {
-          $('span', context).removeClass('nword tword lword');
-          $('.wsty', context).css('background-color', '')
-          .css('border-bottom-color', '');
-          $('#pe').remove();
-        }
-      });
-      pos = parseInt($(this).attr('data_order'));
-      $('.lword', context).removeClass('lword');
-      $(this).addClass('lword');
-      $(context).on('mouseleave', function () {
-        $('.lword', context).removeClass('lword');
-      });
-      $(context).one('mouseup', '.nword,.tword', function (ev) {
-        if (ev.handled !== true) {
-          const len = $('.lword.tword', context).length;
-          if (len > 0) {
-            g = $('.lword', context).first().attr('data_order');
-            if (len > 1) {
-              const text = $('.lword', context)
-              .map(function () { return $(this).text(); }).get().join('');
-              if (text.length > 250) {
-                alert('selected text is too long!!!');
-              } else {
-                showRightFrames(
-                  'edit_mword.php?tid=' + LWT_DATA.text.id + '&len=' + len + '&ord=' + g + 
-                  '&txt=' + text
-                );
-              }
-            } else {
-              showRightFrames(
-                'edit_word.php?tid=' + LWT_DATA.text.id + '&ord=' + g + '&txt=' + 
-                $('#ID-' + g + '-1').text()
-              );
-            }
-          }
-          $('span', context).removeClass('tword nword');
-          ev.handled = true;
-        }
-      });
-    });
-    $(context).hoverIntent({
-      over: function () {
-        $('.lword', context).removeClass('lword');
-        const lpos = parseInt($(this).attr('data_order'));
-        $(this).addClass('lword');
-        if (lpos > pos) {
-          for (var i = pos; i < lpos; i++) {
-            $(
-              '.tword[data_order="' + i + '"],.nword[data_order="' + i + '"]', 
-              context
-            ).addClass('lword');
-          }
-        } else {
-          for (var i = pos; i > lpos; i--) {
-            $(
-              '.tword[data_order="' + i + '"],.nword[data_order="' + i + '"]', 
-              context
-            ).addClass('lword');
-          }
-        }
-      },
-      out: function () {},
-      sensitivity: 18,
-      selector: '.tword'
-    });
-  }, 300);
-}
-
-function word_hover_over () {
-  if (!$('.tword')[0]) {
-    const v = $(this).attr('class').replace(/.*(TERM[^ ]*)( .*)*/, '$1');
-    $('.' + v).addClass('hword');
-    if (LWT_DATA.settings.jQuery_tooltip) {
-      $(this).trigger('mouseover');
-    }
-    if (LWT_DATA.settings.hts == 3) { 
-      const lg = getLangFromDict(LWT_DATA.language.translator_link);
-      speechDispatcher($(this).text(), lg);
-      }
-  }
-}
-
-function word_hover_out () {
-  $('.hword').removeClass('hword');
-  if (LWT_DATA.settings.jQuery_tooltip)$('.ui-helper-hidden-accessible>div[style]').remove();
-}
-
 jQuery.fn.extend({
   tooltip_wsty_content: function () {
     var re = new RegExp('([' + LWT_DATA.language.delimiter + '])(?! )', 'g');
     let title = '';
     if ($(this).hasClass('mwsty')) {
-      title = "<p><b style='font-size:120%'>" + $(this).attr('data_text') + 
+      title = "<p><b style='font-size:120%'>" + $(this).attr('data_text') +
       '</b></p>';
     } else {
       title = "<p><b style='font-size:120%'>" + $(this).text() + '</b></p>';
@@ -960,9 +616,9 @@ jQuery.fn.extend({
         const ann = $(this).attr('data_ann');
         if (ann != '' && ann != '*') {
           var re = new RegExp(
-            '(.*[' + LWT_DATA.language.delimiter + '][ ]{0,1}|^)(' + 
-            ann.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + ')($|[ ]{0,1}[' + 
-            LWT_DATA.language.delimiter + '].*$| \\[.*$)', 
+            '(.*[' + LWT_DATA.language.delimiter + '][ ]{0,1}|^)(' +
+            ann.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + ')($|[ ]{0,1}[' +
+            LWT_DATA.language.delimiter + '].*$| \\[.*$)',
             ''
           );
           trans = trans.replace(re, '$1<span style="color:red">$2</span>$3');
@@ -970,7 +626,7 @@ jQuery.fn.extend({
       }
       title += '<p><b>Transl.</b>: ' + trans + '</p>';
     }
-    title += '<p><b>Status</b>: <span class="status' + status + '">' + statname + 
+    title += '<p><b>Status</b>: <span class="status' + status + '">' + statname +
     '</span></p>';
     return title;
   }
@@ -993,270 +649,11 @@ function get_position_from_id (id_string) {
   return parseInt(arr[1]) * 10 + 10 - parseInt(arr[2]);
 }
 
-function keydown_event_do_text_text (e) {
-  if (e.which == 27) { // esc = reset all
-    LWT_DATA.text.reading_position = -1;
-    $('span.uwordmarked').removeClass('uwordmarked');
-    $('span.kwordmarked').removeClass('kwordmarked');
-    cClick();
-    return false;
-  }
-
-  if (e.which == 13) { // return = edit next unknown word
-    $('span.uwordmarked').removeClass('uwordmarked');
-    const unknownwordlist = $('span.status0.word:not(.hide):first');
-    if (unknownwordlist.size() == 0) return false;
-    $(window).scrollTo(unknownwordlist, { axis: 'y', offset: -150 });
-    unknownwordlist.addClass('uwordmarked').trigger('click');
-    cClick();
-    return false;
-  }
-
-  const knownwordlist = $(
-    'span.word:not(.hide):not(.status0)' + LWT_DATA.settings.word_status_filter + 
-    ',span.mword:not(.hide)' + LWT_DATA.settings.word_status_filter
-  );
-  const l_knownwordlist = knownwordlist.size();
-  if (l_knownwordlist == 0) return true;
-
-  // the following only for a non-zero known words list
-  if (e.which == 36) { // home : known word navigation -> first
-    $('span.kwordmarked').removeClass('kwordmarked');
-    LWT_DATA.text.reading_position = 0;
-    curr = knownwordlist.eq(LWT_DATA.text.reading_position);
-    curr.addClass('kwordmarked');
-    $(window).scrollTo(curr, { axis: 'y', offset: -150 });
-    var ann = '';
-    if ((typeof curr.attr('data_ann')) !== 'undefined') { 
-      ann = curr.attr('data_ann');
-    }
-    showRightFrames(
-      'show_word.php?wid=' + curr.attr('data_wid') + '&ann=' + 
-      encodeURIComponent(ann)
-    );
-    return false;
-  }
-  if (e.which == 35) { // end : known word navigation -> last
-    $('span.kwordmarked').removeClass('kwordmarked');
-    LWT_DATA.text.reading_position = l_knownwordlist - 1;
-    curr = knownwordlist.eq(LWT_DATA.text.reading_position);
-    curr.addClass('kwordmarked');
-    $(window).scrollTo(curr, { axis: 'y', offset: -150 });
-    var ann = '';
-    if ((typeof curr.attr('data_ann')) !== 'undefined') { 
-      ann = curr.attr('data_ann');
-    }
-    showRightFrames(
-      'show_word.php?wid=' + curr.attr('data_wid') + '&ann=' + 
-      encodeURIComponent(ann)
-    );
-    return false;
-  }
-  if (e.which == 37) { // left : known word navigation
-    var marked = $('span.kwordmarked');
-    var currid = (marked.length == 0)
-      ? (100000000)
-      : get_position_from_id(marked.attr('id'));
-    $('span.kwordmarked').removeClass('kwordmarked');
-    LWT_DATA.text.reading_position = l_knownwordlist - 1;
-    for (var i = l_knownwordlist - 1; i >= 0; i--) {
-      var iid = get_position_from_id(knownwordlist.eq(i).attr('id'));
-      if (iid < currid) {
-        LWT_DATA.text.reading_position = i;
-        break;
-      }
-    }
-    curr = knownwordlist.eq(LWT_DATA.text.reading_position);
-    curr.addClass('kwordmarked');
-    $(window).scrollTo(curr, { axis: 'y', offset: -150 });
-    var ann = '';
-    if ((typeof curr.attr('data_ann')) !== 'undefined') { 
-      ann = curr.attr('data_ann'); 
-    }
-    showRightFrames(
-      'show_word.php?wid=' + curr.attr('data_wid') + '&ann=' + 
-      encodeURIComponent(ann)
-    );
-    return false;
-  }
-  if (e.which == 39 || e.which == 32) { // space /right : known word navigation
-    var marked = $('span.kwordmarked');
-    var currid = (marked.length == 0)
-      ? (-1)
-      : get_position_from_id(marked.attr('id'));
-    $('span.kwordmarked').removeClass('kwordmarked');
-    LWT_DATA.text.reading_position = 0;
-    for (var i = 0; i < l_knownwordlist; i++) {
-      var iid = get_position_from_id(knownwordlist.eq(i).attr('id'));
-      if (iid > currid) {
-        LWT_DATA.text.reading_position = i;
-        break;
-      }
-    }
-    
-    curr = knownwordlist.eq(LWT_DATA.text.reading_position);
-    curr.addClass('kwordmarked');
-    $(window).scrollTo(curr, { axis: 'y', offset: -150 });
-    var ann = '';
-    if ((typeof curr.attr('data_ann')) !== 'undefined') { 
-      ann = curr.attr('data_ann'); 
-    }
-    showRightFrames(
-      'show_word.php?wid=' + curr.attr('data_wid') + '&ann=' + 
-      encodeURIComponent(ann)
-    );
-    return false;
-  }
-
-  if ((!$('.kwordmarked, .uwordmarked')[0]) && $('.hword:hover')[0]) {
-    curr = $('.hword:hover');
-  } else {
-    if (LWT_DATA.text.reading_position < 0 || LWT_DATA.text.reading_position >= l_knownwordlist) return true;
-    curr = knownwordlist.eq(LWT_DATA.text.reading_position);
-  }
-  const wid = curr.attr('data_wid');
-  const ord = curr.attr('data_order');
-  const stat = curr.attr('data_status');
-  const txt = (curr.hasClass('mwsty')) ? curr.attr('data_text') : curr.text();
-  let dict = '';
-
-  for (var i = 1; i <= 5; i++) {
-    if (e.which == (48 + i) || e.which == (96 + i)) { // 1,.. : status=i
-      if (stat == '0') {
-        if (i == 1) {
-          /** @var {string} sl Source language */
-          const sl = getLangFromDict(LWT_DATA.language.translator_link);
-          const tl = LWT_DATA.language.translator_link.replace(/.*[?&]tl=([a-zA-Z\-]*)(&.*)*$/, '$1');
-          if (sl != LWT_DATA.language.translator_link && tl != LWT_DATA.language.translator_link)
-            i = i + '&sl=' + sl + '&tl=' + tl;
-        }
-        showRightFrames(
-          'set_word_on_hover.php?text=' + txt + '&tid=' + LWT_DATA.text.id + '&status=' + i
-        );
-      } else {
-				showRightFrames(
-          'set_word_status.php?wid=' + wid + '&tid=' + LWT_DATA.text.id + '&ord=' + ord + 
-          '&status=' + i
-        );
-        return false;
-      }
-    }
-  }
-  if (e.which == 73) { // I : status=98
-    if (stat == '0') {
-			showRightFrames(
-        'set_word_on_hover.php?text=' + txt + '&tid=' + LWT_DATA.text.id + 
-        '&status=98'
-      );
-    } else {
-			showRightFrames(
-        'set_word_status.php?wid=' + wid + '&tid=' + LWT_DATA.text.id + 
-        '&ord=' + ord + '&status=98'
-      );
-      return false;
-    }
-  }
-  if (e.which == 87) { // W : status=99
-    if (stat == '0') {
-			showRightFrames(
-        'set_word_on_hover.php?text=' + txt + '&tid=' + LWT_DATA.text.id + '&status=99'
-      );
-    } else {
-			showRightFrames(
-        'set_word_status.php?wid=' + wid + '&tid=' + LWT_DATA.text.id + '&ord=' + ord + 
-        '&status=99'
-      );
-    }
-    return false;
-  }
-  if (e.which == 80) { // P : pronounce term
-    const lg = getLangFromDict(LWT_DATA.language.translator_link);
-    speechDispatcher(txt, lg);
-    return false;
-  }
-  if (e.which == 84) { // T : translate sentence
-    let popup = false;
-    let dict_link = LWT_DATA.language.translator_link;
-    if (LWT_DATA.language.translator_link.startsWith('*')) {
-      popup = true;
-      dict_link = substring(dict_link, 1);
-    }
-    if (dict_link.startsWith('ggl.php')) {
-      dict_link = "http://" + dict_link;
-    }
-    let open_url = true;
-    let final_url;
-    try {
-      final_url = new URL(dict_link);
-      popup |= final_url.searchParams.has("lwt_popup");
-    } catch (err) {
-      if (err instanceof TypeError) {
-        open_url = false;
-      }
-    }
-    if (popup) {
-      owin('trans.php?x=1&i=' + ord + '&t=' + LWT_DATA.text.id);
-    } else if (open_url) {
-      showRightFrames(undefined, 'trans.php?x=1&i=' + ord + '&t=' + LWT_DATA.text.id);
-    }
-    return false;
-  }
-  if (e.which == 65) { // A : set audio pos.
-    let p = curr.attr('data_pos');
-    const t = parseInt($('#totalcharcount').text(), 10);
-    if (t == 0) 
-      return true;
-    p = 100 * (p - 5) / t;
-    if (p < 0) p = 0;
-    if (typeof (window.parent.frames.h.lwt_audio_controller.newPosition) === 'function') { 
-      window.parent.frames.h.lwt_audio_controller.newPosition(p); 
-    } else {
-      return true; 
-    }
-    return false;
-  }
-  if (e.which == 71) { //  G : edit term and open GTr
-    dict = '&nodict';
-    setTimeout(function () {
-      let target_url = LWT_DATA.language.translator_link;
-      let popup = false;
-      popup = target_url.startsWith('*');
-      try {
-        const final_url = new URL(target_url);
-        popup |= final_url.searchParams.has('lwt_popup');
-      } catch (err) {
-        if (!(err instanceof TypeError)) {
-          throw err;
-        }
-      }
-      if (popup) { 
-        owin(createTheDictUrl(target_url, txt)); 
-      } else {
-          showRightFrames(undefined, createTheDictUrl(target_url, txt));
-      }
-    }, 10);
-  }
-  if (e.which == 69 || e.which == 71) { //  E / G: edit term
-    let url = '';
-    if (curr.hasClass('mword')) {
-      url = 'edit_mword.php?wid=' + wid + '&len=' + curr.attr('data_code') + 
-      '&tid=' + LWT_DATA.text.id + '&ord=' + ord + dict;
-    } else if (stat == '0') {
-			url =	'edit_word.php?wid=&tid=' + LWT_DATA.text.id + '&ord=' + ord + dict;
-    } else {
-			url =	'edit_word.php?wid=' + wid + '&tid=' + LWT_DATA.text.id + '&ord=' + ord + dict;
-    }
-    showRightFrames(url);
-    return false;
-  }
-  return true;
-}
-
 /**
  * Save a setting to the database.
- * 
- * @param {string} k Setting name as a key 
- * @param {string} v Setting value 
+ *
+ * @param {string} k Setting name as a key
+ * @param {string} v Setting value
  */
 function do_ajax_save_setting (k, v) {
   $.post(
@@ -1269,40 +666,37 @@ function do_ajax_save_setting (k, v) {
 }
 
 /**
- * Assign the display value of a select element to the value element of another input. 
- * 
- * @param {elem} select_elem 
- * @param {elem} input_elem 
+ * Assign the display value of a select element to the value element of another input.
+ *
+ * @param {elem} select_elem
+ * @param {elem} input_elem
  */
-function quick_select_to_input(select_elem, input_elem)
-{
-  let val = select_elem.options[select_elem.selectedIndex].value; 
-  if (val != '') 
-    input_elem.value = val; 
+function quick_select_to_input (select_elem, input_elem) {
+  const val = select_elem.options[select_elem.selectedIndex].value;
+  if (val != '') { input_elem.value = val; }
   select_elem.value = '';
 }
 
 /**
  * Return an HTML group of options to add to a select field.
- * 
+ *
  * @param {string[]} paths     All paths (files and folders)
  * @param {string[]} folders   Folders paths, should be a subset of paths
  * @param {string}   base_path Base path for LWT to append
- * 
+ *
  * @returns {HTMLOptionElement[]} List of options to append to the select.
- * 
+ *
  * @since 2.9.1-fork Base path is no longer used
  */
-function select_media_path(paths, folders, base_path)
-{
-  let options = [], temp_option = document.createElement('option');
-  temp_option.value = "";
-  temp_option.text = "[Choose...]";
+function select_media_path (paths, folders, base_path) {
+  const options = []; let temp_option = document.createElement('option');
+  temp_option.value = '';
+  temp_option.text = '[Choose...]';
   options.push(temp_option);
   for (let i = 0; i < paths.length; i++) {
     temp_option = document.createElement('option')
     if (folders.includes(paths[i])) {
-      temp_option.setAttribute("disabled", "disabled");
+      temp_option.setAttribute('disabled', 'disabled');
       temp_option.text = '-- Directory: ' + paths[i] + '--';
     } else {
       temp_option.value = paths[i];
@@ -1315,39 +709,39 @@ function select_media_path(paths, folders, base_path)
 
 /**
  * Process the received data from media selection query
- * 
- * @param {Object} data Received data as a JSON object 
+ *
+ * @param {Object} data Received data as a JSON object
  */
-function media_select_receive_data(data) {
-    $('#mediaSelectLoadingImg').css("display", "none");
-    if (data["error"] !== undefined) {
-      let msg;
-      if (data["error"] == "not_a_directory") {
-        msg = '[Error: "../' + data["base_path"] + '/media" exists, but it is not a directory.]';
-      } else if (data["error"] == "does_not_exist") {
-        msg = '[Directory "../' + data["base_path"] + '/media" does not yet exist.]';
-      } else {
-        msg = "[Unknown error!]";
-      }
-      $('#mediaSelectErrorMessage').text(msg);
-      $('#mediaSelectErrorMessage').css("display", "inherit");
+function media_select_receive_data (data) {
+  $('#mediaSelectLoadingImg').css('display', 'none');
+  if (data.error !== undefined) {
+    let msg;
+    if (data.error == 'not_a_directory') {
+      msg = '[Error: "../' + data.base_path + '/media" exists, but it is not a directory.]';
+    } else if (data.error == 'does_not_exist') {
+      msg = '[Directory "../' + data.base_path + '/media" does not yet exist.]';
     } else {
-      const options = select_media_path(data["paths"], data["folders"], data["base_path"]);
-      $('#mediaselect select').empty();
-      for (let i = 0; i < options.length; i++) {
-        $('#mediaselect select').append(options[i]);
-      }
-      $('#mediaselect select').css("display", "inherit");
+      msg = '[Unknown error!]';
     }
+    $('#mediaSelectErrorMessage').text(msg);
+    $('#mediaSelectErrorMessage').css('display', 'inherit');
+  } else {
+    const options = select_media_path(data.paths, data.folders, data.base_path);
+    $('#mediaselect select').empty();
+    for (let i = 0; i < options.length; i++) {
+      $('#mediaselect select').append(options[i]);
+    }
+    $('#mediaselect select').css('display', 'inherit');
+  }
 }
 
 /**
  * Perform an AJAX query to retrieve and display the media files path.
  */
 function do_ajax_update_media_select (id) {
-  $('#mediaSelectErrorMessage').css("display", "none");
-  $('#mediaselect select').css("display", "none");
-  $('#mediaSelectLoadingImg').css("display", "inherit");
+  $('#mediaSelectErrorMessage').css('display', 'none');
+  $('#mediaselect select').css('display', 'none');
+  $('#mediaSelectLoadingImg').css('display', 'inherit');
   $.getJSON(
     'api.php/v1/media-files',
     {
@@ -1408,84 +802,82 @@ function do_ajax_update_subtitles () {
 
 /**
  * Prepare am HTML element that formats the sentences
- * 
- * @param {JSON}   sentences    A list of sentences to display. 
+ *
+ * @param {JSON}   sentences    A list of sentences to display.
  * @param {string} click_target The selector for the element that should change value on click
  * @returns {HTMLElement} A formatted group of sentences
  */
-function display_example_sentences(sentences, click_target)
-{
+function display_example_sentences (sentences, click_target) {
   let img, clickable, parentDiv;
-  const outElement = document.createElement("div");
+  const outElement = document.createElement('div');
   for (let i = 0; i < sentences.length; i++) {
     // Add the checbox
-    img = document.createElement("img");
-    img.src = "icn/tick-button.png";
-    img.title = "Choose";
+    img = document.createElement('img');
+    img.src = 'icn/tick-button.png';
+    img.title = 'Choose';
     // Clickable element
     clickable = document.createElement('span');
-    clickable.classList.add("click");
+    clickable.classList.add('click');
     // Doesn't feel the right way to do it
     clickable.setAttribute(
-      "onclick", 
-      "{" + click_target + ".value = '" + sentences[i][1].replaceAll("'", "\\'") + 
-      "';lwt_form_check.makeDirty();}"
+      'onclick',
+      '{' + click_target + ".value = '" + sentences[i][1].replaceAll("'", "\\'") +
+      "';lwtFormCheck.makeDirty();}"
     );
     clickable.appendChild(img);
     // Create parent
-    parentDiv = document.createElement("div");
+    parentDiv = document.createElement('div');
     parentDiv.appendChild(clickable);
-    parentDiv.innerHTML += "&nbsp; " + sentences[i][0];
+    parentDiv.innerHTML += '&nbsp; ' + sentences[i][0];
     // Add to the output
     outElement.appendChild(parentDiv);
   }
   return outElement;
 }
 
-
 /**
  * Prepare am HTML element that formats the sentences
- * 
- * @param {JSON}   sentences    A list of sentences to display. 
+ *
+ * @param {JSON}   sentences    A list of sentences to display.
  * @param {string} click_target The selector for the element that should change value on click
  * @returns {HTMLElement} A formatted group of sentences
  */
-function change_example_sentences_zone(sentences, ctl) {
-  $('#exsent-waiting').css("display", "none");
-  $('#exsent-sentences').css("display", "inherit");
+function change_example_sentences_zone (sentences, ctl) {
+  $('#exsent-waiting').css('display', 'none');
+  $('#exsent-sentences').css('display', 'inherit');
   const new_element = display_example_sentences(sentences, ctl);
   $('#exsent-sentences').append(new_element);
 }
 
 /**
  * Get and display the sentences containing specific word.
- * 
- * @param {int}    lang Language ID 
- * @param {string} word Term text (the looked for term) 
+ *
+ * @param {int}    lang Language ID
+ * @param {string} word Term text (the looked for term)
  * @param {string} ctl  Selector for the element to edit on click
  * @param {int}    woid Term id (word or multi-word)
  * @returns {undefined}
  */
 function do_ajax_show_sentences (lang, word, ctl, woid) {
-  $('#exsent-interactable').css("display", "none");
-  $('#exsent-waiting').css("display", "inherit");
+  $('#exsent-interactable').css('display', 'none');
+  $('#exsent-waiting').css('display', 'inherit');
 
   if (isInt(woid) && woid != -1) {
     $.getJSON(
       'api.php/v1/sentences-with-term/' + woid,
       {
-        lg_id: lang, 
+        lg_id: lang,
         word_lc: word
       },
       (data) => change_example_sentences_zone(data, ctl)
     );
   } else {
-    let query = { 
-      lg_id: lang, 
+    const query = {
+      lg_id: lang,
       word_lc: word
     };
     if (parseInt(woid, 10) == -1) {
-      query["advanced_search"] = true;
+      query.advanced_search = true;
     }
     $.getJSON(
       'api.php/v1/sentences-with-term',
@@ -1497,12 +889,12 @@ function do_ajax_show_sentences (lang, word, ctl, woid) {
 
 /**
  * Send an AJAX request to get similar terms to a term.
- * 
+ *
  * @param {number} lg_id Language ID
  * @param {string} word_text Text to match
  * @returns {JSON} Request used
  */
-function do_ajax_req_sim_terms(lg_id, word_text) {
+function do_ajax_req_sim_terms (lg_id, word_text) {
   return $.getJSON(
     'api.php/v1/similar-terms',
     {
@@ -1520,27 +912,27 @@ function do_ajax_show_similar_terms () {
   do_ajax_req_sim_terms(
     parseInt($('#langfield').val(), 10), $('#wordfield').val()
   )
-  .done(
-    function (data) {
-      $('#simwords').html(data.similar_terms);
-    }
-  ).fail(
-    function (data) {
-      console.log(data);
-    }
-  );
+    .done(
+      function (data) {
+        $('#simwords').html(data.similar_terms);
+      }
+    ).fail(
+      function (data) {
+        console.log(data);
+      }
+    );
 }
 
 /**
  * Update WORDCOUNTS in with an AJAX request.
- * 
+ *
  * @returns {undefined}
  */
 function do_ajax_word_counts () {
-  const t = $('.markcheck').map(function () { 
-    return $(this).val(); 
+  const t = $('.markcheck').map(function () {
+    return $(this).val();
   })
-  .get().join(',');
+    .get().join(',');
   $.getJSON(
     'api.php/v1/texts/statistics',
     {
@@ -1556,18 +948,18 @@ function do_ajax_word_counts () {
 
 /**
  * Set a unique item in barchart to reflect how many words are known.
- * 
+ *
  * @returns {undefined}
  */
-function set_barchart_item() {
+function set_barchart_item () {
   const id = $(this).find('span').first().attr('id').split('_')[2];
   /** @var {int} v Number of terms in the text */
   let v;
   if (SUW & 16) {
-    v = parseInt(WORDCOUNTS.expru[id] || 0, 10) + 
+    v = parseInt(WORDCOUNTS.expru[id] || 0, 10) +
     parseInt(WORDCOUNTS.totalu[id], 10);
   } else {
-    v = parseInt(WORDCOUNTS.expr[id] || 0, 10) + 
+    v = parseInt(WORDCOUNTS.expr[id] || 0, 10) +
     parseInt(WORDCOUNTS.total[id], 10);
   }
   $(this).children('li').each(function () {
@@ -1577,17 +969,17 @@ function set_barchart_item() {
     Linear version
 		const h = (v - $(this).children('span').text()) * 25 / v;
     */
-    /* 
+    /*
     Logarithmic version
     (25 / v) is vocab per pixel
     log scale so the size scaled becomes Math.log(($(this).children('span').text()))
-    so the total height corresponding to text vocab after scaling should be 
-    Math.log(v) the proportion of column height to box height is thus 
+    so the total height corresponding to text vocab after scaling should be
+    Math.log(v) the proportion of column height to box height is thus
     (Math.log(($(this).children('span').text())) / Math.log(v))
-    putting this back in pixel, we get 
-    (Math.log(($(this).children('span').text())) / Math.log(v)) * 25 
+    putting this back in pixel, we get
+    (Math.log(($(this).children('span').text())) / Math.log(v)) * 25
     should be the column height
-    so (25 - (Math.log(($(this).children('span').text())) / Math.log(v)) * 25) 
+    so (25 - (Math.log(($(this).children('span').text())) / Math.log(v)) * 25)
     is the intended border top size.
     */
     // Avoid to put 0 in logarithm
@@ -1600,7 +992,7 @@ function set_barchart_item() {
 
 /**
  * Set the number of words known in a text (in edit_texts.php main page).
- * 
+ *
  * @returns {undefined}
  */
 function set_word_counts () {
@@ -1613,13 +1005,11 @@ function set_word_counts () {
     }
     $('#total_' + key).html((SUW & 1 ? value : WORDCOUNTS.total[key]));
     $.each(WORDCOUNTS.statu[key], function (k, v) {
-      if (SUW & 8)
-        $('#stat_' + k + '_' + key).html(v); 
+      if (SUW & 8) { $('#stat_' + k + '_' + key).html(v); }
       knownu += parseInt(v);
     });
     $.each(WORDCOUNTS.stat[key], function (k, v) {
-      if (!(SUW & 8))
-        $('#stat_' + k + '_' + key).html(v); 
+      if (!(SUW & 8)) { $('#stat_' + k + '_' + key).html(v); }
       known += parseInt(v);
     });
     $('#saved_' + key).html(known ? ((SUW & 2 ? knownu : known) - expr + '+' + expr) : 0);
@@ -1652,9 +1042,9 @@ function set_word_counts () {
 }
 
 /**
- * Handle the click event to switch between total and 
+ * Handle the click event to switch between total and
  * unique words count in edit_texts.php.
- * 
+ *
  * @returns {undefined}
  */
 function word_count_click () {
@@ -1664,10 +1054,10 @@ function word_count_click () {
     } else {
       $(this).html('t');
     }
-    SUW = (parseInt($('#chart').attr('data_wo_cnt')) << 4) + 
-    (parseInt($('#unknownpercent').attr('data_wo_cnt')) << 3) + 
-    (parseInt($('#unknown').attr('data_wo_cnt')) << 2) + 
-    (parseInt($('#saved').attr('data_wo_cnt')) << 1) + 
+    SUW = (parseInt($('#chart').attr('data_wo_cnt')) << 4) +
+    (parseInt($('#unknownpercent').attr('data_wo_cnt')) << 3) +
+    (parseInt($('#unknown').attr('data_wo_cnt')) << 2) +
+    (parseInt($('#saved').attr('data_wo_cnt')) << 1) +
     (parseInt($('#total').attr('data_wo_cnt')));
     set_word_counts();
   });
@@ -1675,25 +1065,24 @@ function word_count_click () {
 
 /**
  * Create a radio button with a candidate choice for a term annotation.
- * 
- * @param {string} curr_trans Current anotation (translation) set for the term 
+ *
+ * @param {string} curr_trans Current anotation (translation) set for the term
  * @param {string} trans_data All the useful data for the term
  * @returns {string} An HTML-formatted option
  */
-function translation_radio(curr_trans, trans_data) 
-{
+function translation_radio (curr_trans, trans_data) {
   if (trans_data.wid === null) {
-    return "";
+    return '';
   }
   const trim_trans = curr_trans.trim();
   if (trim_trans == '*' || trim_trans == '') {
-    return "";
+    return '';
   }
   const set = trim_trans == trans_data.trans;
   const option = `<span class="nowrap">
-    <input class="impr-ann-radio" ` + 
+    <input class="impr-ann-radio" ` +
       (set ? 'checked="checked" ' : '') + 'type="radio" name="rg' +
-      trans_data.ann_index + `" value="` + escape_html_chars(trim_trans) + `" /> 
+      trans_data.ann_index + '" value="' + escape_html_chars(trim_trans) + `" /> 
           &nbsp; ` + escape_html_chars(trim_trans) + `
   </span>
   <br />`;
@@ -1702,18 +1091,17 @@ function translation_radio(curr_trans, trans_data)
 
 /**
  * When a term translation is edited, recreate it's annotations.
- * 
+ *
  * @param {Object} trans_data Useful data for this term
  * @param {int}    text_id    Text ID
  */
-function edit_term_ann_translations(trans_data, text_id)
-{
+function edit_term_ann_translations (trans_data, text_id) {
   const widset = trans_data.wid !== null;
   // First create a link to edit the word in a new window
   let edit_word_link;
   if (widset) {
     const req_arg = $.param({
-      fromAnn: "$(document).scrollTop()",
+      fromAnn: '$(document).scrollTop()',
       wid: trans_data.wid,
       ord: trans_data.term_ord,
       tid: text_id
@@ -1728,7 +1116,7 @@ function edit_term_ann_translations(trans_data, text_id)
   }
   $(`#editlink${trans_data.ann_index}`).html(edit_word_link);
   // Now edit translations (if necessary)
-  let translations_list = "";
+  let translations_list = '';
   trans_data.translations.forEach(
     function (candidate_trans) {
       translations_list += translation_radio(candidate_trans, trans_data);
@@ -1738,12 +1126,12 @@ function edit_term_ann_translations(trans_data, text_id)
   const select_last = trans_data.translations.length == 0;
   // Empty radio button and text field after the list of translations
   translations_list += `<span class="nowrap">
-  <input class="impr-ann-radio" type="radio" name="rg${trans_data.ann_index}" ` + 
+  <input class="impr-ann-radio" type="radio" name="rg${trans_data.ann_index}" ` +
   (select_last ? 'checked="checked" ' : '') + `value="" />
   &nbsp;
-  <input class="impr-ann-text" type="text" name="tx${trans_data.ann_index}` + 
+  <input class="impr-ann-text" type="text" name="tx${trans_data.ann_index}` +
     `" id="tx${trans_data.ann_index}" value="` +
-    (select_last ? escape_html_chars(curr_trans) : '') + 
+    (select_last ? escape_html_chars(curr_trans) : '') +
   `" maxlength="50" size="40" />
    &nbsp;
   <img class="click" src="icn/eraser.png" title="Erase Text Field" 
@@ -1756,19 +1144,19 @@ function edit_term_ann_translations(trans_data, text_id)
   &nbsp;`;
   // Add the "plus button" to add a translation
   if (widset) {
-    translations_list += 
+    translations_list +=
     `<img class="click" src="icn/plus-button.png" 
     title="Save another translation to existent term" 
     alt="Save another translation to existent term" 
     onclick="updateTermTranslation(${trans_data.wid}, ` +
-      `'#tx${trans_data.ann_index}');" />`; 
-  } else { 
-    translations_list += 
+      `'#tx${trans_data.ann_index}');" />`;
+  } else {
+    translations_list +=
     `<img class="click" src="icn/plus-button.png" 
     title="Save translation to new term" 
     alt="Save translation to new term" 
     onclick="addTermTranslation('#tx${trans_data.ann_index}',` +
-      `${trans_data.term_lc},${trans_data.lang_id});" />`; 
+      `${trans_data.term_lc},${trans_data.lang_id});" />`;
   }
   translations_list += `&nbsp;&nbsp;
   <span id="wait${trans_data.ann_index}">
@@ -1780,15 +1168,14 @@ function edit_term_ann_translations(trans_data, text_id)
 
 /**
  * Load the possible translations for a word.
- * 
- * @param {int}    pagepos Position to scroll to 
+ *
+ * @param {int}    pagepos Position to scroll to
  * @param {string} word    Word in lowercase to get annotations
  * @param {int}    term_id Term ID
- * 
+ *
  * @since 2.9.0 The new parameter $wid is now necessary
  */
-function do_ajax_edit_impr_text(pagepos, word, term_id) 
-{
+function do_ajax_edit_impr_text (pagepos, word, term_id) {
   // Special case, on empty word reload the main annotations form
   if (word == '') {
     $('#editimprtextdata').html('<img src="icn/waiting2.gif" />');
@@ -1800,12 +1187,12 @@ function do_ajax_edit_impr_text(pagepos, word, term_id)
   $.getJSON(
     'api.php/v1/terms/' + term_id + '/translations',
     {
-      text_id: textid, 
-      term_lc: word 
+      text_id: textid,
+      term_lc: word
     },
     function (data) {
-      if ("error" in data) {
-        alert(data["error"]);
+      if ('error' in data) {
+        alert(data.error);
       } else {
         edit_term_ann_translations(data, textid);
         $.scrollTo(pagepos);
@@ -1818,12 +1205,12 @@ function do_ajax_edit_impr_text(pagepos, word, term_id)
 
 /**
  * Show the right frames if found, and can load an URL in those frames
- * 
- * @param {string|undefined} roUrl Upper-right frame URL to laod 
+ *
+ * @param {string|undefined} roUrl Upper-right frame URL to laod
  * @param {string|undefined} ruUrl Lower-right frame URL to load
  * @returns {boolean} true if frames were found, false otherwise
  */
-function showRightFrames(roUrl, ruUrl) {
+function showRightFrames (roUrl, ruUrl) {
   if (roUrl !== undefined) {
     top.frames.ro.location.href = roUrl;
   }
@@ -1831,7 +1218,7 @@ function showRightFrames(roUrl, ruUrl) {
     top.frames.ru.location.href = ruUrl;
   }
   if ($('#frames-r').length) {
-    $('#frames-r').animate({right: '5px'});
+    $('#frames-r').animate({ right: '5px' });
     return true;
   }
   return false;
@@ -1839,12 +1226,12 @@ function showRightFrames(roUrl, ruUrl) {
 
 /**
  * Hide the right frames if found.
- * 
+ *
  * @returns {boolean} true if frames were found, false otherwise
  */
-function hideRightFrames() {
+function hideRightFrames () {
   if ($('#frames-r').length) {
-    $('#frames-r').animate({right: '-100%'});
+    $('#frames-r').animate({ right: '-100%' });
     return true;
   }
   return false;
@@ -1855,11 +1242,10 @@ function hideRightFrames() {
  *
  * Called from several places: insert_word_ignore.php,
  * set_word_status.php, delete_word.php, etc.
- * 
+ *
  * @returns {undefined}
  */
-function cleanupRightFrames() {
-
+function cleanupRightFrames () {
   // A very annoying hack to get right frames to hide correctly.
   // Calling hideRightFrames directly in window.parent.setTimeout
   // does  //not work* for some reason ... when called that way,
@@ -1870,7 +1256,7 @@ function cleanupRightFrames() {
   //
   // We have to use an anon function to ensure that the frames-r
   // gets resolved when the timeout fires.
-  const mytimeout = function() {
+  const mytimeout = function () {
     const rf = window.parent.document.getElementById('frames-r');
     rf.click();
   }
@@ -1880,13 +1266,12 @@ function cleanupRightFrames() {
   window.parent.setTimeout(window.parent.cClick, 100);
 }
 
-
 /**
  * Play the success sound.
- *  
+ *
  * @returns {object} Promise on the status of sound
  */
-function successSound() {
+function successSound () {
   document.getElementById('success_sound').pause();
   document.getElementById('failure_sound').pause();
   return document.getElementById('success_sound').play();
@@ -1897,7 +1282,7 @@ function successSound() {
  *
  * @returns {object} Promise on the status of sound
  */
-function failureSound() {
+function failureSound () {
   document.getElementById('success_sound').pause();
   document.getElementById('failure_sound').pause();
   return document.getElementById('failure_sound').play();
@@ -1906,36 +1291,36 @@ function failureSound() {
 const lwt = {
 
   /**
-   * Prepare the action so that a click switches between 
+   * Prepare the action so that a click switches between
    * unique word count and total word count.
-   * 
+   *
    * @returns {undefined}
    */
   prepare_word_count_click: function () {
     $('#total,#saved,#unknown,#chart,#unknownpercent')
-    .on('click', function( event ) {
-        $(this).attr('data_wo_cnt',parseInt($(this).attr('data_wo_cnt'))^1);
+      .on('click', function (event) {
+        $(this).attr('data_wo_cnt', parseInt($(this).attr('data_wo_cnt')) ^ 1);
         word_count_click();
         event.stopImmediatePropagation();
-    }).attr('title',"u: Unique Word Counts\nt: Total  Word  Counts");
+      }).attr('title', 'u: Unique Word Counts\nt: Total  Word  Counts');
     do_ajax_word_counts();
   },
 
   /**
    * Save the settings about unique/total words count.
-   * 
+   *
    * @returns {undefined}
    */
   save_text_word_count_settings: function () {
-      if (SUW == SHOWUNIQUE) {
-          return;
-      }
-      const a = $('#total').attr('data_wo_cnt') + 
-      $('#saved').attr('data_wo_cnt') + 
-      $('#unknown').attr('data_wo_cnt') + 
-      $('#unknownpercent').attr('data_wo_cnt') + 
+    if (SUW == SHOWUNIQUE) {
+      return;
+    }
+    const a = $('#total').attr('data_wo_cnt') +
+      $('#saved').attr('data_wo_cnt') +
+      $('#unknown').attr('data_wo_cnt') +
+      $('#unknownpercent').attr('data_wo_cnt') +
       $('#chart').attr('data_wo_cnt');
-      do_ajax_save_setting('set-show-text-word-counts', a);
+    do_ajax_save_setting('set-show-text-word-counts', a);
   }
 }
 
@@ -1959,9 +1344,9 @@ $.fn.serializeObject = function () {
 /**
  * Wrap the radio buttons into stylised elements.
  */
-function wrapRadioButtons() {
+function wrapRadioButtons () {
   $(
-    ':input,.wrap_checkbox span,.wrap_radio span,a:not([name^=rec]),select,' + 
+    ':input,.wrap_checkbox span,.wrap_radio span,a:not([name^=rec]),select,' +
     '#mediaselect span.click,#forwbutt,#backbutt'
   ).each(function (i) { $(this).attr('tabindex', i + 1); });
   $('.wrap_radio span').on('keydown', function (e) {
@@ -1975,7 +1360,7 @@ function wrapRadioButtons() {
 /**
  * Do a lot of different DOM manipulations
  */
-function prepareMainAreas() {
+function prepareMainAreas () {
   $('.edit_area').editable('inline_edit.php',
     {
       type: 'textarea',
@@ -2011,7 +1396,7 @@ function prepareMainAreas() {
       $(this).attr('id', 'cb_' + z++);
     }
     $(this).after(
-      '<label class="wrap_checkbox" for="' + $(this).attr('id') + 
+      '<label class="wrap_checkbox" for="' + $(this).attr('id') +
       '"><span></span></label>'
     );
   });
@@ -2022,7 +1407,7 @@ function prepareMainAreas() {
   });
   $(document).on('mouseup', function () {
     $('button,input[type=button],.wrap_radio span,.wrap_checkbox span')
-    .trigger('blur');
+      .trigger('blur');
   });
   $('.wrap_checkbox span').on('keydown', function (e) {
     if (e.keyCode == 32) {
@@ -2038,13 +1423,13 @@ function prepareMainAreas() {
       $(this).attr('id', 'rb_' + z++);
     }
     $(this).after(
-      '<label class="wrap_radio" for="' + $(this).attr('id') + 
+      '<label class="wrap_radio" for="' + $(this).attr('id') +
       '"><span></span></label>'
     );
   });
-  $('.button-file').on('click', function () { 
-    $(this).next('input[type="file"]').trigger('click'); 
-    return false; 
+  $('.button-file').on('click', function () {
+    $(this).next('input[type="file"]').trigger('click');
+    return false;
   });
   $('input.impr-ann-text').on('change', changeImprAnnText);
   $('input.impr-ann-radio').on('change', changeImprAnnRadio);
@@ -2054,13 +1439,13 @@ function prepareMainAreas() {
   $('textarea.textarea-noreturn').on('keydown', textareaKeydown);
   // Resizable from right frames
   $('#frames-r').resizable({
-    handles: "w",
+    handles: 'w',
     stop: function (_event, ui) {
       // Resize left frames
       $('#frames-l').css('width', ui.position.left - 20);
       // Save settings
       do_ajax_save_setting(
-        'set-text-l-framewidth-percent', 
+        'set-text-l-framewidth-percent',
         Math.round($('#frames-l').width() / $(window).width() * 100)
       );
     }
@@ -2086,9 +1471,9 @@ function prepareMainAreas() {
   markClick();
   setTheFocus();
   if (
-    $('#simwords').length > 0 && $('#langfield').length > 0 && 
+    $('#simwords').length > 0 && $('#langfield').length > 0 &&
     $('#wordfield').length > 0
-    ) {
+  ) {
   	$('#wordfield').on('blur', do_ajax_show_similar_terms);
   	do_ajax_show_similar_terms();
   }

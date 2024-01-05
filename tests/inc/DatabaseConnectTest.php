@@ -46,5 +46,13 @@ class DatabaseConnectTest extends TestCase
         );
     }
 
+    public function testPrefixSQLQuery()
+    {
+        $value = prefixSQLQuery("CREATE TABLE `languages` test;", "prefix");
+        $this->assertEquals("CREATE TABLE `prefixlanguages` test;", $value);
+        $value = prefixSQLQuery("ALTER TABLE languages test;", "prefix");
+        $this->assertEquals("ALTER TABLE prefixlanguages test;", $value);
+    }
+
 }
 ?>

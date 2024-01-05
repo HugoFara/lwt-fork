@@ -24,13 +24,13 @@ use MatthiasMullie\Minify;
 /**
  * @var string[] LWT_JS_FILES All the paths of JS files to be minified.
  * 
- * @since 2.10.0-fork Adds src/js/overlib_interface.js
+ * @since 2.10.0-fork Adds src/js/overlib_interface.js and src/js/text_events.js
  */
 define(
     'LWT_JS_FILES', 
     array(
         'src/js/audio_controller.js', 'src/js/third_party/countuptimer.js', 
-        'src/js/jq_feedwizard.js', 
+        'src/js/jq_feedwizard.js', 'src/js/text_events.js',
         'src/js/jq_pgm.js', 'src/js/overlib_interface.js', 'src/js/pgm.js', 
         'src/js/translation_api.js', 'src/js/unloadformcheck.js',
         'src/js/third_party/sorttable.js', 'src/js/user_interactions.js', 
