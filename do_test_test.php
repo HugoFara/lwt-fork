@@ -485,6 +485,15 @@ function do_test_prepare_ajax_test_area($selector, $selection, $count, $testtype
 
     ?>
     <script type="text/javascript">
+                window.onload = (event) => {
+            var utterancecheckbox = document.getElementById('utterance-allowed')
+
+            var utterancechecked = JSON.parse(localStorage.getItem('utterance-allowed'));
+            utterancecheckbox.checked = utterancechecked;
+            utterancecheckbox.addEventListener('change', function () {
+                localStorage.setItem('utterance-allowed', utterancecheckbox.checked);
+            });
+        };
         /**
          * Get a new word test.
          */
